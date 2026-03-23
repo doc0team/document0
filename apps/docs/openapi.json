@@ -1,0 +1,265 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "document0 Example API",
+    "version": "1.0.0",
+    "description": "A sample API to demonstrate OpenAPI integration with document0."
+  },
+  "servers": [
+    { "url": "https://api.example.com/v1" }
+  ],
+  "paths": {
+    "/docs": {
+      "get": {
+        "operationId": "listDocs",
+        "summary": "List documents",
+        "description": "Returns a paginated list of all documents in the workspace.",
+        "tags": ["Documents"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of items per page.",
+            "schema": { "type": "integer", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of documents.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string", "description": "Unique identifier." },
+                          "title": { "type": "string", "description": "Document title." },
+                          "slug": { "type": "string", "description": "URL-friendly slug." }
+                        },
+                        "required": ["id", "title", "slug"]
+                      }
+                    },
+                    "total": { "type": "integer", "description": "Total number of documents." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createDoc",
+        "summary": "Create a document",
+        "description": "Creates a new document in the workspace.",
+        "tags": ["Documents"],
+        "requestBody": {
+          "required": true,
+          "description": "The document to create.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "description": "Document title." },
+                  "content": { "type": "string", "description": "Markdown content." },
+                  "tags": { "type": "array", "items": { "type": "string" }, "description": "Tags for categorization." }
+                },
+                "required": ["title", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created document.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "title": { "type": "string" },
+                    "slug": { "type": "string" },
+                    "createdAt": { "type": "string", "description": "ISO 8601 timestamp." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "details": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/docs/{id}": {
+      "get": {
+        "operationId": "getDoc",
+        "summary": "Get a document",
+        "description": "Retrieves a single document by its ID.",
+        "tags": ["Documents"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The document ID.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested document.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "title": { "type": "string" },
+                    "slug": { "type": "string" },
+                    "content": { "type": "string" },
+                    "tags": { "type": "array", "items": { "type": "string" } },
+                    "createdAt": { "type": "string" },
+                    "updatedAt": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Document not found."
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateDoc",
+        "summary": "Update a document",
+        "description": "Updates an existing document.",
+        "tags": ["Documents"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The document ID.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string" },
+                  "tags": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated document."
+          },
+          "404": {
+            "description": "Document not found."
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteDoc",
+        "summary": "Delete a document",
+        "description": "Permanently deletes a document.",
+        "tags": ["Documents"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The document ID.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Document deleted successfully."
+          },
+          "404": {
+            "description": "Document not found."
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "operationId": "searchDocs",
+        "summary": "Search documents",
+        "description": "Full-text search across all documents using Orama.",
+        "tags": ["Search"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "The search query string.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum results to return.",
+            "schema": { "type": "integer", "default": 10 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": { "type": "string" },
+                      "url": { "type": "string" },
+                      "score": { "type": "number" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

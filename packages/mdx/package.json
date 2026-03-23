@@ -1,0 +1,67 @@
+{
+  "name": "@document0/mdx",
+  "version": "0.1.0",
+  "description": "document0 MDX processor - MDX compilation, frontmatter, remark/rehype plugins, and Shiki syntax highlighting",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./plugins": {
+      "types": "./dist/plugins/index.d.ts",
+      "import": "./dist/plugins/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@mdx-js/mdx": "^3.0.0",
+    "@shikijs/rehype": "^4.0.2",
+    "@types/hast": "^3.0.0",
+    "@types/mdast": "^4.0.0",
+    "gray-matter": "^4.0.3",
+    "hast-util-to-string": "^3.0.0",
+    "rehype-slug": "^6.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.0",
+    "shiki": "^1.0.0",
+    "unified": "^11.0.0",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.4.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "docs",
+    "headless",
+    "mdx",
+    "shiki",
+    "syntax-highlighting"
+  ],
+  "license": "MIT"
+}

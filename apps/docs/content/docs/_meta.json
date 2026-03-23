@@ -1,0 +1,16 @@
+{
+  "title": "document0",
+  "pages": [
+    "index",
+    "--- Getting Started",
+    "installation",
+    "quickstart",
+    "--- Packages",
+    "core",
+    "mdx",
+    "--- CLI",
+    "create",
+    "--- Guides",
+    "guides"
+  ]
+}

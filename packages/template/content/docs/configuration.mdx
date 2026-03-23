@@ -1,0 +1,83 @@
+---
+title: Configuration
+description: All configuration options for document0.
+---
+
+# Configuration
+
+## DocsSource
+
+```ts
+import { DocsSource } from "@document0/core";
+
+const source = new DocsSource({
+  rootDir: "./content/docs", // required
+  baseUrl: "/docs",          // default: "/docs"
+  extensions: [".md", ".mdx"] // default
+});
+```
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `rootDir` | `string` | — | Root directory to scan for content files |
+| `baseUrl` | `string` | `"/docs"` | URL prefix for all pages |
+| `extensions` | `string[]` | `[".md", ".mdx"]` | File extensions to include |
+
+## processMdx
+
+```ts
+import { processMdx } from "@document0/mdx";
+
+const { code, frontmatter, toc } = await processMdx(source, {
+  highlighter,        // Shiki highlighter instance
+  defaultLanguage: "plaintext",
+  remarkPlugins: [],  // extra remark plugins
+  rehypePlugins: [],  // extra rehype plugins
+  jsxRuntime: "automatic",
+});
+```
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `highlighter` | `HighlighterGeneric` | — | Shiki highlighter. Omit to skip code highlighting |
+| `defaultLanguage` | `string` | `"plaintext"` | Fallback language for unlabelled code blocks |
+| `remarkPlugins` | `Plugin[]` | `[]` | Additional remark plugins |
+| `rehypePlugins` | `Plugin[]` | `[]` | Additional rehype plugins |
+| `jsxRuntime` | `"automatic" \| "classic"` | `"automatic"` | JSX runtime to use |
+
+## \_meta.json
+
+Place a `_meta.json` file in any content directory to control the page tree for that directory.
+
+```json
+{
+  "title": "Guides",
+  "pages": [
+    "introduction",
+    "---",
+    "--- Advanced",
+    "configuration",
+    "deployment"
+  ],
+  "defaultOpen": true,
+  "icon": "📖"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `title` | `string` | Display name for the folder node |
+| `pages` | `string[]` | Ordered list of page slugs. Use `"---"` for a separator, `"--- Label"` for a labelled separator |
+| `defaultOpen` | `boolean` | Whether the folder is expanded by default |
+| `icon` | `string` | Icon to show next to the folder name |
+
+## Frontmatter fields
+
+```yaml
+---
+title: My Page        # required — used in page tree and <title>
+description: ...      # used in search index and <meta description>
+icon: 🚀              # shown in sidebar next to page name
+full: true            # hint to your layout to use full width
+---
+```

@@ -1,0 +1,91 @@
+---
+title: create-document0
+description: CLI tool to scaffold a new document0 project in seconds.
+---
+
+# create-document0
+
+The `create-document0` CLI scaffolds a complete, working docs site based on the document0 template.
+
+## Usage
+
+```bash
+npx create-document0 my-docs
+```
+
+```bash
+pnpm dlx create-document0 my-docs
+```
+
+```bash
+bunx create-document0 my-docs
+```
+
+If you omit the project name, the CLI will prompt you for one.
+
+## What gets scaffolded
+
+```
+my-docs/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx                     ← redirects to /docs
+│   └── docs/
+│       ├── layout.tsx               ← sidebar + main layout
+│       └── [[...slug]]/
+│           └── page.tsx             ← MDX rendering page
+├── components/
+│   ├── sidebar.tsx
+│   ├── breadcrumbs.tsx
+│   ├── page-navigation.tsx
+│   ├── table-of-contents.tsx
+│   └── mdx-components.tsx
+├── content/
+│   └── docs/
+│       ├── _meta.json
+│       ├── index.mdx
+│       ├── installation.mdx
+│       ├── configuration.mdx
+│       └── guides/
+│           └── index.mdx
+├── lib/
+│   ├── source.ts
+│   ├── highlighter.ts
+│   └── utils.ts
+├── next.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+The scaffolded site is intentionally unstyled — it uses inline styles as a baseline so you can see the structure and replace everything with your own design system.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--no-install` | Skip installing dependencies |
+
+## Package manager detection
+
+The CLI detects your package manager from `npm_config_user_agent` and uses it automatically:
+
+```bash
+pnpm dlx create-document0 my-docs   # uses pnpm install
+yarn dlx create-document0 my-docs   # uses yarn
+bunx create-document0 my-docs       # uses bun install
+npx create-document0 my-docs        # uses npm install
+```
+
+## After scaffolding
+
+```bash
+cd my-docs
+pnpm dev
+```
+
+Open [http://localhost:3000/docs](http://localhost:3000/docs) to see your site.
+
+From there:
+1. Replace the inline styles in `components/` with your design system
+2. Edit `content/docs/` with your actual documentation
+3. Update `_meta.json` files to control page ordering

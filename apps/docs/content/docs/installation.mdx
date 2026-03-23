@@ -1,0 +1,73 @@
+---
+title: Installation
+description: Install document0 in your project.
+---
+
+# Installation
+
+<Callout>
+**Zero UI.** document0 is a headless documentation engine — it handles content sourcing, MDX processing, search, and navigation but ships with no UI components. You bring your own design system and have complete control over every pixel.
+</Callout>
+
+## Requirements
+
+- Node.js 18 or later
+- React 18 or later (React 19 recommended)
+
+## Install the packages
+
+<CodeTabs labels={["npm", "pnpm", "yarn", "bun"]}>
+
+```bash
+npm install @document0/core @document0/mdx
+```
+
+```bash
+pnpm add @document0/core @document0/mdx
+```
+
+```bash
+yarn add @document0/core @document0/mdx
+```
+
+```bash
+bun add @document0/core @document0/mdx
+```
+
+</CodeTabs>
+
+## Peer dependencies
+
+You'll also need these peer dependencies depending on your setup:
+
+<CodeTabs labels={["npm", "pnpm", "yarn", "bun"]}>
+
+```bash
+npm install shiki @mdx-js/mdx react react-dom
+```
+
+```bash
+pnpm add shiki @mdx-js/mdx react react-dom
+```
+
+```bash
+yarn add shiki @mdx-js/mdx react react-dom
+```
+
+```bash
+bun add shiki @mdx-js/mdx react react-dom
+```
+
+</CodeTabs>
+
+| Package | Purpose |
+|---|---|
+| `shiki` | Syntax highlighting for code blocks |
+| `@mdx-js/mdx` | Compiling MDX at runtime |
+| `react` / `react-dom` | Rendering compiled MDX |
+
+## Framework setup
+
+document0 works with any Node.js framework. The [Quickstart](/docs/quickstart) guide walks through a complete Next.js setup.
+
+For other frameworks, use `DocsSource` and `processMdx` directly — they have no framework dependencies.

@@ -1,0 +1,153 @@
+---
+title: "@document0/mdx"
+description: MDX compilation, frontmatter extraction, remark/rehype plugins, and Shiki syntax highlighting.
+---
+
+# @document0/mdx
+
+The MDX package compiles your `.mdx` files into executable JavaScript, extracts frontmatter, and runs Shiki over code blocks — all in one call.
+
+## processMdx
+
+```ts
+import { processMdx } from "@document0/mdx";
+
+const { code, frontmatter, toc } = await processMdx(source, options);
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `source` | `string` | Raw MDX/Markdown source content |
+| `options` | `ProcessMdxOptions` | Processing options (see below) |
+
+### Options
+
+```ts
+interface ProcessMdxOptions {
+  highlighter?: HighlighterGeneric<BundledLanguage, BundledTheme>;
+  defaultLanguage?: string;       // default: "plaintext"
+  theme?: string;                 // default: "github-dark"
+  remarkPlugins?: PluggableList;
+  rehypePlugins?: PluggableList;
+  jsxRuntime?: "automatic" | "classic"; // default: "automatic"
+}
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `highlighter` | — | Shiki highlighter instance. Omit to skip syntax highlighting |
+| `defaultLanguage` | `"plaintext"` | Language used for code blocks with no language specified |
+| `theme` | `"github-dark"` | Shiki theme name |
+| `remarkPlugins` | `[]` | Additional remark plugins to run |
+| `rehypePlugins` | `[]` | Additional rehype plugins to run |
+| `jsxRuntime` | `"automatic"` | JSX runtime mode passed to `@mdx-js/mdx` |
+
+### Return value
+
+```ts
+interface ProcessMdxResult {
+  code: string;          // compiled JS — pass to @mdx-js/mdx run()
+  frontmatter: Record<string, unknown>;
+  toc: TocEntry[];
+}
+```
+
+### TocEntry
+
+```ts
+interface TocEntry {
+  id: string;    // heading anchor id (auto-generated from text)
+  text: string;  // heading text content
+  depth: number; // 1–6
+}
+```
+
+---
+
+## Built-in plugins
+
+### remarkToc
+
+Extracts headings into `toc` without modifying the document tree.
+
+### rehypeShiki
+
+Replaces fenced code blocks with Shiki-highlighted hast output. Uses `codeToHast` internally so the result is proper hast nodes — compatible with `@mdx-js/mdx`'s JSX runtime.
+
+Language is read from the code fence tag:
+
+````md
+```typescript
+const x: number = 1;
+```
+````
+
+---
+
+## Setting up Shiki
+
+Create the highlighter once and reuse it across requests (it's expensive to initialise):
+
+```ts
+import { createHighlighter } from "shiki";
+
+let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
+
+export async function getHighlighter() {
+  if (highlighter) return highlighter;
+  highlighter = await createHighlighter({
+    themes: ["github-dark", "github-light"],
+    langs: ["typescript", "javascript", "bash", "json", "css"],
+  });
+  return highlighter;
+}
+```
+
+Then pass it to `processMdx`:
+
+```ts
+const highlighter = await getHighlighter();
+const { code, toc } = await processMdx(raw, { highlighter, theme: "github-dark" });
+```
+
+---
+
+## Running compiled MDX
+
+The `code` returned by `processMdx` is a compiled JS module. Use `@mdx-js/mdx`'s `run` to execute it:
+
+```ts
+import { run } from "@mdx-js/mdx";
+import * as runtime from "react/jsx-runtime";
+
+const { default: MDXContent } = await run(code, {
+  ...(runtime as object),
+  baseUrl: import.meta.url,
+});
+
+// Render it — pass your component overrides
+<MDXContent components={myComponents} />
+```
+
+---
+
+## Custom MDX components
+
+Pass a `components` object to override any HTML element:
+
+```tsx
+const components = {
+  h2: ({ children, id }) => (
+    <h2 id={id} className="text-2xl font-bold mt-10 mb-4 text-white">
+      {children}
+    </h2>
+  ),
+  pre: ({ children }) => (
+    <pre className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 overflow-x-auto">
+      {children}
+    </pre>
+  ),
+};
+```

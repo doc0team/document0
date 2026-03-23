@@ -1,0 +1,198 @@
+---
+title: "@document0/core"
+description: File-system source scanning, page trees, navigation utilities, and search indexing.
+---
+
+# @document0/core
+
+The core package handles everything related to reading your content from disk and building the data structures your UI needs.
+
+## DocsSource
+
+The main entry point. Scans a directory for `.md` and `.mdx` files and produces typed `PageData` objects.
+
+```ts
+import { DocsSource } from "@document0/core";
+
+const source = new DocsSource({
+  rootDir: "./content/docs", // required — absolute or relative path
+  baseUrl: "/docs",          // default: "/docs"
+  extensions: [".md", ".mdx"], // default
+});
+```
+
+### Methods
+
+#### `getPages()`
+
+Returns all pages as a flat array of `PageData`.
+
+```ts
+const pages = source.getPages();
+// PageData[]
+```
+
+#### `getPage(slug)`
+
+Looks up a single page by its slug string (e.g. `"guides/installation"`).
+
+```ts
+const page = source.getPage("installation");
+// PageData | undefined
+```
+
+### PageData
+
+```ts
+interface PageData {
+  slug: string;           // e.g. "guides/installation"
+  slugs: string[];        // e.g. ["guides", "installation"]
+  url: string;            // e.g. "/docs/guides/installation"
+  filePath: string;       // absolute path to the .mdx file
+  frontmatter: {
+    title: string;
+    description?: string;
+    icon?: string;
+    full?: boolean;
+    [key: string]: unknown;
+  };
+}
+```
+
+---
+
+## buildPageTree
+
+Converts a flat `PageData[]` into a nested tree for sidebar rendering. Respects `_meta.json` ordering.
+
+```ts
+import { buildPageTree } from "@document0/core";
+
+const tree = buildPageTree(source.getPages(), rootDir);
+// TreeNode[]
+```
+
+### TreeNode
+
+```ts
+type TreeNode = PageNode | FolderNode | SeparatorNode;
+
+interface PageNode {
+  type: "page";
+  name: string;
+  url: string;
+  icon?: string;
+}
+
+interface FolderNode {
+  type: "folder";
+  name: string;
+  icon?: string;
+  defaultOpen: boolean;
+  index: PageNode | null;   // index.mdx inside this folder
+  children: TreeNode[];
+}
+
+interface SeparatorNode {
+  type: "separator";
+  name?: string;            // label, or undefined for an unlabelled divider
+}
+```
+
+### \_meta.json
+
+Place a `_meta.json` file in any content directory to control ordering and labels.
+
+```json
+{
+  "title": "Guides",
+  "pages": [
+    "index",
+    "--- Getting Started",
+    "installation",
+    "---",
+    "advanced"
+  ],
+  "defaultOpen": true,
+  "icon": "📖"
+}
+```
+
+- Strings starting with `"--- "` become labelled separators
+- `"---"` alone becomes an unlabelled divider
+- Pages not listed are appended alphabetically
+
+---
+
+## Navigation utilities
+
+### getBreadcrumbs
+
+Returns the breadcrumb trail from the root to the current page.
+
+```ts
+import { getBreadcrumbs } from "@document0/core";
+
+const crumbs = getBreadcrumbs(tree, "/docs/guides/installation");
+// BreadcrumbItem[]
+```
+
+```ts
+interface BreadcrumbItem {
+  name: string;
+  url?: string;  // undefined for the current (last) item
+}
+```
+
+### getPageNeighbours
+
+Returns the previous and next pages in document order.
+
+```ts
+import { getPageNeighbours } from "@document0/core";
+
+const { previous, next } = getPageNeighbours(tree, "/docs/installation");
+// { previous: PageNode | null, next: PageNode | null }
+```
+
+### isActiveOrAncestor
+
+Returns `true` if a tree node is the active page or an ancestor of it — useful for expanding folders in a sidebar.
+
+```ts
+import { isActiveOrAncestor } from "@document0/core";
+
+const open = isActiveOrAncestor(folderNode, currentUrl);
+```
+
+---
+
+## Search
+
+### buildSearchIndex
+
+Produces a lightweight search index from your pages' frontmatter.
+
+```ts
+import { buildSearchIndex } from "@document0/core";
+
+const index = buildSearchIndex(source.getPages());
+```
+
+### search
+
+Searches the index by query string.
+
+```ts
+import { search } from "@document0/core";
+
+const results = search(index, "installation");
+// SearchResult[]
+```
+
+```ts
+interface SearchResult {
+  page: PageData;
+  score: number;
+}
+```

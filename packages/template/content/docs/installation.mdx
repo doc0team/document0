@@ -1,0 +1,81 @@
+---
+title: Installation
+description: How to install and set up document0 in your project.
+---
+
+# Installation
+
+## Requirements
+
+- Node.js 18 or later
+- React 18 or later
+
+## Install
+
+```bash
+npm install @document0/core @document0/mdx
+```
+
+Or with your preferred package manager:
+
+```bash
+pnpm add @document0/core @document0/mdx
+yarn add @document0/core @document0/mdx
+bun add @document0/core @document0/mdx
+```
+
+## Quick setup with Next.js
+
+### 1. Install Next.js dependencies
+
+```bash
+npm install next react react-dom @mdx-js/mdx shiki
+```
+
+### 2. Create your content directory
+
+```bash
+mkdir -p content/docs
+```
+
+### 3. Set up your source
+
+Create `lib/source.ts`:
+
+```ts
+import path from "node:path";
+import { DocsSource, buildPageTree } from "@document0/core";
+
+const rootDir = path.join(process.cwd(), "content/docs");
+
+export const source = new DocsSource({ rootDir, baseUrl: "/docs" });
+
+export function getPageTree() {
+  return buildPageTree(source.getPages(), rootDir);
+}
+```
+
+### 4. Set up the Shiki highlighter
+
+Create `lib/highlighter.ts`:
+
+```ts
+import { createHighlighter } from "shiki";
+
+let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
+
+export async function getHighlighter() {
+  if (highlighter) return highlighter;
+  highlighter = await createHighlighter({
+    themes: ["github-dark"],
+    langs: ["typescript", "javascript", "bash", "json"],
+  });
+  return highlighter;
+}
+```
+
+### 5. Create your dynamic page
+
+Create `app/docs/[[...slug]]/page.tsx` and use `processMdx` to compile content on the server.
+
+See the [Configuration](/docs/configuration) page for all available options.

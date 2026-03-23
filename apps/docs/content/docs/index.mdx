@@ -1,0 +1,43 @@
+---
+title: Introduction
+description: document0 is a file-system based documentation framework with zero UI assumptions.
+---
+
+# Introduction
+
+**document0** is an open-source documentation framework that gives you all the hard parts — file-system scanning, page trees, MDX processing, and Shiki syntax highlighting — while making zero decisions about your UI.
+
+Build your docs site with any styling system you like. Ship exactly the design you want.
+
+## Why document0?
+
+Most documentation frameworks force you into their component library, their design tokens, and their CSS. Customising them means fighting the framework. document0 takes the opposite approach: it handles the data and processing layer completely, and hands you typed data structures you can render any way you want.
+
+## Packages
+
+document0 ships two packages:
+
+| Package | Description |
+|---|---|
+| `@document0/core` | File-system source scanning, page tree building, navigation utilities, search indexing |
+| `@document0/mdx` | MDX compilation, frontmatter extraction, remark/rehype plugins, Shiki highlighting |
+
+## Quick example
+
+```ts
+import { DocsSource, buildPageTree } from "@document0/core";
+import { processMdx } from "@document0/mdx";
+import { createHighlighter } from "shiki";
+
+const source = new DocsSource({ rootDir: "./content/docs", baseUrl: "/docs" });
+const pages = source.getPages();
+const tree = buildPageTree(pages, "./content/docs");
+
+const highlighter = await createHighlighter({ themes: ["github-dark"], langs: ["typescript"] });
+const { code, frontmatter, toc } = await processMdx(rawMdx, { highlighter });
+```
+
+## Next steps
+
+- [Installation](/docs/installation) — install the packages
+- [Quickstart](/docs/quickstart) — build your first docs site in 5 minutes
