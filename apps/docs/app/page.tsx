@@ -9,8 +9,18 @@ import { Selectable } from "@/components/selectable";
 
 export default function Home() {
   const [sel, setSel] = useState<string | null>("design");
+  const [resetTrigger, setResetTrigger] = useState(0);
+  const [dirtyCount, setDirtyCount] = useState(0);
   const select = useCallback((id: string) => setSel(id), []);
   const deselect = useCallback(() => setSel(null), []);
+  const reset = useCallback(() => {
+    setResetTrigger((t) => t + 1);
+    setSel(null);
+  }, []);
+  const onDirtyChange = useCallback((dirty: boolean) => {
+    setDirtyCount((c) => c + (dirty ? 1 : -1));
+  }, []);
+  const hasDirty = dirtyCount > 0;
 
   return (
     <div className="bg-[#0a0a0a]">
@@ -32,6 +42,27 @@ export default function Home() {
             >
               document0
             </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                reset();
+              }}
+              className={`group flex items-center gap-1.5 rounded-full border border-zinc-700/60 bg-zinc-900/60 backdrop-blur-sm px-3.5 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:border-zinc-500 transition-all duration-300 ${hasDirty ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}
+            >
+              <svg
+                className="h-3 w-3 transition-transform duration-300 group-hover:-rotate-180"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3 12a9 9 0 1 1 3 6.7" />
+                <path d="M3 22v-6h6" />
+              </svg>
+              Reset
+            </button>
             <div className="flex items-center gap-4">
               <Link
                 href="/docs"
@@ -50,35 +81,38 @@ export default function Home() {
             </div>
           </nav>
 
-          {/* Hero */}
+          {/* Hero + Features */}
+          <div className="flex-1 flex flex-col">
           <div className="flex-1 flex flex-col items-center justify-center px-6">
             {/* Logo */}
-            <Selectable selected={sel === "logo"} onSelect={() => select("logo")}>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.05 }}
-                className="mb-10"
-              >
-                <PixelLogo size={120} interactive={sel !== "logo"} />
-              </motion.div>
-            </Selectable>
+            <div className="mb-10">
+              <Selectable selected={sel === "logo"} onSelect={() => select("logo")} resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.05 }}
+                >
+                  <PixelLogo size={120} interactive={sel !== "logo"} />
+                </motion.div>
+              </Selectable>
+            </div>
 
             {/* Centered content */}
             <div className="flex flex-col items-center text-center max-w-2xl">
               {/* Badge */}
-              <Selectable selected={sel === "badge"} onSelect={() => select("badge")}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                  className="mb-5"
-                >
-                  <span className="inline-flex items-center rounded-full border border-zinc-700/60 bg-zinc-900/60 backdrop-blur-sm px-3.5 py-1 text-xs font-medium text-zinc-300 shadow-sm">
-                    Open Source
-                  </span>
-                </motion.div>
-              </Selectable>
+              <div className="mb-5">
+                <Selectable selected={sel === "badge"} onSelect={() => select("badge")} resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                  >
+                    <span className="inline-flex items-center rounded-full border border-zinc-700/60 bg-zinc-900/60 backdrop-blur-sm px-3.5 py-1 text-xs font-medium text-zinc-300 shadow-sm">
+                      Open Source
+                    </span>
+                  </motion.div>
+                </Selectable>
+              </div>
 
               {/* Headline */}
               <motion.h1
@@ -87,30 +121,32 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1]"
               >
-                <Selectable selected={sel === "you"} onSelect={() => select("you")} inline>
+                <Selectable selected={sel === "you"} onSelect={() => select("you")} inline resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
                   You
                 </Selectable>{" "}
-                <Selectable selected={sel === "design"} onSelect={() => select("design")} inline>
+                <Selectable selected={sel === "design"} onSelect={() => select("design")} inline resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
                   design.
                 </Selectable>
                 <br />
-                <Selectable selected={sel === "subtitle"} onSelect={() => select("subtitle")} inline>
+                <Selectable selected={sel === "subtitle"} onSelect={() => select("subtitle")} inline resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
                   <span className="text-zinc-500">We handle the rest.</span>
                 </Selectable>
               </motion.h1>
 
               {/* Description */}
-              <Selectable selected={sel === "desc"} onSelect={() => select("desc")}>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.35 }}
-                  className="mt-6 text-base md:text-lg leading-relaxed text-zinc-400 max-w-lg"
-                >
-                  File-system source, page trees, MDX, search, and syntax
-                  highlighting — zero UI lock-in. Same content, any look.
-                </motion.p>
-              </Selectable>
+              <div className="mt-6">
+                <Selectable selected={sel === "desc"} onSelect={() => select("desc")} resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.35 }}
+                    className="text-base md:text-lg leading-relaxed text-zinc-400 max-w-lg"
+                  >
+                    File-system source, page trees, MDX, search, and syntax
+                    highlighting — zero UI lock-in. Same content, any look.
+                  </motion.p>
+                </Selectable>
+              </div>
 
               {/* CTAs — not selectable per user request */}
               <motion.div
@@ -156,24 +192,25 @@ export default function Home() {
               </motion.div>
 
               {/* Install snippet */}
-              <Selectable selected={sel === "install"} onSelect={() => select("install")}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.65 }}
-                  className="mt-6"
-                >
-                  <div className="inline-flex items-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900/60 backdrop-blur-sm px-4 py-2.5 font-mono text-sm text-zinc-300 shadow-sm">
-                    <span className="text-zinc-500 select-none">$</span>
-                    <span>pnpm add @document0/core</span>
-                  </div>
-                </motion.div>
-              </Selectable>
+              <div className="mt-6">
+                <Selectable selected={sel === "install"} onSelect={() => select("install")} resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.65 }}
+                  >
+                    <div className="inline-flex items-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900/60 backdrop-blur-sm px-4 py-2.5 font-mono text-sm text-zinc-300 shadow-sm">
+                      <span className="text-zinc-500 select-none">$</span>
+                      <span>pnpm add @document0/core</span>
+                    </div>
+                  </motion.div>
+                </Selectable>
+              </div>
             </div>
           </div>
 
           {/* Features row */}
-          <Selectable selected={sel === "features"} onSelect={() => select("features")}>
+          <Selectable selected={sel === "features"} onSelect={() => select("features")} resetTrigger={resetTrigger} onDirtyChange={onDirtyChange}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -219,6 +256,7 @@ export default function Home() {
               </div>
             </motion.div>
           </Selectable>
+          </div>
         </div>
       </div>
 
