@@ -5,14 +5,14 @@ let ctx: AudioContext | null = null;
 let toneInitializing = false;
 let tickSynth: any = null;
 
-function getCtx() {
-  if (!ctx) ctx = new AudioContext();
+function getCtx(): AudioContext | null {
+  if (!ctx && typeof window !== "undefined") ctx = new AudioContext();
   return ctx;
 }
 
 async function loadPopBuffer() {
   const ac = getCtx();
-  if (popBuffer) return;
+  if (!ac || popBuffer) return;
   try {
     const res = await fetch("/ui-pop.mp3");
     const buf = await res.arrayBuffer();
@@ -42,12 +42,13 @@ async function initTone() {
   }
 }
 
-loadPopBuffer();
+if (typeof window !== "undefined") loadPopBuffer();
 
 export function playPop() {
   initTone();
   try {
     const ac = getCtx();
+    if (!ac) return;
     if (ac.state === "suspended") ac.resume();
     if (!popBuffer) {
       loadPopBuffer();

@@ -6,12 +6,13 @@
   "bin": {
     "create-document0": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": ["dist", "template"],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "copy-template": "node -e \"const fs=require('fs');fs.cpSync('../template','.\/template',{recursive:true,filter:(s)=>!s.includes('node_modules')&&!s.includes('.next')&&!s.includes('.turbo')})\"",
+    "build": "tsc -p tsconfig.json && npm run copy-template",
     "dev": "tsc -p tsconfig.json --watch",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist template"
   },
   "dependencies": {
     "kleur": "^4.1.5",
@@ -23,6 +24,6 @@
     "rimraf": "^5.0.0",
     "typescript": "^5.4.0"
   },
-  "keywords": ["docs", "headless", "documentation", "create"],
+  "keywords": ["docs", "document0", "documentation", "nextjs", "shadcn", "create", "scaffold"],
   "license": "MIT"
 }

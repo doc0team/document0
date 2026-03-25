@@ -64,12 +64,12 @@ function SchemaView({ schema, depth = 0 }: { schema: Record<string, unknown>; de
                   <span className="text-[10px] font-medium text-red-400">required</span>
                 )}
               </div>
-              {prop.description && (
+              {typeof prop.description === "string" && (
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  {prop.description as string}
+                  {prop.description}
                 </p>
               )}
-              {propType === "object" && prop.properties && (
+              {propType === "object" && typeof prop.properties === "object" && prop.properties !== null && (
                 <SchemaView schema={prop} depth={depth + 1} />
               )}
             </div>
