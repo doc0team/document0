@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "next build",
+    "build": "cd ../../packages/core && pnpm run build && cd ../mdx && pnpm run build && cd ../../apps/docs && next build",
     "start": "next start --port 3001"
   },
   "dependencies": {
