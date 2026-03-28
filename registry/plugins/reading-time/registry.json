@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "tags": ["reading-time", "word-count", "metadata"],
   "category": "core",
+  "frameworks": ["any"],
   "files": ["index.ts"],
   "dependencies": {},
   "registryDependencies": [],

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+
+type Framework = "any" | "react" | "next" | "astro" | "vue" | "solid" | "svelte";
 
 interface PluginInfo {
   name: string;
@@ -9,6 +12,7 @@ interface PluginInfo {
   version: string;
   tags: string[];
   category: "mdx" | "core";
+  frameworks: readonly Framework[];
   install: string;
 }
 
@@ -24,6 +28,39 @@ function CategoryBadge({ category }: { category: "mdx" | "core" }) {
     >
       {category}
     </span>
+  );
+}
+
+function FrameworkBadges({ frameworks }: { frameworks: readonly Framework[] }) {
+  if (frameworks.includes("any")) {
+    return (
+      <span className="text-[11px] text-zinc-500">
+        Works with any framework
+      </span>
+    );
+  }
+
+  const labels: Record<Framework, string> = {
+    any: "Any",
+    react: "React",
+    next: "Next.js",
+    astro: "Astro",
+    vue: "Vue",
+    solid: "Solid",
+    svelte: "Svelte",
+  };
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {frameworks.map((fw) => (
+        <span
+          key={fw}
+          className="rounded bg-zinc-800/80 px-1.5 py-0.5 text-[10px] text-zinc-500"
+        >
+          {labels[fw]}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -89,7 +126,11 @@ function PluginCard({ plugin }: { plugin: PluginInfo }) {
         {plugin.description}
       </p>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
+      <div className="mt-3">
+        <FrameworkBadges frameworks={plugin.frameworks} />
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
         {plugin.tags.map((tag) => (
           <span
             key={tag}
@@ -114,11 +155,24 @@ function PluginCard({ plugin }: { plugin: PluginInfo }) {
 }
 
 export function PluginGrid({ plugins }: { plugins: PluginInfo[] }) {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") as "all" | "mdx" | "core" | null;
+
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<"all" | "mdx" | "core">("all");
+  const [category, setCategory] = useState<"all" | "mdx" | "core">(
+    initialCategory && ["mdx", "core"].includes(initialCategory)
+      ? initialCategory
+      : "all"
+  );
+  const [framework, setFramework] = useState<"all" | Framework>("all");
 
   const filtered = plugins.filter((p) => {
     if (category !== "all" && p.category !== category) return false;
+    if (framework !== "all") {
+      if (!p.frameworks.includes("any") && !p.frameworks.includes(framework)) {
+        return false;
+      }
+    }
     if (!query) return true;
     const q = query.toLowerCase();
     return (
@@ -149,9 +203,10 @@ export function PluginGrid({ plugins }: { plugins: PluginInfo[] }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search plugins..."
-            className="h-9 w-64 rounded-lg border border-zinc-800 bg-zinc-900/60 pl-9 pr-3 text-sm text-zinc-300 placeholder:text-zinc-600 focus:border-zinc-700 focus:outline-none"
+            className="h-9 w-56 rounded-lg border border-zinc-800 bg-zinc-900/60 pl-9 pr-3 text-sm text-zinc-300 placeholder:text-zinc-600 focus:border-zinc-700 focus:outline-none"
           />
         </div>
+
         <div className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/60 p-0.5">
           {(["all", "mdx", "core"] as const).map((c) => (
             <button
@@ -168,14 +223,28 @@ export function PluginGrid({ plugins }: { plugins: PluginInfo[] }) {
             </button>
           ))}
         </div>
+
+        <select
+          value={framework}
+          onChange={(e) => setFramework(e.target.value as typeof framework)}
+          className="h-9 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 text-sm text-zinc-400 focus:border-zinc-700 focus:outline-none appearance-none cursor-pointer"
+        >
+          <option value="all">All Frameworks</option>
+          <option value="react">React</option>
+          <option value="next">Next.js</option>
+          <option value="astro">Astro</option>
+          <option value="vue">Vue</option>
+          <option value="solid">Solid</option>
+          <option value="svelte">Svelte</option>
+        </select>
       </div>
 
       {filtered.length === 0 ? (
         <div className="py-16 text-center text-sm text-zinc-600">
-          No plugins match your search.
+          No plugins match your filters.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {filtered.map((plugin) => (
             <PluginCard key={plugin.name} plugin={plugin} />
           ))}

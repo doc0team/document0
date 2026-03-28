@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "tags": ["graph", "backlinks", "broken-links", "navigation"],
   "category": "core",
+  "frameworks": ["any"],
   "files": ["index.ts"],
   "dependencies": {},
   "registryDependencies": [],

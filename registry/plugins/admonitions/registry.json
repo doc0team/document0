@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "tags": ["remark", "mdx", "callouts", "markdown"],
   "category": "mdx",
+  "frameworks": ["react", "next", "astro", "vue", "solid", "svelte"],
   "files": ["index.ts"],
   "dependencies": {
     "unist-util-visit": "^5.0.0"

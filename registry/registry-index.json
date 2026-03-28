@@ -9,6 +9,7 @@
       "version": "0.1.0",
       "tags": ["remark", "mdx", "callouts", "markdown"],
       "category": "mdx",
+      "frameworks": ["react", "next", "astro", "vue", "solid", "svelte"],
       "files": ["index.ts"],
       "dependencies": {
         "unist-util-visit": "^5.0.0"
@@ -23,6 +24,7 @@
       "version": "0.1.0",
       "tags": ["reading-time", "word-count", "metadata"],
       "category": "core",
+      "frameworks": ["any"],
       "files": ["index.ts"],
       "dependencies": {},
       "registryDependencies": [],
@@ -35,6 +37,7 @@
       "version": "0.1.0",
       "tags": ["graph", "backlinks", "broken-links", "navigation"],
       "category": "core",
+      "frameworks": ["any"],
       "files": ["index.ts"],
       "dependencies": {},
       "registryDependencies": [],
