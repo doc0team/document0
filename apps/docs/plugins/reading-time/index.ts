@@ -1,9 +1,3 @@
-import type {
-  Document0Plugin,
-  PluginMdxResult,
-  PluginContext,
-} from "../plugin.js";
-
 export interface ReadingTimeOptions {
   /** Words per minute. @default 250 */
   wordsPerMinute?: number;
@@ -22,15 +16,32 @@ function stripMarkdown(content: string): string {
     .trim();
 }
 
-export function readingTime(options?: ReadingTimeOptions): Document0Plugin {
+interface ProcessedMdx {
+  code: string;
+  frontmatter: Record<string, unknown>;
+  toc: { id: string; text: string; depth: number }[];
+  [key: string]: unknown;
+}
+
+/**
+ * Document0 plugin: adds `readingTime` (minutes) and `wordCount`
+ * to the processed MDX result.
+ *
+ * ```ts
+ * processMdx(source, { plugins: [readingTime()] });
+ * // result.readingTime → 3
+ * // result.wordCount   → 742
+ * ```
+ */
+export function readingTime(options?: ReadingTimeOptions) {
   const wpm = options?.wordsPerMinute ?? 250;
 
   return {
     name: "reading-time",
     transformResult(
-      result: PluginMdxResult,
-      context: PluginContext,
-    ): PluginMdxResult {
+      result: ProcessedMdx,
+      context: { source: string; content: string },
+    ): ProcessedMdx {
       const text = stripMarkdown(context.content);
       const words = text.split(/\s+/).filter(Boolean).length;
       return {

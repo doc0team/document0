@@ -7,4 +7,3 @@ export * from "./search/index.js";
 export * from "./llms/index.js";
 export * from "./openapi/index.js";
 export * from "./graph/index.js";
-export * from "./plugins/index.js";

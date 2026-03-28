@@ -11,6 +11,8 @@
     "--- CLI",
     "create",
     "--- Guides",
-    "guides"
+    "guides",
+    "--- Other",
+    "test-reading-time"
   ]
 }

@@ -11,6 +11,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageNavigation } from "@/components/page-navigation";
 import { TableOfContents } from "@/components/table-of-contents";
 import { mdxComponents } from "@/components/mdx-components";
+import { readingTime } from "@/plugins/reading-time";
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -41,7 +42,13 @@ export default async function DocPage({ params }: PageProps) {
 
   const raw = fs.readFileSync(page.filePath, "utf-8");
   const highlighter = await getHighlighter();
-  const { code, toc } = await processMdx(raw, { highlighter, themes: shikiThemes });
+  const result = await processMdx(raw, {
+    highlighter,
+    themes: shikiThemes,
+    plugins: [readingTime()],
+  });
+  const { code, toc } = result;
+  const readingTimeMinutes = result.readingTime as number;
 
   const { default: MDXContent } = await run(code, {
     ...(runtime as object),
@@ -57,6 +64,9 @@ export default async function DocPage({ params }: PageProps) {
       <div className="flex gap-12 px-8 py-10 max-w-screen-xl mx-auto w-full">
         <article className="flex-1 min-w-0 max-w-3xl pb-[50vh]">
           {breadcrumbs.length > 1 && <Breadcrumbs items={breadcrumbs} />}
+          <div className="mb-4 text-sm text-zinc-500">
+            {readingTimeMinutes} min read
+          </div>
           <div className="prose-headless">
             <MDXContent components={mdxComponents} />
           </div>

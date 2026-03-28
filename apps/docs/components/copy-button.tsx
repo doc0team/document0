@@ -2,20 +2,30 @@
 
 import { useState, useCallback, useRef, type ComponentPropsWithoutRef } from "react";
 
-export function CopyButton({ className, ...props }: ComponentPropsWithoutRef<"button">) {
+interface CopyButtonProps extends ComponentPropsWithoutRef<"button"> {
+  text?: string;
+}
+
+export function CopyButton({ className, text, ...props }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
 
   const handleClick = useCallback(() => {
-    const pre = ref.current?.closest(".code-block-wrapper")?.querySelector("pre");
-    const code = pre?.querySelector("code");
-    if (!code) return;
+    let content = text;
 
-    void navigator.clipboard.writeText(code.textContent ?? "").then(() => {
+    if (!content) {
+      const pre = ref.current?.closest(".code-block-wrapper")?.querySelector("pre");
+      const code = pre?.querySelector("code");
+      content = code?.textContent ?? "";
+    }
+
+    if (!content) return;
+
+    void navigator.clipboard.writeText(content).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
-  }, []);
+  }, [text]);
 
   return (
     <button

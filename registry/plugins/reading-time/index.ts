@@ -3,6 +3,13 @@ export interface ReadingTimeOptions {
   wordsPerMinute?: number;
 }
 
+interface ProcessedMdx {
+  code: string;
+  frontmatter: Record<string, unknown>;
+  toc: { id: string; text: string; depth: number }[];
+  [key: string]: unknown;
+}
+
 function stripMarkdown(content: string): string {
   return content
     .replace(/```[\s\S]*?```/g, "")
@@ -32,9 +39,9 @@ export function readingTime(options?: ReadingTimeOptions) {
   return {
     name: "reading-time",
     transformResult(
-      result: Record<string, unknown>,
+      result: ProcessedMdx,
       context: { source: string; content: string },
-    ) {
+    ): ProcessedMdx {
       const text = stripMarkdown(context.content);
       const words = text.split(/\s+/).filter(Boolean).length;
       return {
