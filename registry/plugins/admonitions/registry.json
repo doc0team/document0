@@ -1,0 +1,14 @@
+{
+  "name": "admonitions",
+  "description": "GitHub-style blockquote callouts. Converts > [!NOTE], > [!WARNING] etc. into <Callout> JSX elements.",
+  "author": "document0",
+  "version": "0.1.0",
+  "tags": ["remark", "mdx", "callouts", "markdown"],
+  "category": "mdx",
+  "files": ["index.ts"],
+  "dependencies": {
+    "unist-util-visit": "^5.0.0"
+  },
+  "registryDependencies": [],
+  "installPath": "plugins/admonitions"
+}

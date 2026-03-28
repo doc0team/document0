@@ -1,0 +1,12 @@
+{
+  "name": "content-graph",
+  "description": "Builds a directed graph of internal links across all pages. Enables backlinks, broken link detection, and related pages.",
+  "author": "document0",
+  "version": "0.1.0",
+  "tags": ["graph", "backlinks", "broken-links", "navigation"],
+  "category": "core",
+  "files": ["index.ts"],
+  "dependencies": {},
+  "registryDependencies": [],
+  "installPath": "plugins/content-graph"
+}

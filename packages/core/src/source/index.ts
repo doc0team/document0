@@ -6,7 +6,11 @@ import type {
   PageFrontmatter,
   MetaFile,
   SourceOptions,
+  TreeNode,
 } from "../types.js";
+import type { Document0Plugin } from "../plugin.js";
+import { applyPageTransforms, applyTreeTransforms } from "../plugin.js";
+import { buildPageTree } from "../tree/index.js";
 
 const DEFAULT_EXTENSIONS = [".md", ".mdx"];
 const DEFAULT_BASE_URL = "/docs";
@@ -103,23 +107,36 @@ export class DocsSource {
   private rootDir: string;
   private baseUrl: string;
   private extensions: string[];
+  private plugins: Document0Plugin[];
   private _pages: PageData[] | null = null;
+  private _tree: TreeNode[] | null = null;
 
   constructor(options: SourceOptions) {
     this.rootDir = path.resolve(options.rootDir);
     this.baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
     this.extensions = options.extensions ?? DEFAULT_EXTENSIONS;
+    this.plugins = options.plugins ?? [];
   }
 
   getPages(): PageData[] {
     if (this._pages) return this._pages;
-    this._pages = scanDir(
+    let pages = scanDir(
       this.rootDir,
       this.rootDir,
       this.baseUrl,
-      this.extensions
+      this.extensions,
     );
+    pages = applyPageTransforms(pages, this.plugins);
+    this._pages = pages;
     return this._pages;
+  }
+
+  getPageTree(): TreeNode[] {
+    if (this._tree) return this._tree;
+    let tree = buildPageTree(this.getPages(), this.rootDir);
+    tree = applyTreeTransforms(tree, this.plugins);
+    this._tree = tree;
+    return this._tree;
   }
 
   getPage(slug: string): PageData | undefined {
@@ -136,5 +153,6 @@ export class DocsSource {
 
   invalidate(): void {
     this._pages = null;
+    this._tree = null;
   }
 }

@@ -71,7 +71,7 @@ export default function Home() {
                 Docs
               </Link>
               <Link
-                href="https://github.com/your-org/document0"
+                href="https://github.com/doc0team/document0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-zinc-400 hover:text-white transition-colors"
@@ -175,7 +175,7 @@ export default function Home() {
                   </svg>
                 </Link>
                 <Link
-                  href="https://github.com/your-org/document0"
+                  href="https://github.com/doc0team/document0"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-lg border border-zinc-700/80 bg-zinc-900/60 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-zinc-300 shadow-sm hover:bg-zinc-800 hover:border-zinc-600 transition-colors"
@@ -282,6 +282,7 @@ export default function Home() {
                   <ul className="space-y-2">
                     <li><Link href="/docs" className="text-sm text-zinc-400 hover:text-white transition-colors">Docs</Link></li>
                     <li><Link href="/api" className="text-sm text-zinc-400 hover:text-white transition-colors">API Reference</Link></li>
+                    <li><Link href="/plugins" className="text-sm text-zinc-400 hover:text-white transition-colors">Plugins</Link></li>
                     <li><Link href="/docs/quickstart" className="text-sm text-zinc-400 hover:text-white transition-colors">Quickstart</Link></li>
                   </ul>
                 </div>
@@ -296,7 +297,7 @@ export default function Home() {
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Community</h4>
                   <ul className="space-y-2">
-                    <li><Link href="https://github.com/your-org/document0" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-400 hover:text-white transition-colors">GitHub</Link></li>
+                    <li><Link href="https://github.com/doc0team/document0" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-400 hover:text-white transition-colors">GitHub</Link></li>
                     <li><Link href="https://github.com/your-org/document0/issues" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-400 hover:text-white transition-colors">Issues</Link></li>
                     <li><Link href="https://github.com/your-org/document0/releases" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-400 hover:text-white transition-colors">Releases</Link></li>
                   </ul>

@@ -10,6 +10,7 @@ function NavLinks() {
   const links = [
     { href: "/docs", label: "Docs", match: (p: string) => p.startsWith("/docs") },
     { href: "/api", label: "API Reference", match: (p: string) => p.startsWith("/api") },
+    { href: "/plugins", label: "Plugins", match: (p: string) => p.startsWith("/plugins") },
   ];
   return (
     <nav className="flex items-center gap-1 text-sm text-zinc-400 ml-4">
@@ -74,7 +75,7 @@ export function Header() {
               </kbd>
             </button>
             <Link
-              href="https://github.com/your-org/document0"
+              href="https://github.com/doc0team/document0"
               target="_blank"
               rel="noopener noreferrer"
               className="text-zinc-400 hover:text-white transition-colors"

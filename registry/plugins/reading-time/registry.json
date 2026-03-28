@@ -1,0 +1,12 @@
+{
+  "name": "reading-time",
+  "description": "Adds readingTime (minutes) and wordCount to your processed MDX output.",
+  "author": "document0",
+  "version": "0.1.0",
+  "tags": ["reading-time", "word-count", "metadata"],
+  "category": "core",
+  "files": ["index.ts"],
+  "dependencies": {},
+  "registryDependencies": [],
+  "installPath": "plugins/reading-time"
+}

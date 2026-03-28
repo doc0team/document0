@@ -1,0 +1,44 @@
+{
+  "$schema": "./schema.json",
+  "version": 1,
+  "plugins": [
+    {
+      "name": "admonitions",
+      "description": "GitHub-style blockquote callouts. Converts > [!NOTE], > [!WARNING] etc. into <Callout> JSX elements.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["remark", "mdx", "callouts", "markdown"],
+      "category": "mdx",
+      "files": ["index.ts"],
+      "dependencies": {
+        "unist-util-visit": "^5.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "plugins/admonitions"
+    },
+    {
+      "name": "reading-time",
+      "description": "Adds readingTime (minutes) and wordCount to your processed MDX output.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["reading-time", "word-count", "metadata"],
+      "category": "core",
+      "files": ["index.ts"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "plugins/reading-time"
+    },
+    {
+      "name": "content-graph",
+      "description": "Builds a directed graph of internal links across all pages. Enables backlinks, broken link detection, and related pages.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["graph", "backlinks", "broken-links", "navigation"],
+      "category": "core",
+      "files": ["index.ts"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "plugins/content-graph"
+    }
+  ]
+}

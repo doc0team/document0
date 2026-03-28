@@ -69,6 +69,10 @@ export interface SourceOptions {
    * @default [".md", ".mdx"]
    */
   extensions?: string[];
+  /**
+   * Document0 plugins to apply to pages and page tree.
+   */
+  plugins?: import("./plugin.js").Document0Plugin[];
 }
 
 export interface SearchIndex {

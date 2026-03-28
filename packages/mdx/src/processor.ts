@@ -7,6 +7,19 @@ import type { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki";
 import { rehypeShiki, rehypeStripShikiStyle, type RehypeShikiThemes } from "./plugins/rehype-shiki.js";
 import { remarkToc, type TocEntry } from "./plugins/remark-toc.js";
 
+/**
+ * Structurally compatible with Document0Plugin from @document0/core.
+ * Defined locally so @document0/mdx has no hard dependency on core.
+ */
+export interface ProcessorPlugin {
+  remarkPlugins?: unknown[];
+  rehypePlugins?: unknown[];
+  transformResult?: (
+    result: ProcessedMdx & Record<string, unknown>,
+    context: { source: string; content: string },
+  ) => ProcessedMdx & Record<string, unknown>;
+}
+
 export interface ProcessorOptions {
   /**
    * Shiki highlighter instance. Create with `createHighlighter` from shiki.
@@ -36,27 +49,38 @@ export interface ProcessorOptions {
    * @default "automatic"
    */
   jsxRuntime?: "automatic" | "classic";
+  /**
+   * Document0 plugins. Each plugin can contribute remark/rehype plugins
+   * and post-process the compiled result.
+   */
+  plugins?: ProcessorPlugin[];
 }
 
 export interface ProcessedMdx {
   code: string;
   frontmatter: Record<string, unknown>;
   toc: TocEntry[];
+  [key: string]: unknown;
 }
 
 export async function processMdx(
   source: string,
-  options: ProcessorOptions = {}
+  options: ProcessorOptions = {},
 ): Promise<ProcessedMdx> {
+  const plugins = options.plugins ?? [];
   const { data: frontmatter, content } = matter(source);
 
   const toc: TocEntry[] = [];
+
+  const pluginRemark = plugins.flatMap((p) => p.remarkPlugins ?? []);
+  const pluginRehype = plugins.flatMap((p) => p.rehypePlugins ?? []);
 
   const remarkPlugins: CompileOptions["remarkPlugins"] = [
     remarkFrontmatter,
     remarkGfm,
     [remarkToc, { onToc: (entries: TocEntry[]) => toc.push(...entries) }],
     ...(options.remarkPlugins ?? []),
+    ...(pluginRemark as CompileOptions["remarkPlugins"] & unknown[]),
   ];
 
   const rehypePlugins: CompileOptions["rehypePlugins"] = [
@@ -75,6 +99,7 @@ export async function processMdx(
         ]
       : []),
     ...(options.rehypePlugins ?? []),
+    ...(pluginRehype as CompileOptions["rehypePlugins"] & unknown[]),
   ];
 
   const compiled = await compile(content, {
@@ -85,9 +110,18 @@ export async function processMdx(
     rehypePlugins,
   });
 
-  return {
+  let result: ProcessedMdx = {
     code: String(compiled),
     frontmatter,
     toc,
   };
+
+  const ctx = { source, content };
+  for (const plugin of plugins) {
+    if (plugin.transformResult) {
+      result = plugin.transformResult(result, ctx) as ProcessedMdx;
+    }
+  }
+
+  return result;
 }

@@ -7,3 +7,4 @@ out/
 .env
 .env.local
 .env.*.local
+apps/docs/data/
