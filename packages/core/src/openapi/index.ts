@@ -8,7 +8,7 @@ import type {
   OpenAPISourceOptions,
   TreeNode,
   PageNode,
-  SearchIndex,
+  SearchResult,
 } from "../types.js";
 
 type HttpMethod = "get" | "post" | "put" | "patch" | "delete" | "head" | "options";
@@ -186,29 +186,17 @@ export function buildOpenAPITree(
 }
 
 /**
- * Builds search index entries from OpenAPI operations.
+ * Builds search result entries from OpenAPI operations.
  */
 export function buildOpenAPISearchIndex(
   operations: OpenAPIPageData[]
-): SearchIndex[] {
-  return operations.map((op) => {
-    const paramNames = op.parameters.map((p) => p.name).join(", ");
-    const content = [
-      `${op.method} ${op.path}`,
-      op.description ?? "",
-      paramNames ? `Parameters: ${paramNames}` : "",
-    ]
-      .filter(Boolean)
-      .join(" - ");
-
-    return {
-      id: op.slug,
-      title: op.summary,
-      description: `${op.method} ${op.path}`,
-      url: op.url,
-      content,
-    };
-  });
+): SearchResult[] {
+  return operations.map((op) => ({
+    title: op.summary,
+    description: `${op.method} ${op.path}`,
+    url: op.url,
+    score: 0,
+  }));
 }
 
 /**

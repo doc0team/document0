@@ -169,30 +169,24 @@ const open = isActiveOrAncestor(folderNode, currentUrl);
 
 ## Search
 
-### buildSearchIndex
+### createSearchRoute
 
-Produces a lightweight search index from your pages' frontmatter.
-
-```ts
-import { buildSearchIndex } from "@document0/core";
-
-const index = buildSearchIndex(source.getPages());
-```
-
-### search
-
-Searches the index by query string.
+Creates an API route handler backed by [Orama](https://orama.com) with full-text search, fuzzy matching, and relevance ranking.
 
 ```ts
-import { search } from "@document0/core";
+import { createSearchRoute } from "@document0/core";
 
-const results = search(index, "installation");
-// SearchResult[]
+// app/internal/search/route.ts
+export const { GET } = createSearchRoute(source);
 ```
+
+The returned `GET` handler accepts a `?q=` query parameter and responds with `SearchResult[]`.
 
 ```ts
 interface SearchResult {
-  page: PageData;
+  title: string;
+  description?: string;
+  url: string;
   score: number;
 }
 ```
