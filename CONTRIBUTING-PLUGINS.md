@@ -71,7 +71,7 @@ export function myPlugin(options?: MyPluginOptions) {
 }
 ```
 
-All hooks are optional — only include what your plugin needs.
+All hooks are optional. Only include what your plugin needs.
 
 Keep the source **self-contained**: avoid importing from `@document0/core`
 or `@document0/mdx` internals. The user owns the code after install.

@@ -199,7 +199,7 @@ export function buildOpenAPISearchIndex(
       paramNames ? `Parameters: ${paramNames}` : "",
     ]
       .filter(Boolean)
-      .join(" — ");
+      .join(" - ");
 
     return {
       id: op.slug,

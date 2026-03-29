@@ -1,7 +1,7 @@
 {
   "name": "@document0/cli",
   "version": "0.1.0",
-  "description": "document0 CLI — add plugins, browse the registry",
+  "description": "document0 CLI: add plugins, browse the registry",
   "type": "module",
   "bin": {
     "document0": "./dist/index.js"

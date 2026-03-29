@@ -129,7 +129,7 @@ function ParametersTable({ parameters }: { parameters: OpenAPIParameter[] }) {
                   )}
                 </td>
                 <td className="px-4 py-2.5 text-zinc-500 text-xs">
-                  {p.description ?? "—"}
+                  {p.description ?? "-"}
                 </td>
               </tr>
             ))}

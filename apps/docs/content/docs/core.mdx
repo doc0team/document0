@@ -15,7 +15,7 @@ The main entry point. Scans a directory for `.md` and `.mdx` files and produces 
 import { DocsSource } from "@document0/core";
 
 const source = new DocsSource({
-  rootDir: "./content/docs", // required — absolute or relative path
+  rootDir: "./content/docs", // required: absolute or relative path
   baseUrl: "/docs",          // default: "/docs"
   extensions: [".md", ".mdx"], // default
 });
@@ -157,7 +157,7 @@ const { previous, next } = getPageNeighbours(tree, "/docs/installation");
 
 ### isActiveOrAncestor
 
-Returns `true` if a tree node is the active page or an ancestor of it — useful for expanding folders in a sidebar.
+Returns `true` if a tree node is the active page or an ancestor of it, useful for expanding folders in a sidebar.
 
 ```ts
 import { isActiveOrAncestor } from "@document0/core";

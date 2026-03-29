@@ -5,7 +5,7 @@ description: MDX compilation, frontmatter extraction, remark/rehype plugins, and
 
 # @document0/mdx
 
-The MDX package compiles your `.mdx` files into executable JavaScript, extracts frontmatter, and runs Shiki over code blocks — all in one call.
+The MDX package compiles your `.mdx` files into executable JavaScript, extracts frontmatter, and runs Shiki over code blocks, all in one call.
 
 ## processMdx
 
@@ -37,7 +37,7 @@ interface ProcessMdxOptions {
 
 | Option | Default | Description |
 |---|---|---|
-| `highlighter` | — | Shiki highlighter instance. Omit to skip syntax highlighting |
+| `highlighter` | - | Shiki highlighter instance. Omit to skip syntax highlighting |
 | `defaultLanguage` | `"plaintext"` | Language used for code blocks with no language specified |
 | `theme` | `"github-dark"` | Shiki theme name |
 | `remarkPlugins` | `[]` | Additional remark plugins to run |
@@ -48,7 +48,7 @@ interface ProcessMdxOptions {
 
 ```ts
 interface ProcessMdxResult {
-  code: string;          // compiled JS — pass to @mdx-js/mdx run()
+  code: string;          // compiled JS; pass to @mdx-js/mdx run()
   frontmatter: Record<string, unknown>;
   toc: TocEntry[];
 }
@@ -74,7 +74,7 @@ Extracts headings into `toc` without modifying the document tree.
 
 ### rehypeShiki
 
-Replaces fenced code blocks with Shiki-highlighted hast output. Uses `codeToHast` internally so the result is proper hast nodes — compatible with `@mdx-js/mdx`'s JSX runtime.
+Replaces fenced code blocks with Shiki-highlighted hast output. Uses `codeToHast` internally so the result is proper hast nodes, compatible with `@mdx-js/mdx`'s JSX runtime.
 
 Language is read from the code fence tag:
 
@@ -127,7 +127,7 @@ const { default: MDXContent } = await run(code, {
   baseUrl: import.meta.url,
 });
 
-// Render it — pass your component overrides
+// Render it; pass your component overrides
 <MDXContent components={myComponents} />
 ```
 

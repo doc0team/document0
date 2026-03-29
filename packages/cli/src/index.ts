@@ -5,7 +5,7 @@ import { list } from "./commands/list.js";
 import { search } from "./commands/search.js";
 
 const HELP = `
-  ${kleur.bold().cyan("document0")} — plugin manager for document0
+  ${kleur.bold().cyan("document0")} - plugin manager for document0
 
   ${kleur.bold("Commands:")}
     add <plugin> [...]   Install plugins from the registry

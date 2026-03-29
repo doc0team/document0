@@ -143,12 +143,12 @@ export default function Home() {
                     className="text-base md:text-lg leading-relaxed text-zinc-400 max-w-lg"
                   >
                     File-system source, page trees, MDX, search, and syntax
-                    highlighting — zero UI lock-in. Same content, any look.
+                    highlighting. Zero UI lock-in. Same content, any look.
                   </motion.p>
                 </Selectable>
               </div>
 
-              {/* CTAs — not selectable per user request */}
+              {/* CTAs - not selectable per user request */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -307,7 +307,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Giant "document0" — only top ~half visible, bottom cropped by overflow-hidden on footer */}
+        {/* Giant "document0" - only top ~half visible, bottom cropped by overflow-hidden on footer */}
         <div className="relative h-[clamp(70px,10vw,130px)] select-none pointer-events-none" aria-hidden="true">
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 whitespace-nowrap text-[clamp(140px,22vw,320px)] leading-[0.75] text-zinc-900/50"

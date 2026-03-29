@@ -8,10 +8,10 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: {
-    template: "%s — document0",
+    template: "%s - document0",
     default: "document0",
   },
-  description: "document0 — documentation framework. File system source, page trees, MDX, and Shiki — zero UI assumptions.",
+  description: "document0: documentation framework. File system source, page trees, MDX, and Shiki. Zero UI assumptions.",
   metadataBase: new URL("https://document0.dev"),
   openGraph: {
     siteName: "document0",

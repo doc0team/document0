@@ -14,7 +14,7 @@ function stripFrontmatter(raw: string): string {
 }
 
 /**
- * Generates `llms.txt` content — a concise index of all pages
+ * Generates `llms.txt` content - a concise index of all pages
  * following the llms.txt specification.
  */
 export function generateLlmsTxt(
@@ -47,7 +47,7 @@ export function generateLlmsTxt(
 }
 
 /**
- * Generates `llms-full.txt` — the complete content of every page
+ * Generates `llms-full.txt` - the complete content of every page
  * concatenated into a single text file for full-context ingestion.
  */
 export function generateLlmsFullTxt(

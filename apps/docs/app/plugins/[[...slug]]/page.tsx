@@ -76,8 +76,8 @@ function PluginsIndexPage() {
           Plugins & Components
         </h1>
         <p className="text-lg text-zinc-400 leading-relaxed max-w-2xl">
-          Extend document0 with plugins and pre-built UI components. Install source code directly —
-          no npm dependencies, full customization, zero lock-in.
+          Extend document0 with plugins and pre-built UI components. Install source code directly.
+          No npm dependencies, full customization, zero lock-in.
         </p>
       </div>
 

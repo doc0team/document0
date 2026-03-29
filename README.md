@@ -1,6 +1,6 @@
 # document0
 
-A documentation framework with a headless data layer. File system source, page trees, navigation, MDX processing, and Shiki syntax highlighting — with zero UI. Bring your own components and styles.
+A documentation framework with a headless data layer. File system source, page trees, navigation, MDX processing, and Shiki syntax highlighting, with zero UI. Bring your own components and styles.
 
 ## Packages
 
@@ -71,7 +71,7 @@ const { default: MDXContent } = await run(code, {
   baseUrl: import.meta.url,
 });
 
-// Your component library, your styles — fully headless
+// Your component library, your styles - fully headless
 export function DocsPage({ slug }) {
   return (
     <MDXContent

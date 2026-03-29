@@ -1,6 +1,6 @@
 # @document0/core
 
-The core package for document0. Provides file system source loading, page tree building, navigation utilities, and search indexing — with zero UI assumptions.
+The core package for document0. Provides file system source loading, page tree building, navigation utilities, and search indexing, with zero UI assumptions.
 
 ## Install
 

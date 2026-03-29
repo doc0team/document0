@@ -229,7 +229,7 @@ function Nav() {
 function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden">
-      {/* Geometric background — full screen */}
+      {/* Geometric background - full screen */}
       <div className="absolute inset-0">
         <HeroGeometric
           className="!min-h-full"
@@ -335,7 +335,7 @@ function RegistryStory() {
             </h2>
             <p className="mt-4 text-zinc-500 leading-relaxed">
               Teams build docs UI with full creative control, publish under their namespace,
-              and anyone can install source code directly — no npm packages, no version conflicts.
+              and anyone can install source code directly. No npm packages, no version conflicts.
             </p>
           </motion.div>
 
@@ -484,7 +484,7 @@ function CodeShowcase() {
             </h2>
             <p className="mt-4 text-zinc-500 leading-relaxed">
               Your content lives as MDX files in your repo. document0 turns them into page trees,
-              navigation, search indexes, and highlighted code — ready for whatever UI you build.
+              navigation, search indexes, and highlighted code, ready for whatever UI you build.
             </p>
           </motion.div>
 
@@ -563,7 +563,7 @@ const { code, toc } = await processMdx(page.raw)`}
 const features = [
   {
     title: "Headless by design",
-    description: "No CSS shipped. No layout opinions. You bring the UI — we power everything behind it.",
+    description: "No CSS shipped. No layout opinions. You bring the UI. We power everything behind it.",
   },
   {
     title: "Full-text search",

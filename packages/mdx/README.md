@@ -1,6 +1,6 @@
 # @document0/mdx
 
-MDX processing for document0. Compiles `.mdx` and `.md` files with frontmatter extraction, GFM support, auto-generated heading IDs, table of contents, and Shiki syntax highlighting — all without any UI.
+MDX processing for document0. Compiles `.mdx` and `.md` files with frontmatter extraction, GFM support, auto-generated heading IDs, table of contents, and Shiki syntax highlighting, all without any UI.
 
 ## Install
 
@@ -88,7 +88,7 @@ import { rehypeShiki, remarkToc } from "@document0/mdx/plugins";
 
 ### `rehypeShiki`
 
-Transforms fenced code blocks into Shiki-highlighted HTML. Requires a pre-created Shiki highlighter instance — this keeps the highlighter lifecycle in your control.
+Transforms fenced code blocks into Shiki-highlighted HTML. Requires a pre-created Shiki highlighter instance. This keeps the highlighter lifecycle in your control.
 
 ### `remarkToc`
 

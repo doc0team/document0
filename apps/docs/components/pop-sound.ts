@@ -18,7 +18,7 @@ async function loadPopBuffer() {
     const buf = await res.arrayBuffer();
     popBuffer = await ac.decodeAudioData(buf);
   } catch {
-    // fall through — pop will be silent if file unavailable
+    // fall through - pop will be silent if file unavailable
   }
 }
 

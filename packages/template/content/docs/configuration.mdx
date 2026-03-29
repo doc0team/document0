@@ -19,7 +19,7 @@ const source = new DocsSource({
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `rootDir` | `string` | — | Root directory to scan for content files |
+| `rootDir` | `string` | - | Root directory to scan for content files |
 | `baseUrl` | `string` | `"/docs"` | URL prefix for all pages |
 | `extensions` | `string[]` | `[".md", ".mdx"]` | File extensions to include |
 
@@ -39,7 +39,7 @@ const { code, frontmatter, toc } = await processMdx(source, {
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `highlighter` | `HighlighterGeneric` | — | Shiki highlighter. Omit to skip code highlighting |
+| `highlighter` | `HighlighterGeneric` | - | Shiki highlighter. Omit to skip code highlighting |
 | `defaultLanguage` | `string` | `"plaintext"` | Fallback language for unlabelled code blocks |
 | `remarkPlugins` | `Plugin[]` | `[]` | Additional remark plugins |
 | `rehypePlugins` | `Plugin[]` | `[]` | Additional rehype plugins |
@@ -75,7 +75,7 @@ Place a `_meta.json` file in any content directory to control the page tree for 
 
 ```yaml
 ---
-title: My Page        # required — used in page tree and <title>
+title: My Page        # required - used in page tree and <title>
 description: ...      # used in search index and <meta description>
 icon: 🚀              # shown in sidebar next to page name
 full: true            # hint to your layout to use full width

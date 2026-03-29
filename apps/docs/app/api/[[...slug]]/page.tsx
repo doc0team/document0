@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const op = pages.find((p) => p.slug === slug.join("/"));
   if (!op) return {};
   return {
-    title: `${op.method} ${op.path} — ${op.summary}`,
+    title: `${op.method} ${op.path} - ${op.summary}`,
     description: op.description ?? op.summary,
   };
 }
