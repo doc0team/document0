@@ -9,20 +9,21 @@ export async function list(): Promise<void> {
 
   console.log();
   console.log(
-    kleur.bold(`  ${index.plugins.length} plugins available`) +
+    kleur.bold(`  ${index.items.length} items available`) +
       kleur.dim("  (document0 registry)\n"),
   );
 
-  const maxName = Math.max(...index.plugins.map((p) => p.name.length));
+  const maxId = Math.max(...index.items.map((i) => `${i.namespace}/${i.name}`.length));
 
-  for (const plugin of index.plugins) {
-    const name = kleur.cyan(plugin.name.padEnd(maxName + 2));
-    const version = kleur.dim(`v${plugin.version}`);
-    const category = kleur.yellow(plugin.category.padEnd(5));
-    console.log(`  ${name} ${category} ${version}  ${plugin.description}`);
+  for (const item of index.items) {
+    const id = `${item.namespace}/${item.name}`;
+    const name = kleur.cyan(id.padEnd(maxId + 2));
+    const version = kleur.dim(`v${item.version}`);
+    const category = kleur.yellow(item.category.padEnd(5));
+    console.log(`  ${name} ${category} ${version}  ${item.description}`);
   }
 
   console.log();
-  console.log(kleur.dim("  Install: document0 add <name>"));
+  console.log(kleur.dim("  Install: document0 add <namespace/name>"));
   console.log();
 }

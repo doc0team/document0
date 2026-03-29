@@ -1,7 +1,7 @@
 import kleur from "kleur";
 import {
   fetchRegistryIndex,
-  searchPlugins,
+  searchItems,
 } from "../registry.js";
 
 export async function search(query: string): Promise<void> {
@@ -15,13 +15,13 @@ export async function search(query: string): Promise<void> {
   console.log(kleur.dim("  Searching registry..."));
 
   const index = await fetchRegistryIndex();
-  const results = searchPlugins(index, query);
+  const results = searchItems(index, query);
 
   if (results.length === 0) {
-    console.log(kleur.yellow(`\n  No plugins found for "${query}".`));
+    console.log(kleur.yellow(`\n  No items found for "${query}".`));
     console.log(
       kleur.dim(
-        `  Available: ${index.plugins.map((p) => p.name).join(", ")}`,
+        `  Available: ${index.items.map((i) => `${i.namespace}/${i.name}`).join(", ")}`,
       ),
     );
     console.log();
@@ -34,17 +34,18 @@ export async function search(query: string): Promise<void> {
       kleur.dim(` for "${query}"\n`),
   );
 
-  const maxName = Math.max(...results.map((p) => p.name.length));
+  const maxId = Math.max(...results.map((i) => `${i.namespace}/${i.name}`.length));
 
-  for (const plugin of results) {
-    const name = kleur.cyan(plugin.name.padEnd(maxName + 2));
-    const version = kleur.dim(`v${plugin.version}`);
-    const tags = kleur.dim(`[${plugin.tags.join(", ")}]`);
-    console.log(`  ${name} ${version}  ${plugin.description}`);
-    console.log(`  ${"".padEnd(maxName + 2)} ${tags}`);
+  for (const item of results) {
+    const id = `${item.namespace}/${item.name}`;
+    const name = kleur.cyan(id.padEnd(maxId + 2));
+    const version = kleur.dim(`v${item.version}`);
+    const tags = kleur.dim(`[${item.tags.join(", ")}]`);
+    console.log(`  ${name} ${version}  ${item.description}`);
+    console.log(`  ${"".padEnd(maxId + 2)} ${tags}`);
   }
 
   console.log();
-  console.log(kleur.dim("  Install: document0 add <name>"));
+  console.log(kleur.dim("  Install: document0 add <namespace/name>"));
   console.log();
 }

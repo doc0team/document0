@@ -1,19 +1,22 @@
-export interface RegistryPlugin {
+export interface RegistryItem {
   name: string;
+  namespace: string;
   description: string;
   author: string;
   version: string;
   tags: string[];
-  category: string;
+  category: "mdx" | "core" | "ui";
+  frameworks: string[];
   files: string[];
   dependencies: Record<string, string>;
   registryDependencies: string[];
   installPath: string;
+  preview?: boolean;
 }
 
 export interface RegistryIndex {
   version: number;
-  plugins: RegistryPlugin[];
+  items: RegistryItem[];
 }
 
 const DEFAULT_REGISTRY_URL =
@@ -32,36 +35,44 @@ export async function fetchRegistryIndex(): Promise<RegistryIndex> {
   return (await res.json()) as RegistryIndex;
 }
 
-export async function fetchPluginFile(
-  pluginName: string,
+function getItemDir(item: RegistryItem): string {
+  const base = item.category === "ui" ? "ui" : "plugins";
+  return `${base}/${item.namespace}/${item.name}`;
+}
+
+export async function fetchItemFile(
+  item: RegistryItem,
   fileName: string,
 ): Promise<string> {
-  const url = `${getRegistryBaseUrl()}/plugins/${pluginName}/${fileName}`;
+  const url = `${getRegistryBaseUrl()}/${getItemDir(item)}/${fileName}`;
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error(`Failed to fetch ${pluginName}/${fileName}: ${res.status}`);
+    throw new Error(`Failed to fetch ${item.namespace}/${item.name}/${fileName}: ${res.status}`);
   }
   return res.text();
 }
 
-export function findPlugin(
-  index: RegistryIndex,
-  name: string,
-): RegistryPlugin | undefined {
-  return index.plugins.find(
-    (p) => p.name === name || p.name === name.replace(/^@document0\/plugin-/, ""),
-  );
-}
-
-export function searchPlugins(
+export function findItem(
   index: RegistryIndex,
   query: string,
-): RegistryPlugin[] {
+): RegistryItem | undefined {
+  if (query.includes("/")) {
+    const [ns, name] = query.split("/", 2);
+    return index.items.find((i) => i.namespace === ns && i.name === name);
+  }
+  return index.items.find((i) => i.name === query);
+}
+
+export function searchItems(
+  index: RegistryIndex,
+  query: string,
+): RegistryItem[] {
   const q = query.toLowerCase();
-  return index.plugins.filter(
-    (p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q) ||
-      p.tags.some((t) => t.toLowerCase().includes(q)),
+  return index.items.filter(
+    (i) =>
+      i.name.toLowerCase().includes(q) ||
+      i.namespace.toLowerCase().includes(q) ||
+      i.description.toLowerCase().includes(q) ||
+      i.tags.some((t) => t.toLowerCase().includes(q)),
   );
 }

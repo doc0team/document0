@@ -19,10 +19,10 @@ const HELP = `
     DOCUMENT0_REGISTRY   Override registry base URL
 
   ${kleur.bold("Examples:")}
-    document0 add admonitions
-    document0 add reading-time content-graph
+    document0 add document0/admonitions
+    document0 add document0/sidebar acme/changelog
     document0 list
-    document0 search callout
+    document0 search sidebar
 `;
 
 async function main(): Promise<void> {

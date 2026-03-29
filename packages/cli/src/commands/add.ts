@@ -4,8 +4,8 @@ import { execSync } from "node:child_process";
 import kleur from "kleur";
 import {
   fetchRegistryIndex,
-  fetchPluginFile,
-  findPlugin,
+  fetchItemFile,
+  findItem,
 } from "../registry.js";
 
 function detectPackageManager(): string {
@@ -24,8 +24,8 @@ function installCmd(pm: string, deps: string[]): string {
 
 export async function add(names: string[]): Promise<void> {
   if (names.length === 0) {
-    console.log(kleur.red("  No plugin names provided."));
-    console.log(kleur.dim("  Usage: document0 add <plugin> [plugin2 ...]"));
+    console.log(kleur.red("  No item names provided."));
+    console.log(kleur.dim("  Usage: document0 add <namespace/name> [...]"));
     process.exit(1);
   }
 
@@ -36,33 +36,34 @@ export async function add(names: string[]): Promise<void> {
   const allDeps: Record<string, string> = {};
 
   for (const name of names) {
-    const plugin = findPlugin(index, name);
-    if (!plugin) {
-      console.log(kleur.red(`  Plugin "${name}" not found in registry.`));
+    const item = findItem(index, name);
+    if (!item) {
+      console.log(kleur.red(`  "${name}" not found in registry.`));
       console.log(
         kleur.dim(
-          `  Available: ${index.plugins.map((p) => p.name).join(", ")}`,
+          `  Available: ${index.items.map((i) => `${i.namespace}/${i.name}`).join(", ")}`,
         ),
       );
       process.exit(1);
     }
 
+    const fullId = `${item.namespace}/${item.name}`;
     console.log(
-      kleur.cyan(`  Installing ${kleur.bold(plugin.name)}`) +
-        kleur.dim(` v${plugin.version}`),
+      kleur.cyan(`  Installing ${kleur.bold(fullId)}`) +
+        kleur.dim(` v${item.version}`),
     );
 
-    const targetDir = path.resolve(process.cwd(), plugin.installPath);
+    const targetDir = path.resolve(process.cwd(), item.installPath);
     fs.mkdirSync(targetDir, { recursive: true });
 
-    for (const file of plugin.files) {
-      const content = await fetchPluginFile(plugin.name, file);
+    for (const file of item.files) {
+      const content = await fetchItemFile(item, file);
       const targetPath = path.join(targetDir, file);
       fs.writeFileSync(targetPath, content, "utf-8");
-      console.log(kleur.dim(`    → ${plugin.installPath}/${file}`));
+      console.log(kleur.dim(`    → ${item.installPath}/${file}`));
     }
 
-    Object.assign(allDeps, plugin.dependencies);
+    Object.assign(allDeps, item.dependencies);
   }
 
   const depsToInstall = Object.entries(allDeps);
@@ -83,14 +84,6 @@ export async function add(names: string[]): Promise<void> {
   }
 
   console.log();
-  console.log(kleur.bold().green("  Done! ✓"));
-  console.log();
-  console.log(kleur.dim("  Usage:"));
-  for (const name of names) {
-    const plugin = findPlugin(index, name)!;
-    console.log(
-      kleur.cyan(`    import { ... } from "./${plugin.installPath}";`),
-    );
-  }
+  console.log(kleur.bold().green("  Done!"));
   console.log();
 }
