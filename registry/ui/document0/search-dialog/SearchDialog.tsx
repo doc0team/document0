@@ -36,7 +36,7 @@ interface SearchResult {
  * ```
  *
  * Requires a search API endpoint at /internal/search that accepts ?q= query param
- * and returns SearchResult[]. Use searchPages() from @document0/core to implement.
+ * and returns SearchResult[]. Use createSearchRoute() from @document0/core to implement.
  */
 export function SearchDialog({
   open,
