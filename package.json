@@ -8,9 +8,19 @@
   ],
   "scripts": {
     "build": "pnpm -r build",
+    "build:core": "pnpm --filter @document0/core build",
+    "build:mdx": "pnpm --filter @document0/mdx build",
+    "build:cli": "pnpm --filter document0 build",
+    "build:create": "pnpm --filter create-document0 build",
     "dev": "pnpm -r dev",
+    "dev:core": "pnpm --filter @document0/core dev",
+    "dev:mdx": "pnpm --filter @document0/mdx dev",
+    "dev:cli": "pnpm --filter document0 dev",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
+    "typecheck:core": "pnpm --filter @document0/core typecheck",
+    "typecheck:mdx": "pnpm --filter @document0/mdx typecheck",
+    "typecheck:cli": "pnpm --filter document0 typecheck",
     "clean": "pnpm -r clean"
   },
   "devDependencies": {
