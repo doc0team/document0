@@ -75,15 +75,6 @@ export interface SourceOptions {
   plugins?: import("./plugin.js").Document0Plugin[];
 }
 
-export interface SearchIndex {
-  id: string;
-  title: string;
-  description?: string;
-  url: string;
-  content: string;
-  section?: string;
-}
-
 export interface NavigationItem {
   name: string;
   url: string;

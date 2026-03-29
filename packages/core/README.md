@@ -61,13 +61,13 @@ const { previous, next } = getPageNeighbours(tree, "/docs/guides/installation");
 const active = isActiveOrAncestor(node, currentUrl);
 ```
 
-### Search index
+### Search
 
 ```ts
-import { buildSearchIndex, searchPages } from "@document0/core";
+import { createSearchRoute } from "@document0/core";
 
-const index = buildSearchIndex(source.getPages());
-const results = searchPages(index, "installation");
+// In your API route (e.g. app/internal/search/route.ts)
+export const { GET } = createSearchRoute(source);
 ```
 
 ## Types

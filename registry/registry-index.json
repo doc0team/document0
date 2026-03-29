@@ -109,7 +109,7 @@
     {
       "name": "search-dialog",
       "namespace": "document0",
-      "description": "Command-palette style search dialog with keyboard navigation. Uses searchPages() from @document0/core.",
+      "description": "Command-palette style search dialog with keyboard navigation. Uses createSearchRoute() from @document0/core.",
       "author": "document0",
       "version": "0.1.0",
       "tags": ["search", "dialog", "keyboard", "react"],
