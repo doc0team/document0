@@ -3,98 +3,8 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import HeroGeometric from "@/components/ui/hero-geometric";
-import { motion, AnimatePresence } from "framer-motion";
-
-const fullText = "document0";
-
-function Intro({ onComplete }: { onComplete: () => void }) {
-  const [typedCount, setTypedCount] = useState(0);
-  const [eraseCount, setEraseCount] = useState(0);
-  const [showCursor, setShowCursor] = useState(true);
-  const [phase, setPhase] = useState<"typing" | "pause" | "erasing" | "hold" | "done">("typing");
-
-  // Typing
-  useEffect(() => {
-    if (phase !== "typing") return;
-    if (typedCount < fullText.length) {
-      const t = setTimeout(() => setTypedCount((c) => c + 1), 100);
-      return () => clearTimeout(t);
-    }
-    setPhase("pause");
-  }, [phase, typedCount]);
-
-  // Pause after typing
-  useEffect(() => {
-    if (phase !== "pause") return;
-    const t = setTimeout(() => setPhase("erasing"), 600);
-    return () => clearTimeout(t);
-  }, [phase]);
-
-  // Erasing from the left
-  useEffect(() => {
-    if (phase !== "erasing") return;
-    if (eraseCount < fullText.length - 1) {
-      const t = setTimeout(() => setEraseCount((c) => c + 1), 60);
-      return () => clearTimeout(t);
-    }
-    setShowCursor(false);
-    setPhase("hold");
-  }, [phase, eraseCount]);
-
-  // Hold then complete
-  useEffect(() => {
-    if (phase !== "hold") return;
-    const t = setTimeout(() => {
-      setPhase("done");
-      onComplete();
-    }, 800);
-    return () => clearTimeout(t);
-  }, [phase, onComplete]);
-
-  // Cursor blink
-  useEffect(() => {
-    if (phase === "hold" || phase === "done") return;
-    const blink = setInterval(() => setShowCursor((v) => !v), 530);
-    return () => clearInterval(blink);
-  }, [phase]);
-
-  const displayed = fullText.slice(eraseCount, typedCount);
-  const isZeroOnly = phase === "hold" || phase === "done";
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-[200] bg-[#0a0a0a] flex items-center justify-center"
-      exit={{ y: "-100%" }}
-      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-    >
-      <div className="flex items-center">
-        <span
-          className="text-white leading-none select-none"
-          style={{
-            fontFamily: "var(--font-geist-pixel-square)",
-            fontSize: isZeroOnly ? "16rem" : "4rem",
-            transition: "font-size 0.4s ease",
-          }}
-        >
-          {displayed}
-        </span>
-        {!isZeroOnly && (
-          <span
-            className="text-white leading-none select-none"
-            style={{
-              fontFamily: "var(--font-geist-pixel-square)",
-              fontSize: "4rem",
-              opacity: showCursor ? 1 : 0,
-              marginLeft: "2px",
-            }}
-          >
-            |
-          </span>
-        )}
-      </div>
-    </motion.div>
-  );
-}
+import { HighlightedCode } from "@/components/highlighted-code";
+import { motion } from "framer-motion";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -319,6 +229,112 @@ function Hero() {
   );
 }
 
+const terminalLines = [
+  { type: "cmd" as const, text: "npx @document0/cli add acme/sidebar" },
+  { type: "out" as const, text: "  Fetched acme/sidebar" },
+  { type: "out" as const, text: "  Created components/sidebar/Sidebar.tsx" },
+  { type: "done" as const, text: "  Done." },
+  { type: "gap" as const, text: "" },
+  { type: "cmd" as const, text: "npx @document0/cli add document0/search-dialog" },
+  { type: "out" as const, text: "  Fetched document0/search-dialog" },
+  { type: "out" as const, text: "  Created components/search-dialog/SearchDialog.tsx" },
+  { type: "done" as const, text: "  Done." },
+  { type: "gap" as const, text: "" },
+  { type: "cmd" as const, text: "npx @document0/cli add acme/changelog" },
+  { type: "out" as const, text: "  Fetched acme/changelog" },
+  { type: "out" as const, text: "  Created components/changelog/Changelog.tsx" },
+  { type: "done" as const, text: "  Done." },
+];
+
+function AnimatedTerminal() {
+  const [visibleLines, setVisibleLines] = useState(0);
+  const [typedChars, setTypedChars] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!started) return;
+    if (visibleLines >= terminalLines.length) return;
+
+    const line = terminalLines[visibleLines];
+
+    if (line.type === "cmd") {
+      const fullCmd = line.text;
+      if (typedChars < fullCmd.length) {
+        const t = setTimeout(() => setTypedChars((c) => c + 1), 25);
+        return () => clearTimeout(t);
+      }
+      const t = setTimeout(() => {
+        setVisibleLines((v) => v + 1);
+        setTypedChars(0);
+      }, 200);
+      return () => clearTimeout(t);
+    }
+
+    if (line.type === "gap") {
+      const t = setTimeout(() => {
+        setVisibleLines((v) => v + 1);
+        setTypedChars(0);
+      }, 400);
+      return () => clearTimeout(t);
+    }
+
+    const t = setTimeout(() => {
+      setVisibleLines((v) => v + 1);
+      setTypedChars(0);
+    }, line.type === "done" ? 300 : 80);
+    return () => clearTimeout(t);
+  }, [started, visibleLines, typedChars]);
+
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-80px" }}
+      onViewportEnter={() => setStarted(true)}
+      variants={fadeUp}
+      custom={0.12}
+    >
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950 overflow-hidden max-w-2xl mx-auto">
+        <div className="flex items-center gap-1.5 border-b border-zinc-800 px-4 py-3">
+          <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+          <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+          <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+          <span className="ml-3 text-xs text-zinc-500 font-mono">terminal</span>
+        </div>
+        <div className="p-6 font-mono text-sm min-h-[280px]">
+          {terminalLines.slice(0, visibleLines).map((line, i) => (
+            <div key={i} className={line.type === "gap" ? "h-3" : ""}>
+              {line.type === "cmd" && (
+                <div>
+                  <span className="text-zinc-500">$ </span>
+                  <span className="text-zinc-200">{line.text}</span>
+                </div>
+              )}
+              {line.type === "out" && <div className="text-zinc-500">{line.text}</div>}
+              {line.type === "done" && <div className="text-emerald-400">{line.text}</div>}
+            </div>
+          ))}
+          {visibleLines < terminalLines.length && terminalLines[visibleLines]?.type === "cmd" && (
+            <div>
+              <span className="text-zinc-500">$ </span>
+              <span className="text-zinc-200">
+                {terminalLines[visibleLines].text.slice(0, typedChars)}
+              </span>
+              <span className="inline-block w-[7px] h-[14px] bg-zinc-400 ml-[1px] animate-pulse" />
+            </div>
+          )}
+          {visibleLines >= terminalLines.length && (
+            <div className="mt-3">
+              <span className="text-zinc-500">$ </span>
+              <span className="inline-block w-[7px] h-[14px] bg-zinc-400 ml-[1px] animate-pulse" />
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function RegistryStory() {
   return (
     <section className="py-28 px-10 bg-white border-t border-zinc-100">
@@ -329,137 +345,17 @@ function RegistryStory() {
           viewport={{ once: true, margin: "-80px" }}
           variants={stagger}
         >
-          <motion.div variants={fadeUp} custom={0} className="max-w-xl mb-16">
+          <motion.div variants={fadeUp} custom={0} className="max-w-xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 tracking-tight leading-tight">
-              Build. Publish. Install.
+              One command. Any namespace.
             </h2>
             <p className="mt-4 text-zinc-500 leading-relaxed">
-              Teams build docs UI with full creative control, publish under their namespace,
-              and anyone can install source code directly. No npm packages, no version conflicts.
+              Teams publish UI components and plugins under their namespace.
+              Install source code directly into your project.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Chapter 1: Build */}
-            <motion.div variants={fadeUp} custom={0.08}>
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 overflow-hidden h-full flex flex-col">
-                <div className="px-6 pt-6 pb-4">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-zinc-900 text-white text-xs font-bold">1</span>
-                  <h3 className="mt-3 text-base font-semibold text-zinc-900">Build</h3>
-                  <p className="mt-1 text-sm text-zinc-500 leading-relaxed">
-                    Your team builds docs UI with full creative control.
-                  </p>
-                </div>
-                <div className="mt-auto border-t border-zinc-200 bg-zinc-100/50">
-                  <div className="flex items-center gap-1.5 border-b border-zinc-200 px-4 py-2.5">
-                    <span className="h-2 w-2 rounded-full bg-zinc-300" />
-                    <span className="h-2 w-2 rounded-full bg-zinc-300" />
-                    <span className="h-2 w-2 rounded-full bg-zinc-300" />
-                    <span className="ml-2 text-[10px] text-zinc-400 font-mono">Sidebar.tsx</span>
-                  </div>
-                  <div className="p-4">
-                    <pre className="text-[11px] leading-relaxed font-mono text-zinc-600 whitespace-pre">
-{`export function Sidebar({
-  tree,
-  activePath,
-}: SidebarProps) {
-  return (
-    <nav className="w-64">
-      {tree.map((node) => (
-        <SidebarNode
-          key={node.id}
-          node={node}
-          active={activePath}
-        />
-      ))}
-    </nav>
-  )
-}`}
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Chapter 2: Publish */}
-            <motion.div variants={fadeUp} custom={0.16}>
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 overflow-hidden h-full flex flex-col">
-                <div className="px-6 pt-6 pb-4">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-zinc-900 text-white text-xs font-bold">2</span>
-                  <h3 className="mt-3 text-base font-semibold text-zinc-900">Publish</h3>
-                  <p className="mt-1 text-sm text-zinc-500 leading-relaxed">
-                    Publish components and plugins under your namespace.
-                  </p>
-                </div>
-                <div className="mt-auto border-t border-zinc-200 bg-zinc-100/50 p-4">
-                  <div className="space-y-2">
-                    {[
-                      { ns: "document0", items: ["sidebar", "toc", "search-dialog"] },
-                      { ns: "acme", items: ["sidebar", "api-ref", "changelog"] },
-                      { ns: "your-company", items: ["breadcrumbs", "theme-toggle"] },
-                    ].map((group) => (
-                      <div key={group.ns}>
-                        <div className="text-[10px] font-mono font-semibold text-zinc-400 uppercase tracking-wider mb-1">
-                          {group.ns}
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {group.items.map((item) => (
-                            <span
-                              key={item}
-                              className="inline-block rounded-md border border-zinc-200 bg-white px-2 py-0.5 text-[11px] font-mono text-zinc-600"
-                            >
-                              {item}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Chapter 3: Install */}
-            <motion.div variants={fadeUp} custom={0.24}>
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 overflow-hidden h-full flex flex-col">
-                <div className="px-6 pt-6 pb-4">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-zinc-900 text-white text-xs font-bold">3</span>
-                  <h3 className="mt-3 text-base font-semibold text-zinc-900">Install</h3>
-                  <p className="mt-1 text-sm text-zinc-500 leading-relaxed">
-                    Anyone installs source code directly. No npm packages. No version conflicts.
-                  </p>
-                </div>
-                <div className="mt-auto border-t border-zinc-200 bg-zinc-100/50">
-                  <div className="flex items-center gap-1.5 border-b border-zinc-200 px-4 py-2.5">
-                    <span className="h-2 w-2 rounded-full bg-zinc-300" />
-                    <span className="h-2 w-2 rounded-full bg-zinc-300" />
-                    <span className="h-2 w-2 rounded-full bg-zinc-300" />
-                    <span className="ml-2 text-[10px] text-zinc-400 font-mono">terminal</span>
-                  </div>
-                  <div className="p-4 font-mono text-[11px] space-y-2 text-zinc-600">
-                    <div>
-                      <span className="text-zinc-400">$</span>{" "}
-                      <span className="text-zinc-800">npx @document0/cli add acme/sidebar</span>
-                    </div>
-                    <div className="text-zinc-400 space-y-0.5">
-                      <div>&nbsp; Fetched acme/sidebar</div>
-                      <div>&nbsp; Created components/sidebar/Sidebar.tsx</div>
-                      <div className="text-emerald-600">&nbsp; Done.</div>
-                    </div>
-                    <div className="pt-2 border-t border-zinc-200 mt-2">
-                      <span className="text-zinc-400">$</span>{" "}
-                      <span className="text-zinc-800">npx @document0/cli add acme/api-ref</span>
-                    </div>
-                    <div className="text-zinc-400 space-y-0.5">
-                      <div>&nbsp; Fetched acme/api-ref</div>
-                      <div>&nbsp; Created components/api-ref/ApiRef.tsx</div>
-                      <div className="text-emerald-600">&nbsp; Done.</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+          <AnimatedTerminal />
         </motion.div>
       </div>
     </section>
@@ -497,8 +393,8 @@ function CodeShowcase() {
                 <span className="ml-3 text-xs text-zinc-400 font-mono">page.tsx</span>
               </div>
               <div className="p-6">
-                <pre className="text-[13px] leading-relaxed font-mono text-zinc-700 whitespace-pre">
-{`import { DocsSource } from "@document0/core"
+                <HighlightedCode
+                  code={`import { DocsSource } from "@document0/core"
 import { processMdx } from "@document0/mdx"
 
 const source = new DocsSource({
@@ -507,7 +403,8 @@ const source = new DocsSource({
 
 const page = source.getPage("quickstart")
 const { code, toc } = await processMdx(page.raw)`}
-                </pre>
+                  lang="tsx"
+                />
               </div>
             </div>
 
@@ -718,29 +615,15 @@ function Footer() {
   );
 }
 
-export default function TestHome() {
-  const [showIntro, setShowIntro] = useState(true);
-
-  useEffect(() => {
-    if (!showIntro) {
-      window.scrollTo(0, 0);
-    }
-  }, [showIntro]);
-
+export default function Home() {
   return (
-    <>
-      <AnimatePresence>
-        {showIntro && <Intro onComplete={() => setShowIntro(false)} />}
-      </AnimatePresence>
-
-      <div className="bg-white text-zinc-900 min-h-screen">
-        <Hero />
-        <RegistryStory />
-        <CodeShowcase />
-        <Features />
-        <CtaSection />
-        <Footer />
-      </div>
-    </>
+    <div className="bg-white text-zinc-900 min-h-screen">
+      <Hero />
+      <RegistryStory />
+      <CodeShowcase />
+      <Features />
+      <CtaSection />
+      <Footer />
+    </div>
   );
 }

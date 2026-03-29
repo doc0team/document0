@@ -1,6 +1,6 @@
 {
   "name": "@document0/mdx",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "document0 MDX processor - MDX compilation, frontmatter, remark/rehype plugins, and Shiki syntax highlighting",
   "type": "module",
   "exports": {
