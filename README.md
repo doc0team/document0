@@ -97,10 +97,10 @@ const { previous, next } = getPageNeighbours(tree, currentUrl);
 ### 6. Search
 
 ```ts
-import { buildSearchIndex, searchPages } from "@document0/core";
+import { createSearchRoute } from "@document0/core";
 
-const index = buildSearchIndex(pages);
-const results = searchPages(index, "installation");
+// In your API route (e.g. app/internal/search/route.ts)
+export const { GET } = createSearchRoute(source);
 ```
 
 ## Ordering pages with `_meta.json`
