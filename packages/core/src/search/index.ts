@@ -21,11 +21,13 @@ interface SearchRouteOptions {
   language?: string;
 }
 
-let cachedDb: Awaited<ReturnType<typeof create>> | null = null;
-let cachedSourceRef: DocsSource | null = null;
+const SEARCH_DB_KEY = "__searchDb";
 
-async function getOrCreateDb(source: DocsSource) {
-  if (cachedDb && cachedSourceRef === source) return cachedDb;
+function getOrCreateDb(source: DocsSource) {
+  const cached = source._cache.get(SEARCH_DB_KEY) as
+    | ReturnType<typeof create>
+    | undefined;
+  if (cached) return cached;
 
   const db = create({
     schema: {
@@ -46,8 +48,7 @@ async function getOrCreateDb(source: DocsSource) {
     });
   }
 
-  cachedDb = db;
-  cachedSourceRef = source;
+  source._cache.set(SEARCH_DB_KEY, db);
   return db;
 }
 

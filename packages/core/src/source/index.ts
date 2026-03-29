@@ -110,6 +110,8 @@ export class DocsSource {
   private plugins: Document0Plugin[];
   private _pages: PageData[] | null = null;
   private _tree: TreeNode[] | null = null;
+  /** @internal Generic cache for modules (e.g. search DB). */
+  _cache = new Map<string, unknown>();
 
   constructor(options: SourceOptions) {
     this.rootDir = path.resolve(options.rootDir);
@@ -154,5 +156,6 @@ export class DocsSource {
   invalidate(): void {
     this._pages = null;
     this._tree = null;
+    this._cache.clear();
   }
 }
