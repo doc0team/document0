@@ -1,9 +1,10 @@
 {
   "$schema": "./schema.json",
-  "version": 1,
-  "plugins": [
+  "version": 2,
+  "items": [
     {
       "name": "admonitions",
+      "namespace": "document0",
       "description": "GitHub-style blockquote callouts. Converts > [!NOTE], > [!WARNING] etc. into <Callout> JSX elements.",
       "author": "document0",
       "version": "0.1.0",
@@ -19,6 +20,7 @@
     },
     {
       "name": "reading-time",
+      "namespace": "document0",
       "description": "Adds readingTime (minutes) and wordCount to your processed MDX output.",
       "author": "document0",
       "version": "0.1.0",
@@ -32,6 +34,7 @@
     },
     {
       "name": "content-graph",
+      "namespace": "document0",
       "description": "Builds a directed graph of internal links across all pages. Enables backlinks, broken link detection, and related pages.",
       "author": "document0",
       "version": "0.1.0",
@@ -42,6 +45,81 @@
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "plugins/content-graph"
+    },
+    {
+      "name": "sidebar",
+      "namespace": "document0",
+      "description": "Collapsible navigation sidebar with active state tracking. Renders your page tree with support for folders, separators, and icons.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["navigation", "sidebar", "layout", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["Sidebar.tsx"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "components/sidebar",
+      "preview": true
+    },
+    {
+      "name": "toc",
+      "namespace": "document0",
+      "description": "Table of contents component with scroll-spy highlighting. Shows heading hierarchy extracted from MDX content.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["navigation", "toc", "headings", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["TableOfContents.tsx"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "components/toc",
+      "preview": true
+    },
+    {
+      "name": "breadcrumbs",
+      "namespace": "document0",
+      "description": "Breadcrumb navigation showing the current page path. Uses getBreadcrumbs() from @document0/core.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["navigation", "breadcrumbs", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["Breadcrumbs.tsx"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "components/breadcrumbs",
+      "preview": true
+    },
+    {
+      "name": "page-navigation",
+      "namespace": "document0",
+      "description": "Previous/Next page links for sequential navigation. Uses getPageNeighbours() from @document0/core.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["navigation", "pagination", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["PageNavigation.tsx"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "components/page-navigation",
+      "preview": true
+    },
+    {
+      "name": "search-dialog",
+      "namespace": "document0",
+      "description": "Command-palette style search dialog with keyboard navigation. Uses searchPages() from @document0/core.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["search", "dialog", "keyboard", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["SearchDialog.tsx"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "components/search-dialog",
+      "preview": true
     }
   ]
 }

@@ -2,7 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { DocsSource, buildPageTree } from "@document0/core";
 import { createOpenAPISource, buildOpenAPITree } from "@document0/core/openapi";
-import type { OpenAPIPageData, TreeNode, SeparatorNode, PageNode } from "@document0/core";
+import type { OpenAPIPageData, TreeNode, SeparatorNode, PageNode, FolderNode } from "@document0/core";
 
 const docsRootDir = path.join(process.cwd(), "content/docs");
 const openapiPath = path.join(process.cwd(), "openapi.json");
@@ -13,23 +13,25 @@ export const source = new DocsSource({
   baseUrl: "/docs",
 });
 
-export interface RegistryPlugin {
+export interface RegistryItem {
   name: string;
+  namespace: string;
   description: string;
   author: string;
   version: string;
   tags: string[];
-  category: string;
+  category: "mdx" | "core" | "ui";
   frameworks: string[];
   files: string[];
   dependencies: Record<string, string>;
   registryDependencies: string[];
   installPath: string;
+  preview?: boolean;
 }
 
 export interface RegistryIndex {
   version: number;
-  plugins: RegistryPlugin[];
+  items: RegistryItem[];
 }
 
 let cachedRegistry: RegistryIndex | null = null;
@@ -41,56 +43,99 @@ export function getRegistry(): RegistryIndex {
   return cachedRegistry;
 }
 
-export function getPluginByName(name: string): RegistryPlugin | undefined {
-  return getRegistry().plugins.find((p) => p.name === name);
+/** Full identifier: "namespace/name" */
+export function getItemId(item: RegistryItem): string {
+  return `${item.namespace}/${item.name}`;
 }
 
-export function getPluginSource(name: string): string | null {
-  const plugin = getPluginByName(name);
-  if (!plugin) return null;
-  const filePath = path.join(process.cwd(), "../../registry/plugins", name, "index.ts");
+export function getItemByFullId(fullId: string): RegistryItem | undefined {
+  const [ns, name] = fullId.split("/");
+  return getRegistry().items.find((p) => p.namespace === ns && p.name === name);
+}
+
+export function getItemBySlug(namespace: string, name: string): RegistryItem | undefined {
+  return getRegistry().items.find((p) => p.namespace === namespace && p.name === name);
+}
+
+export function getItemSource(namespace: string, name: string): string | null {
+  const item = getItemBySlug(namespace, name);
+  if (!item) return null;
+
+  const dir = item.category === "ui" ? "ui" : "plugins";
+  const fileName = item.files[0] || "index.ts";
+  const filePath = path.join(process.cwd(), "../../registry", dir, namespace, name, fileName);
+
   if (!fs.existsSync(filePath)) return null;
   return fs.readFileSync(filePath, "utf-8");
 }
 
 export function getPluginsTree(): TreeNode[] {
   const registry = getRegistry();
-  const mdxPlugins = registry.plugins.filter((p) => p.category === "mdx");
-  const corePlugins = registry.plugins.filter((p) => p.category === "core");
 
+  const namespaces = [...new Set(registry.items.map((i) => i.namespace))];
   const nodes: TreeNode[] = [];
 
-  // Index page
   nodes.push({
     type: "page",
-    name: "Introduction",
+    name: "Explore",
     url: "/plugins",
     slug: "",
   } as PageNode);
 
-  // MDX Plugins section
-  if (mdxPlugins.length > 0) {
-    nodes.push({ type: "separator", name: "MDX Plugins" } as SeparatorNode);
-    for (const plugin of mdxPlugins) {
-      nodes.push({
-        type: "page",
-        name: plugin.name,
-        url: `/plugins/${plugin.name}`,
-        slug: plugin.name,
-      } as PageNode);
-    }
-  }
+  for (const ns of namespaces) {
+    const nsItems = registry.items.filter((i) => i.namespace === ns);
+    const mdx = nsItems.filter((i) => i.category === "mdx");
+    const core = nsItems.filter((i) => i.category === "core");
+    const ui = nsItems.filter((i) => i.category === "ui");
 
-  // Core Plugins section
-  if (corePlugins.length > 0) {
-    nodes.push({ type: "separator", name: "Core Plugins" } as SeparatorNode);
-    for (const plugin of corePlugins) {
+    nodes.push({ type: "separator", name: ns } as SeparatorNode);
+
+    if (mdx.length > 0) {
+      const children = mdx.map((item) => ({
+        type: "page" as const,
+        name: item.name,
+        url: `/plugins/${ns}/${item.name}`,
+        slug: item.name,
+      })) as PageNode[];
+
       nodes.push({
-        type: "page",
-        name: plugin.name,
-        url: `/plugins/${plugin.name}`,
-        slug: plugin.name,
-      } as PageNode);
+        type: "folder",
+        name: "MDX Plugins",
+        defaultOpen: true,
+        children,
+      } as FolderNode);
+    }
+
+    if (core.length > 0) {
+      const children = core.map((item) => ({
+        type: "page" as const,
+        name: item.name,
+        url: `/plugins/${ns}/${item.name}`,
+        slug: item.name,
+      })) as PageNode[];
+
+      nodes.push({
+        type: "folder",
+        name: "Core Plugins",
+        defaultOpen: true,
+        children,
+      } as FolderNode);
+    }
+
+    if (ui.length > 0) {
+      const children = ui.map((item) => ({
+        type: "page" as const,
+        name: item.name,
+        url: `/plugins/${ns}/${item.name}`,
+        slug: item.name,
+      })) as PageNode[];
+
+      nodes.push({
+        type: "folder",
+        name: "UI Components",
+        defaultOpen: true,
+        children,
+      } as FolderNode);
     }
   }
 

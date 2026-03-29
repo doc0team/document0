@@ -1,12 +1,26 @@
 import { notFound } from "next/navigation";
+import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import {
   getRegistry,
-  getPluginByName,
-  getPluginSource,
+  getItemBySlug,
+  getItemSource,
+  getItemId,
 } from "@/lib/source";
 import { getHighlighter, shikiThemes } from "@/lib/highlighter";
 import { CopyButton } from "@/components/copy-button";
+import {
+  CliPreview,
+  PluginSearch,
+} from "@/components/plugins";
+
+const previewComponents: Record<string, React.ComponentType> = {
+  "document0/sidebar": dynamic(() => import("@/components/previews/sidebar").then((m) => m.SidebarPreview)),
+  "document0/toc": dynamic(() => import("@/components/previews/toc").then((m) => m.TocPreview)),
+  "document0/breadcrumbs": dynamic(() => import("@/components/previews/breadcrumbs").then((m) => m.BreadcrumbsPreview)),
+  "document0/page-navigation": dynamic(() => import("@/components/previews/page-navigation").then((m) => m.PageNavigationPreview)),
+  "document0/search-dialog": dynamic(() => import("@/components/previews/search-dialog").then((m) => m.SearchDialogPreview)),
+};
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -15,9 +29,9 @@ interface PageProps {
 export async function generateStaticParams() {
   const registry = getRegistry();
   return [
-    { slug: [] }, // /plugins (index)
-    ...registry.plugins.map((plugin) => ({
-      slug: [plugin.name],
+    { slug: [] },
+    ...registry.items.map((item) => ({
+      slug: [item.namespace, item.name],
     })),
   ];
 }
@@ -27,153 +41,112 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!slug || slug.length === 0) {
     return {
-      title: "Plugins",
-      description: "Extend document0 with community plugins.",
+      title: "Plugins & Components",
+      description: "Extend document0 with community plugins and UI components.",
     };
   }
 
-  const plugin = getPluginByName(slug[0]!);
-  if (!plugin) return {};
+  if (slug.length < 2) return {};
+
+  const item = getItemBySlug(slug[0]!, slug[1]!);
+  if (!item) return {};
 
   return {
-    title: plugin.name,
-    description: plugin.description,
+    title: `${item.namespace}/${item.name}`,
+    description: item.description,
   };
 }
 
 function PluginsIndexPage() {
   const registry = getRegistry();
-  const mdxPlugins = registry.plugins.filter((p) => p.category === "mdx");
-  const corePlugins = registry.plugins.filter((p) => p.category === "core");
+  const items = registry.items.map((p) => ({
+    name: p.name,
+    namespace: p.namespace,
+    description: p.description,
+    category: p.category as "mdx" | "core" | "ui",
+    tags: p.tags,
+    frameworks: p.frameworks,
+    author: p.author,
+  }));
 
   return (
-    <div className="prose-headless">
-      <h1>Plugins</h1>
-      <p>
-        Plugins extend document0 with additional features. Install them with the
-        CLI or copy the source directly — you own the code.
-      </p>
-
-      <div className="not-prose my-6 rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
-        <div className="flex items-center gap-3 font-mono text-sm text-zinc-300">
-          <span className="text-zinc-500 select-none">$</span>
-          <span>npx @document0/cli add admonitions</span>
-          <CopyButton text="npx @document0/cli add admonitions" />
-        </div>
+    <div className="max-w-5xl">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-white tracking-tight mb-4">
+          Plugins & Components
+        </h1>
+        <p className="text-lg text-zinc-400 leading-relaxed max-w-2xl">
+          Extend document0 with plugins and pre-built UI components. Install source code directly —
+          no npm dependencies, full customization, zero lock-in.
+        </p>
       </div>
 
-      <h2>How It Works</h2>
-      <p>
-        document0 plugins follow the{" "}
-        <a href="https://ui.shadcn.com" target="_blank" rel="noopener noreferrer">
-          shadcn/ui
-        </a>{" "}
-        model — you install the source code, not an npm dependency. This means
-        you can customize anything and there&apos;s no dependency versioning to
-        manage.
-      </p>
+      <div className="mb-10">
+        <CliPreview />
+      </div>
 
-      <h2>MDX Plugins</h2>
-      <p>Extend the MDX compilation pipeline with remark or rehype plugins.</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Plugin</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mdxPlugins.map((plugin) => (
-            <tr key={plugin.name}>
-              <td>
-                <a href={`/plugins/${plugin.name}`}>{plugin.name}</a>
-              </td>
-              <td>{plugin.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <h2>Core Plugins</h2>
-      <p>
-        Work with the data layer — transform pages, modify the page tree, or
-        analyze content relationships.
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>Plugin</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {corePlugins.map((plugin) => (
-            <tr key={plugin.name}>
-              <td>
-                <a href={`/plugins/${plugin.name}`}>{plugin.name}</a>
-              </td>
-              <td>{plugin.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <h2>CLI Commands</h2>
-      <pre>
-        <code>{`# List all available plugins
-npx @document0/cli list
-
-# Search plugins
-npx @document0/cli search callout
-
-# Install plugins
-npx @document0/cli add admonitions reading-time`}</code>
-      </pre>
+      <PluginSearch plugins={items} />
     </div>
   );
 }
 
-async function PluginDetailPage({
-  plugin,
+function ItemDetailPage({
+  item,
   highlightedSource,
   highlightedUsage,
+  sourceCode,
+  PreviewComponent,
 }: {
-  plugin: ReturnType<typeof getPluginByName> & {};
+  item: NonNullable<ReturnType<typeof getItemBySlug>>;
   highlightedSource: string | null;
   highlightedUsage: string;
+  sourceCode: string | null;
+  PreviewComponent: React.ComponentType | null;
 }) {
-  const sourceCode = getPluginSource(plugin.name);
-  const installCommand = `npx @document0/cli add ${plugin.name}`;
-  const deps = Object.entries(plugin.dependencies);
+  const fullId = getItemId(item);
+  const installCommand = `npx @document0/cli add ${fullId}`;
+  const deps = Object.entries(item.dependencies);
+  const isUi = item.category === "ui";
+  const fileName = item.files[0] || "index.ts";
 
   return (
     <div className="prose-headless">
       <div className="not-prose flex items-center gap-3 mb-2">
-        <h1 className="text-3xl font-bold text-white">{plugin.name}</h1>
-        <span
-          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
-            plugin.category === "mdx"
-              ? "border-sky-500/30 text-sky-400 bg-sky-500/10"
-              : "border-emerald-500/30 text-emerald-400 bg-emerald-500/10"
-          }`}
-        >
-          {plugin.category}
+        <h1 className="text-3xl font-bold text-white">{item.name}</h1>
+        <span className="inline-flex items-center rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+          {item.category}
         </span>
       </div>
 
-      <p>{plugin.description}</p>
+      <p>{item.description}</p>
 
       <div className="not-prose my-4 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
-        <span>v{plugin.version}</span>
+        <span>{fullId}</span>
         <span>•</span>
-        <span>by {plugin.author}</span>
+        <span>v{item.version}</span>
         <span>•</span>
         <span>
-          {plugin.frameworks.includes("any")
-            ? "Works with any framework"
-            : plugin.frameworks.join(", ")}
+          {item.frameworks.includes("any")
+            ? "Any framework"
+            : item.frameworks.join(", ")}
         </span>
       </div>
+
+      {PreviewComponent && (
+        <>
+          <h2>Preview</h2>
+          <div className="not-prose mb-6 rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
+            <div className="flex items-center gap-1.5 border-b border-zinc-800 px-4 py-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+              <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+              <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+            </div>
+            <div className="p-6">
+              <PreviewComponent />
+            </div>
+          </div>
+        </>
+      )}
 
       <h2>Installation</h2>
       <div className="not-prose rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 mb-4">
@@ -193,12 +166,7 @@ async function PluginDetailPage({
       <h2>Usage</h2>
       <div className="code-block-wrapper relative group not-prose">
         <CopyButton
-          text={`import { processMdx } from "@document0/mdx";
-import { ${plugin.name.replace(/-/g, "")} } from "./${plugin.installPath}";
-
-const result = await processMdx(source, {
-  plugins: [${plugin.name.replace(/-/g, "")}()],
-});`}
+          text={isUi ? getUiUsageCode(item.name, item.installPath, fileName) : getPluginUsageCode(item.name, item.installPath)}
           className="opacity-0 group-hover:opacity-100"
         />
         <div dangerouslySetInnerHTML={{ __html: highlightedUsage }} />
@@ -206,8 +174,8 @@ const result = await processMdx(source, {
 
       <h2>Source</h2>
       <p>
-        This is the full plugin source. After installation, it lives at{" "}
-        <code>{plugin.installPath}/index.ts</code> and you can modify it however you like.
+        After installation, this lives at{" "}
+        <code>{item.installPath}/{fileName}</code> and you can modify it however you like.
       </p>
       {sourceCode && highlightedSource && (
         <div className="code-block-wrapper relative group not-prose">
@@ -218,7 +186,7 @@ const result = await processMdx(source, {
 
       <h2>Tags</h2>
       <div className="not-prose flex flex-wrap gap-2">
-        {plugin.tags.map((tag) => (
+        {item.tags.map((tag) => (
           <span
             key={tag}
             className="rounded-md bg-zinc-800/80 px-2 py-1 text-xs text-zinc-400"
@@ -231,58 +199,78 @@ const result = await processMdx(source, {
   );
 }
 
+function getPluginUsageCode(name: string, installPath: string): string {
+  const fnName = name.replace(/-./g, (m) => m[1].toUpperCase());
+  return `import { processMdx } from "@document0/mdx";
+import { ${fnName} } from "./${installPath}";
+
+const result = await processMdx(source, {
+  plugins: [${fnName}()],
+});`;
+}
+
+function getUiUsageCode(name: string, installPath: string, fileName: string): string {
+  const componentName = fileName.replace(".tsx", "").replace(".ts", "");
+  return `import { ${componentName} } from "./${installPath}";
+
+// Example usage in your layout or page:
+<${componentName} />`;
+}
+
 export default async function PluginPage({ params }: PageProps) {
   const { slug } = await params;
 
-  // Index page
   if (!slug || slug.length === 0) {
     return (
-      <div className="flex gap-12 px-8 py-10 max-w-screen-xl mx-auto w-full">
-        <article className="flex-1 min-w-0 max-w-3xl pb-[50vh]">
-          <PluginsIndexPage />
-        </article>
+      <div className="px-8 py-12 max-w-screen-xl mx-auto w-full">
+        <PluginsIndexPage />
       </div>
     );
   }
 
-  // Plugin detail page
-  const plugin = getPluginByName(slug[0]!);
-  if (!plugin) notFound();
+  // Slug is [namespace, name]
+  if (slug.length < 2) notFound();
 
-  // Highlight the source code
-  const sourceCode = getPluginSource(plugin.name);
+  const [namespace, name] = slug;
+  const item = getItemBySlug(namespace!, name!);
+  if (!item) notFound();
+
+  const sourceCode = getItemSource(namespace!, name!);
   const highlighter = await getHighlighter();
 
   let highlightedSource: string | null = null;
   if (sourceCode) {
     highlightedSource = highlighter.codeToHtml(sourceCode, {
-      lang: "typescript",
+      lang: "tsx",
       themes: shikiThemes,
       defaultColor: false,
     });
   }
 
-  // Highlight the usage example
-  const usageCode = `import { processMdx } from "@document0/mdx";
-import { ${plugin.name.replace(/-/g, "")} } from "./${plugin.installPath}";
-
-const result = await processMdx(source, {
-  plugins: [${plugin.name.replace(/-/g, "")}()],
-});`;
+  const isUi = item.category === "ui";
+  const fileName = item.files[0] || "index.ts";
+  const usageCode = isUi
+    ? getUiUsageCode(item.name, item.installPath, fileName)
+    : getPluginUsageCode(item.name, item.installPath);
 
   const highlightedUsage = highlighter.codeToHtml(usageCode, {
-    lang: "typescript",
+    lang: "tsx",
     themes: shikiThemes,
     defaultColor: false,
   });
 
+  const fullId = getItemId(item);
+  const PreviewComponent = item.preview ? previewComponents[fullId] || null : null;
+
   return (
     <div className="flex gap-12 px-8 py-10 max-w-screen-xl mx-auto w-full">
       <article className="flex-1 min-w-0 max-w-3xl pb-[50vh]">
-        <PluginDetailPage
-          plugin={plugin}
+        <ItemDetailPage
+          item={item}
           highlightedSource={highlightedSource}
           highlightedUsage={highlightedUsage}
+          sourceCode={sourceCode}
+          PreviewComponent={PreviewComponent}
         />
       </article>
     </div>
