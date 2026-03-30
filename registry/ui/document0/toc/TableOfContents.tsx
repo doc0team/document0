@@ -13,7 +13,7 @@ interface TocEntry {
  *
  * Usage:
  * ```tsx
- * import { TableOfContents } from "@/components/toc";
+ * import { TableOfContents } from "@/components/document0/toc/TableOfContents";
  * import { processMdx } from "@document0/mdx";
  *
  * // In your page component:
@@ -68,7 +68,7 @@ export function TableOfContents({ toc }: { toc: TocEntry[] }) {
               className={[
                 "block py-0.5 text-sm transition-colors",
                 activeId === entry.id
-                  ? "text-white font-medium"
+                  ? "text-sky-400 font-medium"
                   : "text-zinc-500 hover:text-zinc-300",
               ].join(" ")}
             >
