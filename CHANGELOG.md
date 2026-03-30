@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-23
+
+### Changed
+
+- Added `_cache = new Map<string, unknown>()` to `DocsSource` - a generic instance-scoped cache that any module can use. `invalidate()` now also calls `this._cache.clear()`. Removed module-level cachedDb and cachedSourceRef singletons. `getOrCreateDb()` now reads/writes via `source._cache` using a `_searchDb` key. Each `DocsSource` instance gets its own isolated Orama DB, and it's automatically cleared on `invalidate()`. This fixes the singleton anti-pattern. Multiple `DocsSource` instances now each maintain their own search index, and hot-reload works correctly via `invalidate()`.
+
+- Removed the _meta.ts and _meta.js candidates that were never actually supported. Only _meta.json is now supported. Now directly checks for _meta.json only, consistent with readMetaFromDir in tree/index.ts.
+
 ## [0.3.0] - 2026-03-29
 
 ### Removed

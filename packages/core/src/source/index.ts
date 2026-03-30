@@ -33,16 +33,13 @@ function buildUrl(slugs: string[], baseUrl: string): string {
 }
 
 function readMeta(dir: string): MetaFile | null {
-  const candidates = ["_meta.json", "_meta.ts", "_meta.js"];
-  for (const candidate of candidates) {
-    const full = path.join(dir, candidate);
-    if (fs.existsSync(full)) {
-      try {
-        const raw = fs.readFileSync(full, "utf-8");
-        return JSON.parse(raw) as MetaFile;
-      } catch {
-        return null;
-      }
+  const full = path.join(dir, "_meta.json");
+  if (fs.existsSync(full)) {
+    try {
+      const raw = fs.readFileSync(full, "utf-8");
+      return JSON.parse(raw) as MetaFile;
+    } catch {
+      return null;
     }
   }
   return null;
