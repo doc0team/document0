@@ -20,6 +20,10 @@ Remove the now unused fs import and stripFrontMatter helper.
 - generateLlmsFullTxt - replaced fs.readFileSync(page.filePath) + stripFrontMatter() with page.content (already in memory, already fronmatter-stripped by gray-matter during scan).
 - getPageRawContent - same fix as above. No more redundant disk reads at request time. 
 
+- Added _slugMap and _urlMap (Map<string, PageData>) fields, populated once when getPages() first loads.
+- getpage(slug) - now 0(1) via _slugMap.get(slug) instead of .find()
+- getPageByUrl(url) - now 0(1) via _urlMap.get(url) instead of .find()
+
 ## [0.3.0] - 2026-03-29
 
 ### Removed

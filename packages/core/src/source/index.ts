@@ -107,6 +107,8 @@ export class DocsSource {
   private plugins: Document0Plugin[];
   private _pages: PageData[] | null = null;
   private _tree: TreeNode[] | null = null;
+  private _slugMap: Map<string, PageData> | null = null;
+  private _urlMap: Map<string, PageData> | null = null;
   /** @internal Generic cache for modules (e.g. search DB). */
   _cache = new Map<string, unknown>();
 
@@ -127,6 +129,14 @@ export class DocsSource {
     );
     pages = applyPageTransforms(pages, this.plugins);
     this._pages = pages;
+
+    this._slugMap = new Map();
+    this._urlMap = new Map();
+    for (const page of pages) {
+      this._slugMap.set(page.slug, page);
+      this._urlMap.set(page.url, page);
+    }
+
     return this._pages;
   }
 
@@ -139,11 +149,13 @@ export class DocsSource {
   }
 
   getPage(slug: string): PageData | undefined {
-    return this.getPages().find((p) => p.slug === slug);
+    this.getPages();
+    return this._slugMap!.get(slug);
   }
 
   getPageByUrl(url: string): PageData | undefined {
-    return this.getPages().find((p) => p.url === url);
+    this.getPages();
+    return this._urlMap!.get(url);
   }
 
   getMeta(dir: string): MetaFile | null {
@@ -153,6 +165,8 @@ export class DocsSource {
   invalidate(): void {
     this._pages = null;
     this._tree = null;
+    this._slugMap = null;
+    this._urlMap = null;
     this._cache.clear();
   }
 }
