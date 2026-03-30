@@ -24,6 +24,8 @@ Remove the now unused fs import and stripFrontMatter helper.
 - getpage(slug) - now 0(1) via _slugMap.get(slug) instead of .find()
 - getPageByUrl(url) - now 0(1) via _urlMap.get(url) instead of .find()
 
+- Added lockfile for component/plugin versions. Update CLI commands for update command. Update registry-index for namespaces
+
 ## [0.3.0] - 2026-03-29
 
 ### Removed
