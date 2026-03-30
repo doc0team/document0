@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "document0 - headless documentation framework, bring your own styles",
+  "license": "MIT",
   "workspaces": [
     "packages/*"
   ],
