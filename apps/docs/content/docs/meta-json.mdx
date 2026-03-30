@@ -1,0 +1,60 @@
+---
+title: Sidebar Ordering
+description: Control page ordering and labels with _meta.json files.
+---
+
+# Sidebar Ordering
+
+Place a `_meta.json` file in any content directory to control the order pages appear in the sidebar tree.
+
+## Example
+
+```json
+{
+  "title": "API Reference",
+  "pages": [
+    "index",
+    "--- Core",
+    "dosource",
+    "buildpagetree",
+    "---",
+    "--- Navigation",
+    "getbreadcrumbs",
+    "getpageneighbours"
+  ],
+  "defaultOpen": true,
+  "icon": "📖"
+}
+```
+
+## Rules
+
+- Strings starting with `"--- "` become labelled separators
+- `"---"` alone becomes an unlabelled divider
+- Pages not listed in `pages` are appended at the end in alphabetical order
+- `defaultOpen` controls whether the folder starts expanded in the sidebar
+- `icon` adds an emoji or string icon to the folder
+
+## Static generation
+
+Use `generateStaticParams` to pre-render all docs pages at build time:
+
+```ts
+export async function generateStaticParams() {
+  return source.getPages().map((page) => ({
+    slug: page.slugs.filter(Boolean),
+  }));
+}
+```
+
+This works with Next.js App Router's `[[...slug]]` catch-all route.
+
+## Hot reload
+
+During development, call `source.invalidate()` when content files change to clear all cached data:
+
+```ts
+source.invalidate();
+```
+
+This forces the next `getPages()`, `getPageTree()`, `getPage()`, or search query to re-read from disk.

@@ -1,0 +1,41 @@
+---
+title: Search
+description: Add full-text search to your docs site with Orama.
+---
+
+# Search
+
+document0 includes full-text search powered by [Orama](https://orama.com) with fuzzy matching and relevance ranking. The search index is built on first request and cached per `DocsSource` instance.
+
+## 1. Create the search API route
+
+```ts
+// app/internal/search/route.ts
+import { createSearchRoute } from "@document0/core";
+import { source } from "@/lib/source";
+
+export const { GET } = createSearchRoute(source);
+```
+
+This creates a `GET` endpoint at `/internal/search?q=...` that returns `SearchResult[]`.
+
+## 2. SearchResult
+
+```ts
+interface SearchResult {
+  title: string;
+  description?: string;
+  url: string;
+  score: number;
+}
+```
+
+## 3. Add a search UI
+
+Install the pre-built search dialog from the registry:
+
+```bash
+document0 add document0/search-dialog
+```
+
+Or build your own — fetch from the endpoint and render the results however you like.

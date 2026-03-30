@@ -1,13 +1,9 @@
 ---
-title: Guides
-description: In-depth guides for building with document0.
+title: Custom Components
+description: Override any HTML element rendered from MDX with your own components.
 ---
 
-# Guides
-
-In-depth guides for common tasks when building with document0.
-
-## Custom components
+# Custom Components
 
 Replace any HTML element rendered from MDX with your own component by passing a `components` map to the compiled `MDXContent`:
 
@@ -30,32 +26,9 @@ const components = {
 
 You can override any valid HTML tag name: `h1`–`h6`, `p`, `a`, `ul`, `ol`, `li`, `blockquote`, `pre`, `code`, `table`, `thead`, `tbody`, `tr`, `th`, `td`, `hr`, `strong`, `em`, and more.
 
-## Sidebar ordering with \_meta.json
+## Building a sidebar
 
-Create a `_meta.json` file in any content directory to control the order pages appear in the sidebar tree:
-
-```json
-{
-  "title": "API Reference",
-  "pages": [
-    "index",
-    "--- Core",
-    "dosource",
-    "buildpagetree",
-    "---",
-    "--- Navigation",
-    "getbreadcrumbs",
-    "getpageneighbours"
-  ],
-  "defaultOpen": true
-}
-```
-
-Pages not listed in `pages` are appended at the end in alphabetical order.
-
-## Building a sidebar component
-
-Use the `TreeNode` type from `@document0/core` to build a recursive sidebar component. The key pattern is checking `node.type` to decide how to render each node:
+Use the `TreeNode` type from `@document0/core` to build a recursive sidebar component:
 
 ```tsx
 "use client";
@@ -96,7 +69,13 @@ function SidebarNode({ node }: { node: TreeNode }) {
 }
 ```
 
-## Table of contents with IntersectionObserver
+Or install pre-built components from the registry:
+
+```bash
+document0 add document0/sidebar document0/toc document0/breadcrumbs
+```
+
+## Table of contents
 
 Build an active-heading TOC using the `toc` array returned by `processMdx`:
 
@@ -145,26 +124,14 @@ export function Toc({ toc }: { toc: TocEntry[] }) {
 
 ## Previous / next navigation
 
-Use `getPageNeighbours` to get the adjacent pages in document order:
-
 ```ts
 import { getPageNeighbours } from "@document0/core";
 
 const { previous, next } = getPageNeighbours(tree, page.url);
 ```
 
-Both `previous` and `next` are `PageNode | null`.
+Both `previous` and `next` are `PageNode | null`. Or install from the registry:
 
-## Static generation with Next.js
-
-Use `generateStaticParams` to pre-render all docs pages at build time:
-
-```ts
-export async function generateStaticParams() {
-  return source.getPages().map((page) => ({
-    slug: page.slugs.filter(Boolean),
-  }));
-}
+```bash
+document0 add document0/page-navigation
 ```
-
-This works with Next.js App Router's `[[...slug]]` catch-all route.

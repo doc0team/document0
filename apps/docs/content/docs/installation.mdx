@@ -66,6 +66,38 @@ bun add shiki @mdx-js/mdx react react-dom
 | `@mdx-js/mdx` | Compiling MDX at runtime |
 | `react` / `react-dom` | Rendering compiled MDX |
 
+## CLI (optional)
+
+Install the CLI to add plugins and components from the registry:
+
+<CodeTabs labels={["npm", "pnpm", "yarn", "bun"]}>
+
+```bash
+npm install -D @document0/cli
+```
+
+```bash
+pnpm add -D @document0/cli
+```
+
+```bash
+yarn add -D @document0/cli
+```
+
+```bash
+bun add -D @document0/cli
+```
+
+</CodeTabs>
+
+Then install components:
+
+```bash
+npx document0 add document0/sidebar document0/search-dialog
+```
+
+See the [CLI reference](/docs/cli) for all commands.
+
 ## Framework setup
 
 document0 works with any Node.js framework. The [Quickstart](/docs/quickstart) guide walks through a complete Next.js setup.

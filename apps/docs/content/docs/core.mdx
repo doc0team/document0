@@ -1,15 +1,15 @@
 ---
 title: "@document0/core"
-description: File-system source scanning, page trees, navigation utilities, and search indexing.
+description: File-system source, page trees, navigation, Orama-backed search, llms.txt, and OpenAPI support.
 ---
 
 # @document0/core
 
-The core package handles everything related to reading your content from disk and building the data structures your UI needs.
+The core package handles everything related to reading your content from disk, building data structures for your UI, serving search and LLM endpoints, and processing OpenAPI specs.
 
 ## DocsSource
 
-The main entry point. Scans a directory for `.md` and `.mdx` files and produces typed `PageData` objects.
+The main entry point. Scans a directory for `.md` and `.mdx` files and produces typed `PageData` objects. All results are cached on the instance — subsequent calls return instantly.
 
 ```ts
 import { DocsSource } from "@document0/core";
@@ -25,20 +25,46 @@ const source = new DocsSource({
 
 #### `getPages()`
 
-Returns all pages as a flat array of `PageData`.
+Returns all pages as a flat array of `PageData`. Cached after first call.
 
 ```ts
 const pages = source.getPages();
 // PageData[]
 ```
 
+#### `getPageTree()`
+
+Returns a nested `TreeNode[]` for sidebar rendering. Respects `_meta.json` ordering. Cached after first call.
+
+```ts
+const tree = source.getPageTree();
+// TreeNode[]
+```
+
 #### `getPage(slug)`
 
-Looks up a single page by its slug string (e.g. `"guides/installation"`).
+O(1) lookup of a single page by its slug string (e.g. `"guides/installation"`).
 
 ```ts
 const page = source.getPage("installation");
 // PageData | undefined
+```
+
+#### `getPageByUrl(url)`
+
+O(1) lookup of a single page by its full URL (e.g. `"/docs/guides/installation"`).
+
+```ts
+const page = source.getPageByUrl("/docs/installation");
+// PageData | undefined
+```
+
+#### `invalidate()`
+
+Clears all cached data (pages, tree, search index, lookup maps). Call this when content files change to force a reload.
+
+```ts
+source.invalidate();
 ```
 
 ### PageData
@@ -49,6 +75,7 @@ interface PageData {
   slugs: string[];        // e.g. ["guides", "installation"]
   url: string;            // e.g. "/docs/guides/installation"
   filePath: string;       // absolute path to the .mdx file
+  content: string;        // raw markdown body (frontmatter stripped)
   frontmatter: {
     title: string;
     description?: string;
@@ -61,16 +88,7 @@ interface PageData {
 
 ---
 
-## buildPageTree
-
-Converts a flat `PageData[]` into a nested tree for sidebar rendering. Respects `_meta.json` ordering.
-
-```ts
-import { buildPageTree } from "@document0/core";
-
-const tree = buildPageTree(source.getPages(), rootDir);
-// TreeNode[]
-```
+## Page tree
 
 ### TreeNode
 
@@ -81,6 +99,7 @@ interface PageNode {
   type: "page";
   name: string;
   url: string;
+  slug: string;
   icon?: string;
 }
 
@@ -88,14 +107,14 @@ interface FolderNode {
   type: "folder";
   name: string;
   icon?: string;
-  defaultOpen: boolean;
-  index: PageNode | null;   // index.mdx inside this folder
+  defaultOpen?: boolean;
+  index?: PageNode;       // index.mdx inside this folder
   children: TreeNode[];
 }
 
 interface SeparatorNode {
   type: "separator";
-  name?: string;            // label, or undefined for an unlabelled divider
+  name: string;           // label, or empty string for an unlabelled divider
 }
 ```
 
@@ -171,7 +190,7 @@ const open = isActiveOrAncestor(folderNode, currentUrl);
 
 ### createSearchRoute
 
-Creates an API route handler backed by [Orama](https://orama.com) with full-text search, fuzzy matching, and relevance ranking.
+Creates an API route handler backed by [Orama](https://orama.com) with full-text search, fuzzy matching, and relevance ranking. The search index is cached per `DocsSource` instance and cleared on `invalidate()`.
 
 ```ts
 import { createSearchRoute } from "@document0/core";
@@ -189,4 +208,85 @@ interface SearchResult {
   url: string;
   score: number;
 }
+```
+
+---
+
+## llms.txt
+
+Generate [llms.txt](https://llmstxt.org/) files so LLMs and AI tools can ingest your documentation.
+
+### createLlmsTxtRoute
+
+Serves a concise index of all pages as `llms.txt`.
+
+```ts
+import { createLlmsTxtRoute } from "@document0/core";
+
+// app/llms.txt/route.ts
+export const { GET } = createLlmsTxtRoute(source, {
+  title: "My Docs",
+  description: "Documentation for my project",
+  baseUrl: "https://docs.example.com",
+});
+```
+
+### createLlmsFullTxtRoute
+
+Serves the complete content of every page concatenated into a single text file.
+
+```ts
+import { createLlmsFullTxtRoute } from "@document0/core";
+
+// app/llms-full.txt/route.ts
+export const { GET } = createLlmsFullTxtRoute(source, {
+  title: "My Docs",
+  description: "Documentation for my project",
+  baseUrl: "https://docs.example.com",
+});
+```
+
+### createMdxPageRoute
+
+Serves raw markdown content for a single page by slug.
+
+```ts
+import { createMdxPageRoute } from "@document0/core";
+
+// app/api/page/[...slug]/route.ts
+export const { GET } = createMdxPageRoute(source);
+```
+
+---
+
+## OpenAPI
+
+### createOpenAPISource
+
+Parses an OpenAPI 3.x spec and generates `OpenAPIPageData` for each operation.
+
+```ts
+import { createOpenAPISource } from "@document0/core";
+
+const operations = createOpenAPISource(specObject, { baseUrl: "/docs/api" });
+```
+
+### buildOpenAPITree
+
+Builds a `TreeNode[]` from OpenAPI operations, grouped by tag.
+
+```ts
+import { buildOpenAPITree } from "@document0/core";
+
+const tree = buildOpenAPITree(operations);
+```
+
+### buildOpenAPISearchIndex
+
+Returns `SearchResult[]` from OpenAPI operations for use with search.
+
+```ts
+import { buildOpenAPISearchIndex } from "@document0/core";
+
+const results = buildOpenAPISearchIndex(operations);
 ```

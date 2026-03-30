@@ -1,0 +1,48 @@
+---
+title: llms.txt
+description: Serve llms.txt files so AI tools can ingest your documentation.
+---
+
+# llms.txt
+
+Serve [llms.txt](https://llmstxt.org/) files so LLMs and AI tools can discover and ingest your documentation.
+
+## llms.txt (concise index)
+
+```ts
+// app/llms.txt/route.ts
+import { createLlmsTxtRoute } from "@document0/core";
+import { source } from "@/lib/source";
+
+export const { GET } = createLlmsTxtRoute(source, {
+  title: "My Project",
+  description: "Documentation for My Project",
+  baseUrl: "https://docs.example.com",
+});
+```
+
+## llms-full.txt (complete content)
+
+```ts
+// app/llms-full.txt/route.ts
+import { createLlmsFullTxtRoute } from "@document0/core";
+import { source } from "@/lib/source";
+
+export const { GET } = createLlmsFullTxtRoute(source, {
+  title: "My Project",
+  description: "Documentation for My Project",
+  baseUrl: "https://docs.example.com",
+});
+```
+
+## Raw page content
+
+Serve raw markdown for individual pages:
+
+```ts
+// app/api/page/[...slug]/route.ts
+import { createMdxPageRoute } from "@document0/core";
+import { source } from "@/lib/source";
+
+export const { GET } = createMdxPageRoute(source);
+```

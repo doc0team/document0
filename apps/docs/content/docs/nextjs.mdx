@@ -1,0 +1,171 @@
+---
+title: Next.js
+description: Build a document0 docs site with Next.js App Router.
+---
+
+# Next.js
+
+This guide builds a working docs site from scratch using Next.js App Router and document0.
+
+## 1. Create a Next.js app
+
+```bash
+npx create-next-app@latest my-docs --typescript --tailwind --app --no-src-dir
+cd my-docs
+```
+
+Or scaffold instantly with `create-document0`:
+
+```bash
+npx create-document0 my-docs
+```
+
+## 2. Install document0
+
+```bash
+npm install @document0/core @document0/mdx shiki @mdx-js/mdx
+```
+
+## 3. Configure Next.js
+
+Add `serverExternalPackages` to `next.config.ts` so Node.js modules aren't bundled for the browser:
+
+```ts
+// next.config.ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  serverExternalPackages: ["@document0/core", "@document0/mdx", "shiki"],
+};
+
+export default nextConfig;
+```
+
+## 4. Create your source loader
+
+```ts
+// lib/source.ts
+import path from "node:path";
+import { DocsSource } from "@document0/core";
+
+const rootDir = path.join(process.cwd(), "content/docs");
+
+export const source = new DocsSource({ rootDir, baseUrl: "/docs" });
+```
+
+## 5. Create a Shiki highlighter
+
+```ts
+// lib/highlighter.ts
+import { createHighlighter } from "shiki";
+
+let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
+
+export async function getHighlighter() {
+  if (highlighter) return highlighter;
+  highlighter = await createHighlighter({
+    themes: ["github-dark"],
+    langs: ["typescript", "javascript", "bash", "json"],
+  });
+  return highlighter;
+}
+```
+
+## 6. Create your docs page
+
+```tsx
+// app/docs/[[...slug]]/page.tsx
+import { notFound } from "next/navigation";
+import { run } from "@mdx-js/mdx";
+import * as runtime from "react/jsx-runtime";
+import { source } from "@/lib/source";
+import { getHighlighter } from "@/lib/highlighter";
+import { processMdx } from "@document0/mdx";
+
+export async function generateStaticParams() {
+  return source.getPages().map((page) => ({
+    slug: page.slugs.filter(Boolean),
+  }));
+}
+
+export default async function DocPage({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}) {
+  const { slug } = await params;
+  const page = source.getPage(slug ? slug.join("/") : "");
+  if (!page) notFound();
+
+  const highlighter = await getHighlighter();
+  const { code } = await processMdx(page.content, { highlighter });
+
+  const { default: MDXContent } = await run(code, {
+    ...(runtime as object),
+    baseUrl: import.meta.url,
+  } as Parameters<typeof run>[1]);
+
+  return (
+    <article>
+      <h1>{page.frontmatter.title}</h1>
+      <MDXContent />
+    </article>
+  );
+}
+```
+
+## 7. Add a search route
+
+```ts
+// app/internal/search/route.ts
+import { createSearchRoute } from "@document0/core";
+import { source } from "@/lib/source";
+
+export const { GET } = createSearchRoute(source);
+```
+
+## 8. Add llms.txt routes (optional)
+
+```ts
+// app/llms.txt/route.ts
+import { createLlmsTxtRoute } from "@document0/core";
+import { source } from "@/lib/source";
+
+export const { GET } = createLlmsTxtRoute(source, {
+  title: "My Docs",
+  description: "Documentation for my project",
+  baseUrl: "https://docs.example.com",
+});
+```
+
+## 9. Add some content
+
+```bash
+mkdir -p content/docs
+```
+
+Create `content/docs/index.mdx`:
+
+```mdx
+---
+title: My Docs
+description: Welcome to my documentation.
+---
+
+# My Docs
+
+Hello world!
+```
+
+## 10. Run the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000/docs](http://localhost:3000/docs). Your docs site is live.
+
+## Next steps
+
+- Install UI components: `npx document0 add document0/sidebar document0/toc document0/search-dialog`
+- [Core package reference](/docs/core): all APIs for source, navigation, search, and llms.txt
