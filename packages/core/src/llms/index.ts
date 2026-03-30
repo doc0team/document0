@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import type { DocsSource } from "../source/index.js";
 
 export interface LlmsOptions {
@@ -6,11 +5,6 @@ export interface LlmsOptions {
   description?: string;
   /** Full origin URL, e.g. "https://docs.example.com" */
   baseUrl: string;
-}
-
-function stripFrontmatter(raw: string): string {
-  const match = raw.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
-  return match ? raw.slice(match[0].length) : raw;
 }
 
 /**
@@ -65,8 +59,7 @@ export function generateLlmsFullTxt(
   for (const page of pages) {
     const url = `${options.baseUrl}${page.url}`;
     const title = page.frontmatter.title ?? page.slug;
-    const raw = fs.readFileSync(page.filePath, "utf-8");
-    const content = stripFrontmatter(raw).trim();
+    const content = page.content.trim();
 
     sections.push(
       "",
@@ -93,8 +86,7 @@ export function getPageRawContent(
 ): string | null {
   const page = source.getPage(slug);
   if (!page) return null;
-  const raw = fs.readFileSync(page.filePath, "utf-8");
-  return stripFrontmatter(raw).trim();
+  return page.content.trim();
 }
 
 // --- Route helpers ---
