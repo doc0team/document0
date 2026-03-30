@@ -7,6 +7,7 @@ import {
   fetchItemFile,
   findItem,
 } from "../registry.js";
+import { recordInstall } from "../lockfile.js";
 
 function detectPackageManager(): string {
   if (fs.existsSync("pnpm-lock.yaml")) return "pnpm";
@@ -63,6 +64,7 @@ export async function add(names: string[]): Promise<void> {
       console.log(kleur.dim(`    → ${item.installPath}/${file}`));
     }
 
+    recordInstall(item.namespace, item.name, item.version, item.installPath);
     Object.assign(allDeps, item.dependencies);
   }
 

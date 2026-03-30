@@ -16,7 +16,7 @@
         "unist-util-visit": "^5.0.0"
       },
       "registryDependencies": [],
-      "installPath": "plugins/admonitions"
+      "installPath": "plugins/document0/admonitions"
     },
     {
       "name": "reading-time",
@@ -30,7 +30,7 @@
       "files": ["index.ts"],
       "dependencies": {},
       "registryDependencies": [],
-      "installPath": "plugins/reading-time"
+      "installPath": "plugins/document0/reading-time"
     },
     {
       "name": "content-graph",
@@ -44,7 +44,7 @@
       "files": ["index.ts"],
       "dependencies": {},
       "registryDependencies": [],
-      "installPath": "plugins/content-graph"
+      "installPath": "plugins/document0/content-graph"
     },
     {
       "name": "sidebar",
@@ -58,7 +58,7 @@
       "files": ["Sidebar.tsx"],
       "dependencies": {},
       "registryDependencies": [],
-      "installPath": "components/sidebar",
+      "installPath": "components/document0/sidebar",
       "preview": true
     },
     {
@@ -73,7 +73,7 @@
       "files": ["TableOfContents.tsx"],
       "dependencies": {},
       "registryDependencies": [],
-      "installPath": "components/toc",
+      "installPath": "components/document0/toc",
       "preview": true
     },
     {
@@ -88,7 +88,7 @@
       "files": ["Breadcrumbs.tsx"],
       "dependencies": {},
       "registryDependencies": [],
-      "installPath": "components/breadcrumbs",
+      "installPath": "components/document0/breadcrumbs",
       "preview": true
     },
     {
@@ -103,7 +103,7 @@
       "files": ["PageNavigation.tsx"],
       "dependencies": {},
       "registryDependencies": [],
-      "installPath": "components/page-navigation",
+      "installPath": "components/document0/page-navigation",
       "preview": true
     },
     {
@@ -118,7 +118,7 @@
       "files": ["SearchDialog.tsx"],
       "dependencies": {},
       "registryDependencies": [],
-      "installPath": "components/search-dialog",
+      "installPath": "components/document0/search-dialog",
       "preview": true
     }
   ]
