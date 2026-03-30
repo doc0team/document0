@@ -1,14 +1,17 @@
 {
   "name": "create-document0",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Create a new document0 site",
   "type": "module",
   "bin": {
     "create-document0": "./dist/index.js"
   },
-  "files": ["dist", "template"],
+  "files": [
+    "dist",
+    "template"
+  ],
   "scripts": {
-    "copy-template": "node -e \"const fs=require('fs');fs.cpSync('../template','.\/template',{recursive:true,filter:(s)=>!s.includes('node_modules')&&!s.includes('.next')&&!s.includes('.turbo')})\"",
+    "copy-template": "node -e \"const fs=require('fs');fs.cpSync('../template','./template',{recursive:true,filter:(s)=>!s.includes('node_modules')&&!s.includes('.next')&&!s.includes('.turbo')})\"",
     "build": "tsc -p tsconfig.json && npm run copy-template",
     "dev": "tsc -p tsconfig.json --watch",
     "typecheck": "tsc --noEmit",
@@ -24,6 +27,14 @@
     "rimraf": "^5.0.0",
     "typescript": "^5.4.0"
   },
-  "keywords": ["docs", "document0", "documentation", "nextjs", "shadcn", "create", "scaffold"],
+  "keywords": [
+    "docs",
+    "document0",
+    "documentation",
+    "nextjs",
+    "shadcn",
+    "create",
+    "scaffold"
+  ],
   "license": "MIT"
 }

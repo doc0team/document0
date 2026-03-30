@@ -1,6 +1,6 @@
 {
   "name": "@document0/core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "document0 core - file system source, page tree, navigation, and search utilities",
   "type": "module",
   "exports": {
