@@ -1,0 +1,187 @@
+---
+title: "@document0/mdc"
+description: MDC (Markdown Components) processor — parses markdown to HTML or JSON AST with Shiki syntax highlighting, TOC extraction, and frontmatter.
+---
+
+# @document0/mdc
+
+The MDC package processes `.mdx` / `.md` files into either an HTML string or a JSON AST, with frontmatter extraction, Shiki syntax highlighting, and table-of-contents generation — all without React.
+
+This is the recommended content processor for **Vue**, **Svelte**, **Astro**, and any non-React framework. For React/Next.js, see [@document0/mdx](/docs/mdx).
+
+## Install
+
+```bash
+npm install @document0/mdc shiki
+```
+
+## processMdcToHtml
+
+Parses markdown source directly into an HTML string. The simplest path — use this when you want to render with `v-html` or inject into a template.
+
+```ts
+import { processMdcToHtml } from "@document0/mdc";
+
+const { html, frontmatter, toc } = await processMdcToHtml(source, options);
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `source` | `string` | Raw markdown/MDX source content |
+| `options` | `MdcProcessorOptions` | Processing options (see below) |
+
+### Return value
+
+```ts
+interface ProcessedMdcHtml {
+  html: string;
+  frontmatter: Record<string, unknown>;
+  toc: TocEntry[];
+}
+```
+
+---
+
+## processMdc
+
+Parses markdown source into a JSON AST (`MdcRoot`). Use this when you want programmatic control over rendering — for example, mapping AST nodes to Vue or Svelte components.
+
+```ts
+import { processMdc } from "@document0/mdc";
+
+const { body, frontmatter, toc } = await processMdc(source, options);
+```
+
+### Return value
+
+```ts
+interface ProcessedMdc {
+  body: MdcRoot;
+  frontmatter: Record<string, unknown>;
+  toc: TocEntry[];
+}
+```
+
+The `body` is a tree of `MdcNode` objects (see [types](#types) below) that you can walk and render however you like.
+
+---
+
+## Options
+
+Both `processMdc` and `processMdcToHtml` accept the same options:
+
+```ts
+interface MdcProcessorOptions {
+  highlighter?: HighlighterGeneric<BundledLanguage, BundledTheme>;
+  defaultLanguage?: string;
+  themes?: RehypeShikiThemes;
+  remarkPlugins?: unknown[];
+  rehypePlugins?: unknown[];
+}
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `highlighter` | — | Shiki highlighter instance. Omit to skip syntax highlighting |
+| `defaultLanguage` | `"plaintext"` | Language for code blocks with no language specified |
+| `themes` | `{ light: "github-light", dark: "github-dark" }` | Shiki dual-theme config |
+| `remarkPlugins` | `[]` | Additional remark plugins |
+| `rehypePlugins` | `[]` | Additional rehype plugins |
+
+---
+
+## Setting up Shiki
+
+Create the highlighter once and reuse it (initialisation is expensive):
+
+```ts
+import { createHighlighter } from "shiki";
+
+let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
+
+export async function getHighlighter() {
+  if (highlighter) return highlighter;
+  highlighter = await createHighlighter({
+    themes: ["github-dark", "github-light"],
+    langs: ["typescript", "javascript", "bash", "json", "vue", "css"],
+  });
+  return highlighter;
+}
+```
+
+Then pass it to either processor:
+
+```ts
+const highlighter = await getHighlighter();
+const { html, toc } = await processMdcToHtml(raw, { highlighter });
+```
+
+---
+
+## Types
+
+### TocEntry
+
+```ts
+interface TocEntry {
+  id: string;    // heading anchor id
+  text: string;  // heading text content
+  depth: number; // 1–6
+}
+```
+
+### MdcNode
+
+The JSON AST node returned by `processMdc`:
+
+```ts
+interface MdcNode {
+  type: "element" | "text";
+  tag?: string;                    // HTML tag name (e.g. "h2", "p", "pre")
+  props?: Record<string, unknown>; // element attributes
+  children?: MdcNode[];
+  value?: string;                  // text content (for type: "text")
+}
+```
+
+### MdcRoot
+
+```ts
+interface MdcRoot {
+  type: "root";
+  children: MdcNode[];
+}
+```
+
+---
+
+## Built-in plugins
+
+### rehypeShiki
+
+Applied automatically when you pass a `highlighter`. Replaces fenced code blocks with Shiki-highlighted HTML output.
+
+### rehypeStripShikiStyle
+
+Also applied automatically. Strips inline `style` attributes from Shiki output so your CSS themes take over.
+
+Both are re-exported if you need them in a custom unified pipeline:
+
+```ts
+import { rehypeShiki, rehypeStripShikiStyle } from "@document0/mdc";
+```
+
+---
+
+## MDC vs MDX
+
+| | `@document0/mdc` | `@document0/mdx` |
+|---|---|---|
+| Output | HTML string or JSON AST | Compiled JS module |
+| Peer deps | None | `react`, `react-dom`, `@mdx-js/mdx` |
+| Best for | Vue, Svelte, any non-React framework | React / Next.js |
+| Custom components | Style with CSS or render JSON AST | JSX component map via `run()` |
+
+Both packages share the same Shiki integration, frontmatter extraction, and TOC generation. Choose based on your framework.
