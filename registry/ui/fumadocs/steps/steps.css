@@ -1,0 +1,21 @@
+@utility fd-steps {
+  counter-reset: step;
+  position: relative;
+  @apply ps-6 ms-2 border-s sm:ms-4 sm:ps-7;
+}
+
+@utility fd-step {
+  &:before {
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-foreground);
+    content: counter(step);
+    counter-increment: step;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    display: flex;
+    position: absolute;
+    @apply size-8 -start-4 rounded-full;
+  }
+}

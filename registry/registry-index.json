@@ -120,6 +120,208 @@
       "registryDependencies": [],
       "installPath": "components/document0/search-dialog",
       "preview": true
+    },
+    {
+      "name": "steps",
+      "namespace": "fumadocs",
+      "description": "Numbered step-by-step container with vertical connecting line and CSS counters.",
+      "author": "fumadocs",
+      "version": "0.1.0",
+      "tags": ["steps", "guide", "mdx", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["Steps.tsx", "steps.css"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "components/fumadocs/steps",
+      "preview": true,
+      "logo": "/logos/fumadocs.svg"
+    },
+    {
+      "name": "files",
+      "namespace": "fumadocs",
+      "description": "File tree display with collapsible folders. Uses Base UI Collapsible for animations.",
+      "author": "fumadocs",
+      "version": "0.1.0",
+      "tags": ["files", "tree", "mdx", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["Files.tsx"],
+      "dependencies": {
+        "@base-ui/react": ">=1.0.0",
+        "lucide-react": ">=0.300.0",
+        "tailwind-merge": ">=2.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/fumadocs/files",
+      "preview": true,
+      "logo": "/logos/fumadocs.svg"
+    },
+    {
+      "name": "tabs",
+      "namespace": "fumadocs",
+      "description": "Tabbed content with groupId syncing across instances, sessionStorage persistence, and URL hash support.",
+      "author": "fumadocs",
+      "version": "0.1.0",
+      "tags": ["tabs", "mdx", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["Tabs.tsx"],
+      "dependencies": {
+        "@base-ui/react": ">=1.0.0",
+        "tailwind-merge": ">=2.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/fumadocs/tabs",
+      "preview": true,
+      "logo": "/logos/fumadocs.svg"
+    },
+    {
+      "name": "accordion",
+      "namespace": "fumadocs",
+      "description": "Accordion group with animated expand/collapse, URL hash linking, and copy-link button.",
+      "author": "fumadocs",
+      "version": "0.1.0",
+      "tags": ["accordion", "faq", "mdx", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["Accordion.tsx"],
+      "dependencies": {
+        "@base-ui/react": ">=1.0.0",
+        "lucide-react": ">=0.300.0",
+        "tailwind-merge": ">=2.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/fumadocs/accordion",
+      "preview": true,
+      "logo": "/logos/fumadocs.svg"
+    },
+    {
+      "name": "banner",
+      "namespace": "fumadocs",
+      "description": "Dismissible announcement banner with optional rainbow gradient animation. Persists dismissal in localStorage.",
+      "author": "fumadocs",
+      "version": "0.1.0",
+      "tags": ["banner", "announcement", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["Banner.tsx"],
+      "dependencies": {
+        "lucide-react": ">=0.300.0",
+        "tailwind-merge": ">=2.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/fumadocs/banner",
+      "preview": true,
+      "logo": "/logos/fumadocs.svg"
+    },
+    {
+      "name": "codeblock",
+      "namespace": "fumadocs",
+      "description": "Code block with title bar, syntax icon, copy button, and tabbed multi-file support. Uses Base UI Tabs.",
+      "author": "fumadocs",
+      "version": "0.1.0",
+      "tags": ["code", "codeblock", "syntax", "mdx", "react"],
+      "category": "ui",
+      "frameworks": ["react", "next"],
+      "files": ["CodeBlock.tsx"],
+      "dependencies": {
+        "@base-ui/react": ">=1.0.0",
+        "lucide-react": ">=0.300.0",
+        "tailwind-merge": ">=2.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/fumadocs/codeblock",
+      "preview": true,
+      "logo": "/logos/fumadocs.svg"
+    },
+    {
+      "name": "sidebar",
+      "namespace": "document0-vue",
+      "description": "Collapsible navigation sidebar with active state tracking and animated expand/collapse. Vue port of the document0 sidebar.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["sidebar", "navigation", "tree", "vue"],
+      "category": "ui",
+      "frameworks": ["vue"],
+      "files": ["Sidebar.vue", "SidebarNode.vue"],
+      "dependencies": {
+        "vue-router": ">=4.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/document0-vue/sidebar",
+      "preview": true,
+      "framework": "vue"
+    },
+    {
+      "name": "toc",
+      "namespace": "document0-vue",
+      "description": "Table of contents with scroll-spy highlighting. Shows heading hierarchy extracted from MDX content. Vue port.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["toc", "table-of-contents", "scroll-spy", "vue"],
+      "category": "ui",
+      "frameworks": ["vue"],
+      "files": ["TableOfContents.vue"],
+      "dependencies": {},
+      "registryDependencies": [],
+      "installPath": "components/document0-vue/toc",
+      "preview": true,
+      "framework": "vue"
+    },
+    {
+      "name": "breadcrumbs",
+      "namespace": "document0-vue",
+      "description": "Breadcrumb navigation showing the current page path. Vue port of the document0 breadcrumbs.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["breadcrumbs", "navigation", "vue"],
+      "category": "ui",
+      "frameworks": ["vue"],
+      "files": ["Breadcrumbs.vue"],
+      "dependencies": {
+        "vue-router": ">=4.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/document0-vue/breadcrumbs",
+      "preview": true,
+      "framework": "vue"
+    },
+    {
+      "name": "page-navigation",
+      "namespace": "document0-vue",
+      "description": "Previous/Next page links for sequential navigation. Vue port of the document0 page-navigation.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["navigation", "previous", "next", "vue"],
+      "category": "ui",
+      "frameworks": ["vue"],
+      "files": ["PageNavigation.vue"],
+      "dependencies": {
+        "vue-router": ">=4.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/document0-vue/page-navigation",
+      "preview": true,
+      "framework": "vue"
+    },
+    {
+      "name": "search-dialog",
+      "namespace": "document0-vue",
+      "description": "Command-palette style search dialog with keyboard navigation. Vue port of the document0 search-dialog.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": ["search", "dialog", "command-palette", "vue"],
+      "category": "ui",
+      "frameworks": ["vue"],
+      "files": ["SearchDialog.vue"],
+      "dependencies": {
+        "vue-router": ">=4.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "components/document0-vue/search-dialog",
+      "preview": true,
+      "framework": "vue"
     }
   ]
 }

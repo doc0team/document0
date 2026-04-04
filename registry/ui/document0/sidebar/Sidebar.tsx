@@ -66,10 +66,10 @@ function SidebarNode({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
         <Link
           href={node.url}
           className={[
-            "group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] transition-all duration-150",
+            "group flex items-center gap-2 px-2.5 py-1.5 text-[13px] transition-all duration-150",
             depth > 0 ? "ml-3 border-l border-zinc-800/60 pl-3" : "",
             active
-              ? "bg-sky-500/10 text-sky-400 font-medium border-sky-500/30"
+              ? "bg-sky-500/10 text-sky-400 font-medium border-l-2 border-l-sky-400"
               : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40",
           ].join(" ")}
         >
@@ -93,7 +93,7 @@ function SidebarNode({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
             <Link
               href={node.index.url}
               className={[
-                "flex-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150",
+                "flex-1 flex items-center gap-2 px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150",
                 depth > 0 ? "ml-3 border-l border-zinc-800/60 pl-3" : "",
                 indexActive
                   ? "bg-sky-500/10 text-sky-400"
@@ -107,7 +107,7 @@ function SidebarNode({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
             <button
               onClick={() => setManualOpen((prev) => (prev !== null ? !prev : !isOpen))}
               className={[
-                "flex-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150 text-left",
+                "flex-1 flex items-center gap-2 px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150 text-left",
                 depth > 0 ? "ml-3 border-l border-zinc-800/60 pl-3" : "",
                 "text-zinc-300 hover:text-white hover:bg-zinc-800/40",
               ].join(" ")}
