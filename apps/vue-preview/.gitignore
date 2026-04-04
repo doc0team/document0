@@ -1,0 +1,4 @@
+.vercel
+
+.registry/
+.env*.local

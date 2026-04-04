@@ -7,11 +7,11 @@ const props = defineProps<{
 }>();
 
 const previewModules = import.meta.glob<{ default: any }>(
-  "../../../registry/ui/**/preview.vue"
+  "../.registry/ui/**/preview.vue"
 );
 
 const PreviewComponent = computed(() => {
-  const key = `../../../registry/ui/${props.namespace}/${props.component}/preview.vue`;
+  const key = `../.registry/ui/${props.namespace}/${props.component}/preview.vue`;
   const loader = previewModules[key];
   if (!loader) return null;
   return defineAsyncComponent(loader);

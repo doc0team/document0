@@ -2,7 +2,7 @@
 import { computed } from "vue";
 
 const previewModules = import.meta.glob<{ default: any }>(
-  "../../../registry/ui/**/preview.vue"
+  "../.registry/ui/**/preview.vue"
 );
 
 const previews = computed(() => {

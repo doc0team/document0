@@ -8,3 +8,4 @@ out/
 .env.local
 .env.*.local
 apps/docs/data/
+.vercel
