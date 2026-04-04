@@ -1,0 +1,28 @@
+{
+  "name": "openrouter-chat",
+  "description": "Server-side API route helper with Vercel AI SDK that proxies chat to OpenRouter with a built-in /search tool for documentation context.",
+  "author": "document0",
+  "version": "0.1.0",
+  "tags": [
+    "ai",
+    "chat",
+    "openrouter",
+    "llm",
+    "streaming",
+    "search"
+  ],
+  "category": "core",
+  "frameworks": [
+    "any"
+  ],
+  "files": [
+    "index.ts"
+  ],
+  "dependencies": {
+    "ai": ">=4.0.0",
+    "@openrouter/ai-sdk-provider": ">=0.4.0",
+    "zod": ">=3.0.0"
+  },
+  "registryDependencies": [],
+  "installPath": "plugins/document0/openrouter-chat"
+}

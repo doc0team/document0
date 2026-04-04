@@ -8,10 +8,24 @@
       "description": "GitHub-style blockquote callouts. Converts > [!NOTE], > [!WARNING] etc. into <Callout> JSX elements.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["remark", "mdx", "callouts", "markdown"],
+      "tags": [
+        "remark",
+        "mdx",
+        "callouts",
+        "markdown"
+      ],
       "category": "mdx",
-      "frameworks": ["react", "next", "astro", "vue", "solid", "svelte"],
-      "files": ["index.ts"],
+      "frameworks": [
+        "react",
+        "next",
+        "astro",
+        "vue",
+        "solid",
+        "svelte"
+      ],
+      "files": [
+        "index.ts"
+      ],
       "dependencies": {
         "unist-util-visit": "^5.0.0"
       },
@@ -24,10 +38,18 @@
       "description": "Adds readingTime (minutes) and wordCount to your processed MDX output.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["reading-time", "word-count", "metadata"],
+      "tags": [
+        "reading-time",
+        "word-count",
+        "metadata"
+      ],
       "category": "core",
-      "frameworks": ["any"],
-      "files": ["index.ts"],
+      "frameworks": [
+        "any"
+      ],
+      "files": [
+        "index.ts"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "plugins/document0/reading-time"
@@ -38,10 +60,19 @@
       "description": "Builds a directed graph of internal links across all pages. Enables backlinks, broken link detection, and related pages.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["graph", "backlinks", "broken-links", "navigation"],
+      "tags": [
+        "graph",
+        "backlinks",
+        "broken-links",
+        "navigation"
+      ],
       "category": "core",
-      "frameworks": ["any"],
-      "files": ["index.ts"],
+      "frameworks": [
+        "any"
+      ],
+      "files": [
+        "index.ts"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "plugins/document0/content-graph"
@@ -52,10 +83,20 @@
       "description": "Collapsible navigation sidebar with active state tracking and mobile drawer support. Renders your page tree with support for folders, separators, and icons.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["navigation", "sidebar", "layout", "react"],
+      "tags": [
+        "navigation",
+        "sidebar",
+        "layout",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["Sidebar.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "Sidebar.tsx"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "components/document0/sidebar",
@@ -67,10 +108,20 @@
       "description": "Table of contents component with scroll-spy highlighting. Shows heading hierarchy extracted from MDX content.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["navigation", "toc", "headings", "react"],
+      "tags": [
+        "navigation",
+        "toc",
+        "headings",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["TableOfContents.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "TableOfContents.tsx"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "components/document0/toc",
@@ -82,10 +133,19 @@
       "description": "Breadcrumb navigation showing the current page path. Uses getBreadcrumbs() from @document0/core.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["navigation", "breadcrumbs", "react"],
+      "tags": [
+        "navigation",
+        "breadcrumbs",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["Breadcrumbs.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "Breadcrumbs.tsx"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "components/document0/breadcrumbs",
@@ -97,10 +157,19 @@
       "description": "Previous/Next page links for sequential navigation. Uses getPageNeighbours() from @document0/core.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["navigation", "pagination", "react"],
+      "tags": [
+        "navigation",
+        "pagination",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["PageNavigation.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "PageNavigation.tsx"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "components/document0/page-navigation",
@@ -112,10 +181,20 @@
       "description": "Command-palette style search dialog with keyboard navigation. Uses createSearchRoute() from @document0/core.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["search", "dialog", "keyboard", "react"],
+      "tags": [
+        "search",
+        "dialog",
+        "keyboard",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["SearchDialog.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "SearchDialog.tsx"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "components/document0/search-dialog",
@@ -127,10 +206,21 @@
       "description": "Numbered step-by-step container with vertical connecting line and CSS counters.",
       "author": "fumadocs",
       "version": "0.1.0",
-      "tags": ["steps", "guide", "mdx", "react"],
+      "tags": [
+        "steps",
+        "guide",
+        "mdx",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["Steps.tsx", "steps.css"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "Steps.tsx",
+        "steps.css"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "components/fumadocs/steps",
@@ -143,10 +233,20 @@
       "description": "File tree display with collapsible folders. Uses Base UI Collapsible for animations.",
       "author": "fumadocs",
       "version": "0.1.0",
-      "tags": ["files", "tree", "mdx", "react"],
+      "tags": [
+        "files",
+        "tree",
+        "mdx",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["Files.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "Files.tsx"
+      ],
       "dependencies": {
         "@base-ui/react": ">=1.0.0",
         "lucide-react": ">=0.300.0",
@@ -163,10 +263,19 @@
       "description": "Tabbed content with groupId syncing across instances, sessionStorage persistence, and URL hash support.",
       "author": "fumadocs",
       "version": "0.1.0",
-      "tags": ["tabs", "mdx", "react"],
+      "tags": [
+        "tabs",
+        "mdx",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["Tabs.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "Tabs.tsx"
+      ],
       "dependencies": {
         "@base-ui/react": ">=1.0.0",
         "tailwind-merge": ">=2.0.0"
@@ -182,10 +291,20 @@
       "description": "Accordion group with animated expand/collapse, URL hash linking, and copy-link button.",
       "author": "fumadocs",
       "version": "0.1.0",
-      "tags": ["accordion", "faq", "mdx", "react"],
+      "tags": [
+        "accordion",
+        "faq",
+        "mdx",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["Accordion.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "Accordion.tsx"
+      ],
       "dependencies": {
         "@base-ui/react": ">=1.0.0",
         "lucide-react": ">=0.300.0",
@@ -202,10 +321,19 @@
       "description": "Dismissible announcement banner with optional rainbow gradient animation. Persists dismissal in localStorage.",
       "author": "fumadocs",
       "version": "0.1.0",
-      "tags": ["banner", "announcement", "react"],
+      "tags": [
+        "banner",
+        "announcement",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["Banner.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "Banner.tsx"
+      ],
       "dependencies": {
         "lucide-react": ">=0.300.0",
         "tailwind-merge": ">=2.0.0"
@@ -221,10 +349,21 @@
       "description": "Code block with title bar, syntax icon, copy button, and tabbed multi-file support. Uses Base UI Tabs.",
       "author": "fumadocs",
       "version": "0.1.0",
-      "tags": ["code", "codeblock", "syntax", "mdx", "react"],
+      "tags": [
+        "code",
+        "codeblock",
+        "syntax",
+        "mdx",
+        "react"
+      ],
       "category": "ui",
-      "frameworks": ["react", "next"],
-      "files": ["CodeBlock.tsx"],
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "CodeBlock.tsx"
+      ],
       "dependencies": {
         "@base-ui/react": ">=1.0.0",
         "lucide-react": ">=0.300.0",
@@ -241,10 +380,20 @@
       "description": "Collapsible navigation sidebar with active state tracking and animated expand/collapse. Vue port of the document0 sidebar.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["sidebar", "navigation", "tree", "vue"],
+      "tags": [
+        "sidebar",
+        "navigation",
+        "tree",
+        "vue"
+      ],
       "category": "ui",
-      "frameworks": ["vue"],
-      "files": ["Sidebar.vue", "SidebarNode.vue"],
+      "frameworks": [
+        "vue"
+      ],
+      "files": [
+        "Sidebar.vue",
+        "SidebarNode.vue"
+      ],
       "dependencies": {
         "vue-router": ">=4.0.0"
       },
@@ -259,10 +408,19 @@
       "description": "Table of contents with scroll-spy highlighting. Shows heading hierarchy extracted from MDX content. Vue port.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["toc", "table-of-contents", "scroll-spy", "vue"],
+      "tags": [
+        "toc",
+        "table-of-contents",
+        "scroll-spy",
+        "vue"
+      ],
       "category": "ui",
-      "frameworks": ["vue"],
-      "files": ["TableOfContents.vue"],
+      "frameworks": [
+        "vue"
+      ],
+      "files": [
+        "TableOfContents.vue"
+      ],
       "dependencies": {},
       "registryDependencies": [],
       "installPath": "components/document0-vue/toc",
@@ -275,10 +433,18 @@
       "description": "Breadcrumb navigation showing the current page path. Vue port of the document0 breadcrumbs.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["breadcrumbs", "navigation", "vue"],
+      "tags": [
+        "breadcrumbs",
+        "navigation",
+        "vue"
+      ],
       "category": "ui",
-      "frameworks": ["vue"],
-      "files": ["Breadcrumbs.vue"],
+      "frameworks": [
+        "vue"
+      ],
+      "files": [
+        "Breadcrumbs.vue"
+      ],
       "dependencies": {
         "vue-router": ">=4.0.0"
       },
@@ -293,10 +459,19 @@
       "description": "Previous/Next page links for sequential navigation. Vue port of the document0 page-navigation.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["navigation", "previous", "next", "vue"],
+      "tags": [
+        "navigation",
+        "previous",
+        "next",
+        "vue"
+      ],
       "category": "ui",
-      "frameworks": ["vue"],
-      "files": ["PageNavigation.vue"],
+      "frameworks": [
+        "vue"
+      ],
+      "files": [
+        "PageNavigation.vue"
+      ],
       "dependencies": {
         "vue-router": ">=4.0.0"
       },
@@ -311,10 +486,19 @@
       "description": "Command-palette style search dialog with keyboard navigation. Vue port of the document0 search-dialog.",
       "author": "document0",
       "version": "0.1.0",
-      "tags": ["search", "dialog", "command-palette", "vue"],
+      "tags": [
+        "search",
+        "dialog",
+        "command-palette",
+        "vue"
+      ],
       "category": "ui",
-      "frameworks": ["vue"],
-      "files": ["SearchDialog.vue"],
+      "frameworks": [
+        "vue"
+      ],
+      "files": [
+        "SearchDialog.vue"
+      ],
       "dependencies": {
         "vue-router": ">=4.0.0"
       },
@@ -322,6 +506,67 @@
       "installPath": "components/document0-vue/search-dialog",
       "preview": true,
       "framework": "vue"
+    },
+    {
+      "name": "openrouter-chat",
+      "namespace": "document0",
+      "description": "Server-side API route helper with Vercel AI SDK that proxies chat to OpenRouter with a built-in /search tool for documentation context.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": [
+        "ai",
+        "chat",
+        "openrouter",
+        "llm",
+        "streaming",
+        "search"
+      ],
+      "category": "core",
+      "frameworks": [
+        "any"
+      ],
+      "files": [
+        "index.ts"
+      ],
+      "dependencies": {
+        "ai": ">=4.0.0",
+        "@openrouter/ai-sdk-provider": ">=0.4.0",
+        "zod": ">=3.0.0"
+      },
+      "registryDependencies": [],
+      "installPath": "plugins/document0/openrouter-chat"
+    },
+    {
+      "name": "ai-chat",
+      "namespace": "document0",
+      "description": "Floating AI chat widget that works with the Vercel AI SDK. Includes streaming, tool-calls, and markdown rendering. Powered by OpenRouter via the openrouter-chat plugin.",
+      "author": "document0",
+      "version": "0.1.0",
+      "tags": [
+        "ai",
+        "chat",
+        "widget",
+        "openrouter",
+        "react",
+        "vercel-ai"
+      ],
+      "category": "ui",
+      "frameworks": [
+        "react",
+        "next"
+      ],
+      "files": [
+        "AiChat.tsx"
+      ],
+      "dependencies": {
+        "ai": ">=3.0.0",
+        "@ai-sdk/react": ">=1.0.0"
+      },
+      "registryDependencies": [
+        "openrouter-chat"
+      ],
+      "installPath": "components/document0/openrouter-chat",
+      "preview": true
     }
   ]
 }
