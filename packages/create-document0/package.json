@@ -1,6 +1,6 @@
 {
   "name": "create-document0",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Create a new document0 site",
   "type": "module",
   "bin": {
@@ -8,14 +8,15 @@
   },
   "files": [
     "dist",
-    "template"
+    "template-nextjs",
+    "template-vue"
   ],
   "scripts": {
-    "copy-template": "node -e \"const fs=require('fs');fs.cpSync('../template-nextjs','./template',{recursive:true,filter:(s)=>!s.includes('node_modules')&&!s.includes('.next')&&!s.includes('.turbo')})\"",
+    "copy-template": "node -e \"const fs=require('fs');const f=(s)=>!s.includes('node_modules')&&!s.includes('.next')&&!s.includes('.turbo')&&!s.includes('dist');fs.cpSync('../template-nextjs','./template-nextjs',{recursive:true,filter:f});fs.cpSync('../template-vue','./template-vue',{recursive:true,filter:f})\"",
     "build": "tsc -p tsconfig.json && npm run copy-template",
     "dev": "tsc -p tsconfig.json --watch",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist template"
+    "clean": "rimraf dist template-nextjs template-vue"
   },
   "dependencies": {
     "kleur": "^4.1.5",
@@ -32,6 +33,8 @@
     "document0",
     "documentation",
     "nextjs",
+    "vue",
+    "vite",
     "shadcn",
     "create",
     "scaffold"
