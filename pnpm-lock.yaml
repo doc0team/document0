@@ -385,12 +385,9 @@ importers:
       '@document0/core':
         specifier: workspace:*
         version: link:../core
-      '@document0/mdx':
+      '@document0/mdc':
         specifier: workspace:*
-        version: link:../mdx
-      '@mdx-js/mdx':
-        specifier: ^3.1.1
-        version: 3.1.1
+        version: link:../mdc
       '@tailwindcss/vite':
         specifier: ^4.2.2
         version: 4.2.2(vite@6.4.1(@types/node@20.19.37)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
