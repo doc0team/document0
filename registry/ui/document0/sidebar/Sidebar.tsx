@@ -250,7 +250,12 @@ export function MobileSidebar({
   navLinks?: { href: string; label: string }[];
 }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close drawer on route change
   useEffect(() => {
@@ -259,18 +264,17 @@ export function MobileSidebar({
 
   // Lock body scroll when open
   useEffect(() => {
-    if (open) {
+    if (open && mounted) {
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = "";
       };
     }
-  }, [open]);
+  }, [open, mounted]);
 
   const close = useCallback(() => setOpen(false), []);
 
-  const overlay =
-    typeof document !== "undefined"
+  const overlay = mounted
       ? createPortal(
           <>
             {/* Backdrop */}
