@@ -1,0 +1,42 @@
+---
+title: MDC Component Test
+description: Testing MDC (Markdown Components) syntax with Vue rendering.
+---
+
+# MDC Components
+
+This page tests **MDC component syntax** rendered to HTML via `@document0/mdc`.
+
+## Callouts
+
+::callout{type="note"}
+This is a **note** callout using MDC component syntax.
+::
+
+::callout{type="warning"}
+This is a **warning** — MDC components work without React!
+::
+
+::callout{type="tip"}
+You can create any custom component with the `::component-name{props}` syntax.
+::
+
+## Regular Markdown
+
+Everything else works as expected:
+
+- **Bold** and *italic*
+- [Links](/docs)
+- Tables, lists, headings
+
+```typescript
+const message = "MDC + Vue = no React needed";
+console.log(message);
+```
+
+## How It Works
+
+1. `@document0/mdc` parses markdown with the MDC (Markdown Components) syntax
+2. `::callout{type="note"}` becomes a `<callout type="note">` HTML element
+3. `processMdcToHtml` renders everything to HTML with Shiki highlighting
+4. CSS styles the custom elements — no Vue component resolution needed for `v-html`

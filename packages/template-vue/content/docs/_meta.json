@@ -1,0 +1,13 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "index",
+    "--- Getting Started",
+    "installation",
+    "configuration",
+    "--- Guides",
+    "guides",
+    "--- Experiments",
+    "mdx-test"
+  ]
+}
