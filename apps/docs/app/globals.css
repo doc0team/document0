@@ -293,3 +293,9 @@ pre.shiki code > .line {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* Prevent horizontal scroll — placed after all imports and layers for cascade priority */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+}

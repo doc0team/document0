@@ -263,7 +263,7 @@ export default async function PluginPage({ params }: PageProps) {
 
   if (!slug || slug.length === 0) {
     return (
-      <div className="px-8 py-12 max-w-screen-xl mx-auto w-full">
+      <div className="px-4 md:px-8 py-8 md:py-12 max-w-screen-xl mx-auto w-full">
         <PluginsIndexPage />
       </div>
     );
@@ -305,7 +305,7 @@ export default async function PluginPage({ params }: PageProps) {
   const PreviewComponent = item.preview ? previewComponents[fullId] || null : null;
 
   return (
-    <div className="flex gap-12 px-8 py-10 max-w-screen-xl mx-auto w-full">
+    <div className="flex gap-6 md:gap-12 px-4 md:px-8 py-6 md:py-10 max-w-screen-xl mx-auto w-full">
       <article className="flex-1 min-w-0 max-w-3xl pb-[50vh]">
         <ItemDetailPage
           item={item}

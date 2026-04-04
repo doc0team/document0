@@ -1,5 +1,5 @@
 import { getPageTree } from "@/lib/source";
-import { Sidebar } from "../../../../registry/ui/document0/sidebar/Sidebar";
+import { Sidebar, MobileSidebar } from "../../../../registry/ui/document0/sidebar/Sidebar";
 import { Header } from "@/components/header";
 import HeroGeometric from "@/components/ui/hero-geometric";
 
@@ -7,8 +7,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   const tree = getPageTree();
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-zinc-950">
-      <Header />
+    <div className="relative flex min-h-screen flex-col bg-zinc-950 overflow-x-hidden">
+      <Header mobileSidebar={<MobileSidebar tree={tree} navLinks={[{ href: "/docs", label: "Docs" }, { href: "/api", label: "API Reference" }, { href: "/plugins", label: "Plugins" }]} />} />
       <div className="flex flex-1 items-start">
         <Sidebar tree={tree} />
         <main className="relative flex-1 min-w-0">

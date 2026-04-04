@@ -49,7 +49,7 @@
     {
       "name": "sidebar",
       "namespace": "document0",
-      "description": "Collapsible navigation sidebar with active state tracking. Renders your page tree with support for folders, separators, and icons.",
+      "description": "Collapsible navigation sidebar with active state tracking and mobile drawer support. Renders your page tree with support for folders, separators, and icons.",
       "author": "document0",
       "version": "0.1.0",
       "tags": ["navigation", "sidebar", "layout", "react"],

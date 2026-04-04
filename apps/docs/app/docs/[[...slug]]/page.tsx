@@ -61,7 +61,7 @@ export default async function DocPage({ params }: PageProps) {
 
   return (
     <div>
-      <div className="flex gap-12 px-8 py-10 max-w-screen-xl mx-auto w-full">
+      <div className="flex gap-6 md:gap-12 px-4 md:px-8 py-6 md:py-10 max-w-screen-xl mx-auto w-full">
         <article className="flex-1 min-w-0 max-w-3xl pb-[50vh]">
           {breadcrumbs.length > 1 && <Breadcrumbs items={breadcrumbs} />}
           <div className="mb-4 text-sm text-zinc-500">
