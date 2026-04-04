@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "../../../registry/ui/fumadocs/steps/steps.css";
+
+@source "../../../registry";
 
 @custom-variant dark (&:is(.dark *));
 

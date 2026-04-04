@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SearchDialog } from "./search-dialog";
+import { SearchDialog } from "../../../registry/ui/document0/search-dialog/SearchDialog";
 
 function NavLinks() {
   const pathname = usePathname();

@@ -2,6 +2,8 @@
 
 A documentation framework with a headless data layer. File system source, page trees, navigation, MDX processing, and Shiki syntax highlighting, with zero UI. Bring your own components and styles.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/doc0team/document0)
+
 ## Packages
 
 | Package | Description |

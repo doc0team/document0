@@ -15,9 +15,13 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@registry/*": ["../../registry/*"],
+      "@base-ui/react/*": ["./node_modules/@base-ui/react/*"],
+      "lucide-react": ["./node_modules/lucide-react"],
+      "tailwind-merge": ["./node_modules/tailwind-merge"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../registry/**/*.ts", "../../registry/**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../registry/ui/**/*.ts", "../../registry/ui/**/*.tsx"],
   "exclude": ["node_modules"]
 }

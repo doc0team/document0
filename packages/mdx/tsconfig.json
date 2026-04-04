@@ -2,9 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    "rootDir": "./src"
   },
   "include": ["src"]
 }

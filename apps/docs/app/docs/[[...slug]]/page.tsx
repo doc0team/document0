@@ -7,9 +7,9 @@ import { source, getPageTree } from "@/lib/source";
 import { getHighlighter, shikiThemes } from "@/lib/highlighter";
 import { processMdx } from "@document0/mdx";
 import { getBreadcrumbs, getPageNeighbours } from "@document0/core";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { PageNavigation } from "@/components/page-navigation";
-import { TableOfContents } from "@/components/table-of-contents";
+import { Breadcrumbs } from "../../../../../registry/ui/document0/breadcrumbs/Breadcrumbs";
+import { PageNavigation } from "../../../../../registry/ui/document0/page-navigation/PageNavigation";
+import { TableOfContents } from "../../../../../registry/ui/document0/toc/TableOfContents";
 import { mdxComponents } from "@/components/mdx-components";
 import { readingTime } from "@/plugins/reading-time";
 

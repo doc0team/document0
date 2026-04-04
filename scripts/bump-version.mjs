@@ -19,9 +19,11 @@ const ROOT = path.resolve(__dirname, "..");
 const PACKAGES = [
   "packages/core",
   "packages/mdx",
+  "packages/mdc",
   "packages/cli",
   "packages/create-document0",
-  "packages/template",
+  "packages/template-nextjs",
+  "packages/template-vue",
 ];
 
 const type = process.argv[2];

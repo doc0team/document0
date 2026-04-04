@@ -35,6 +35,7 @@ export async function add(names: string[]): Promise<void> {
 
   const index = await fetchRegistryIndex();
   const allDeps: Record<string, string> = {};
+  const cssFiles: string[] = [];
 
   for (const name of names) {
     const item = findItem(index, name);
@@ -62,6 +63,9 @@ export async function add(names: string[]): Promise<void> {
       const targetPath = path.join(targetDir, file);
       fs.writeFileSync(targetPath, content, "utf-8");
       console.log(kleur.dim(`    → ${item.installPath}/${file}`));
+      if (file.endsWith(".css")) {
+        cssFiles.push(path.join(item.installPath, file));
+      }
     }
 
     recordInstall(item.namespace, item.name, item.version, item.installPath);
@@ -82,6 +86,14 @@ export async function add(names: string[]): Promise<void> {
           `\n  Could not auto-install deps. Run manually:\n    ${installCmd(pm, depStrings)}`,
         ),
       );
+    }
+  }
+
+  if (cssFiles.length > 0) {
+    console.log();
+    console.log(kleur.yellow("  CSS files installed — add these imports to your stylesheet:"));
+    for (const cssPath of cssFiles) {
+      console.log(kleur.cyan(`    @import "./${cssPath}";`));
     }
   }
 

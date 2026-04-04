@@ -1,5 +1,5 @@
 import { getApiTree } from "@/lib/source";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "../../../../registry/ui/document0/sidebar/Sidebar";
 import { Header } from "@/components/header";
 
 export default async function ApiLayout({ children }: { children: React.ReactNode }) {

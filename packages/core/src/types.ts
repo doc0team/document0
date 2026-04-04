@@ -84,7 +84,7 @@ export interface NavigationItem {
 
 export interface BreadcrumbItem {
   name: string;
-  url: string;
+  url?: string;
 }
 
 export interface PageNeighbours {

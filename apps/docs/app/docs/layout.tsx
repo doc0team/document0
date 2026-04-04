@@ -1,5 +1,5 @@
 import { getPageTree } from "@/lib/source";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "../../../../registry/ui/document0/sidebar/Sidebar";
 import { Header } from "@/components/header";
 import HeroGeometric from "@/components/ui/hero-geometric";
 

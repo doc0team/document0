@@ -13,6 +13,7 @@ import {
   CliPreview,
   PluginSearch,
 } from "@/components/plugins";
+import { FumadocsIcon } from "@/components/ui/fumadocs-icon";
 
 const previewComponents: Record<string, React.ComponentType> = {
   "document0/sidebar": dynamic(() => import("@/components/previews/sidebar").then((m) => m.SidebarPreview)),
@@ -20,6 +21,12 @@ const previewComponents: Record<string, React.ComponentType> = {
   "document0/breadcrumbs": dynamic(() => import("@/components/previews/breadcrumbs").then((m) => m.BreadcrumbsPreview)),
   "document0/page-navigation": dynamic(() => import("@/components/previews/page-navigation").then((m) => m.PageNavigationPreview)),
   "document0/search-dialog": dynamic(() => import("@/components/previews/search-dialog").then((m) => m.SearchDialogPreview)),
+  "fumadocs/steps": dynamic(() => import("@/components/previews/fumadocs-steps").then((m) => m.StepsPreview)),
+  "fumadocs/files": dynamic(() => import("@/components/previews/fumadocs-files").then((m) => m.FilesPreview)),
+  "fumadocs/tabs": dynamic(() => import("@/components/previews/fumadocs-tabs").then((m) => m.TabsPreview)),
+  "fumadocs/accordion": dynamic(() => import("@/components/previews/fumadocs-accordion").then((m) => m.AccordionPreview)),
+  "fumadocs/banner": dynamic(() => import("@/components/previews/fumadocs-banner").then((m) => m.BannerPreview)),
+  "fumadocs/codeblock": dynamic(() => import("@/components/previews/fumadocs-codeblock").then((m) => m.CodeBlockPreview)),
 };
 
 interface PageProps {
@@ -90,6 +97,8 @@ function PluginsIndexPage() {
   );
 }
 
+const VUE_PREVIEW_BASE = process.env.VUE_PREVIEW_URL || "http://localhost:3002";
+
 function ItemDetailPage({
   item,
   highlightedSource,
@@ -111,11 +120,22 @@ function ItemDetailPage({
 
   return (
     <div className="prose-headless">
-      <div className="not-prose flex items-center gap-3 mb-2">
-        <h1 className="text-3xl font-bold text-white">{item.name}</h1>
-        <span className="inline-flex items-center rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
-          {item.category}
-        </span>
+      <div className="not-prose flex items-center gap-4 mb-2">
+        {item.namespace === "fumadocs" ? (
+          <FumadocsIcon className="size-10" />
+        ) : item.logo ? (
+          <img
+            src={item.logo}
+            alt={`${item.namespace} logo`}
+            className="size-10 rounded-lg"
+          />
+        ) : null}
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-white">{item.name}</h1>
+          <span className="inline-flex items-center rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+            {item.category}
+          </span>
+        </div>
       </div>
 
       <p>{item.description}</p>
@@ -132,7 +152,7 @@ function ItemDetailPage({
         </span>
       </div>
 
-      {PreviewComponent && (
+      {(PreviewComponent || (item.preview && item.framework === "vue")) && (
         <>
           <h2>Preview</h2>
           <div className="not-prose mb-6 rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
@@ -140,10 +160,22 @@ function ItemDetailPage({
               <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
               <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
               <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+              {item.framework === "vue" && (
+                <span className="ml-auto text-xs text-zinc-500 font-medium">Vue</span>
+              )}
             </div>
-            <div className="p-6">
-              <PreviewComponent />
-            </div>
+            {item.framework === "vue" ? (
+              <iframe
+                src={`${VUE_PREVIEW_BASE}/preview/${item.namespace}/${item.name}`}
+                className="w-full border-0"
+                style={{ minHeight: "200px" }}
+                title={`${item.namespace}/${item.name} preview`}
+              />
+            ) : PreviewComponent ? (
+              <div className="p-6">
+                <PreviewComponent />
+              </div>
+            ) : null}
           </div>
         </>
       )}
@@ -209,8 +241,17 @@ const result = await processMdx(source, {
 });`;
 }
 
-function getUiUsageCode(name: string, installPath: string, fileName: string): string {
-  const componentName = fileName.replace(".tsx", "").replace(".ts", "");
+function getUiUsageCode(name: string, installPath: string, fileName: string, framework?: string): string {
+  const componentName = fileName.replace(".tsx", "").replace(".ts", "").replace(".vue", "");
+  if (framework === "vue") {
+    return `<script setup lang="ts">
+import ${componentName} from "./${installPath}/${fileName}";
+</script>
+
+<template>
+  <${componentName} />
+</template>`;
+  }
   return `import { ${componentName} } from "./${installPath}";
 
 // Example usage in your layout or page:
@@ -240,8 +281,9 @@ export default async function PluginPage({ params }: PageProps) {
 
   let highlightedSource: string | null = null;
   if (sourceCode) {
+    const sourceLang = item.framework === "vue" ? "vue" : "tsx";
     highlightedSource = highlighter.codeToHtml(sourceCode, {
-      lang: "tsx",
+      lang: sourceLang,
       themes: shikiThemes,
       defaultColor: false,
     });
@@ -250,11 +292,11 @@ export default async function PluginPage({ params }: PageProps) {
   const isUi = item.category === "ui";
   const fileName = item.files[0] || "index.ts";
   const usageCode = isUi
-    ? getUiUsageCode(item.name, item.installPath, fileName)
+    ? getUiUsageCode(item.name, item.installPath, fileName, item.framework)
     : getPluginUsageCode(item.name, item.installPath);
 
   const highlightedUsage = highlighter.codeToHtml(usageCode, {
-    lang: "tsx",
+    lang: item.framework === "vue" ? "vue" : "tsx",
     themes: shikiThemes,
     defaultColor: false,
   });
