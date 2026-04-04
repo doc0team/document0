@@ -294,8 +294,13 @@ pre.shiki code > .line {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Prevent horizontal scroll — placed after all imports and layers for cascade priority */
+/*
+ * Clip horizontal overflow without `overflow-x: hidden`, which on ancestors
+ * breaks `position: sticky` for the sidebar and TOC (scroll containment).
+ * `clip` hides overflow visually but does not establish the same scrollport
+ * behavior that traps sticky descendants.
+ */
 html, body {
-  overflow-x: hidden !important;
+  overflow-x: clip;
   max-width: 100vw;
 }

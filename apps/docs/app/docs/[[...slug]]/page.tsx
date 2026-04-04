@@ -67,7 +67,7 @@ export default async function DocPage({ params }: PageProps) {
           <div className="mb-4 text-sm text-zinc-500">
             {readingTimeMinutes} min read
           </div>
-          <div className="prose-headless">
+          <div className="prose-headless overflow-x-auto">
             <MDXContent components={mdxComponents} />
           </div>
           <PageNavigation previous={previous} next={next} />
