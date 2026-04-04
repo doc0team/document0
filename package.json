@@ -15,6 +15,7 @@
     "build:cli": "pnpm --filter document0 build",
     "build:create": "pnpm --filter create-document0 build",
     "dev": "pnpm -r dev",
+    "build:vue-preview": "cd apps/vue-preview && npm install && npm run build",
     "dev:docs": "pnpm --filter docs --filter vue-preview dev",
     "dev:core": "pnpm --filter @document0/core dev",
     "dev:mdx": "pnpm --filter @document0/mdx dev",
