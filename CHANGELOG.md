@@ -27,6 +27,12 @@ Introduced the **OpenRouter AI Chat component** (`document0/openrouter-chat`) fe
 
 - **`registry/ui/document0/sidebar` (`MobileSidebar`)** — **Portal** backdrop and **`document.body` scroll lock** run only **after mount**, avoiding SSR/client HTML mismatches from `createPortal`.
 - **`registry/ui/document0/openrouter-chat` (`AiChat`)** — Fixed `Cannot read properties of undefined (reading 'trim')` crash when initialized.
+- **Plugins layout** — Replaced `overflow-x-hidden` with `overflow-x: clip` on the plugins page wrapper, restoring **sticky sidebar** positioning (same fix previously applied to the docs layout).
+- **Webpack / Shiki** — Added `null-loader` rule for `.d.mts` declaration files in `next.config.ts` so Shiki's dynamic `import("shiki/bundle/web")` in the client-side `AiChat` component no longer crashes the production build.
+
+### Changed
+
+- **Changelog page** — Preamble (format notes) and the **Unreleased** section are now filtered out at render time in `app/changelog/page.tsx`, keeping them in `CHANGELOG.md` but hidden from the published page.
 
 ## [0.5.0] - 2026-04-04
 

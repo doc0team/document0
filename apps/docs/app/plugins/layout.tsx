@@ -7,7 +7,7 @@ export default function PluginsLayout({ children }: { children: React.ReactNode 
   const tree = getPluginsTree();
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-zinc-950 overflow-x-hidden">
+    <div className="relative flex min-h-screen flex-col bg-zinc-950" style={{ overflowX: "clip" }}>
       <Header mobileSidebar={<MobileSidebar tree={tree} navLinks={[{ href: "/docs", label: "Docs" }, { href: "/api", label: "API Reference" }, { href: "/plugins", label: "Plugins" }]} />} />
       <div className="flex flex-1 items-start">
         <Sidebar tree={tree} />
