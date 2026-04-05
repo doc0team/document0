@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["shiki", "@shikijs/core", "@shikijs/rehype"],
-  serverExternalPackages: ["@document0/core", "@document0/mdx", "shiki", "@scalar/openapi-parser"],
+  serverExternalPackages: ["@document0/core", "@document0/mdx", "@scalar/openapi-parser"],
   async rewrites() {
     return [
       {
