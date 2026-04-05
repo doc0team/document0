@@ -180,6 +180,110 @@ pre.shiki code > .line {
       @apply rounded bg-zinc-800 px-1.5 py-0.5 text-sm font-mono text-zinc-200;
     }
   }
+
+  /* /changelog — dark, compact; preamble + per-release body (HTML from processMdxToHtml) */
+  .changelog-preamble {
+    @apply max-w-prose text-xs leading-relaxed text-zinc-500;
+
+    a {
+      @apply text-sky-400 underline decoration-sky-400/30 underline-offset-2 hover:decoration-sky-400;
+    }
+    p {
+      @apply my-2 first:mt-0;
+    }
+  }
+
+  .changelog-release-summary {
+    @apply text-[11px] leading-relaxed text-zinc-500;
+
+    p {
+      @apply my-2 first:mt-0 last:mb-0;
+    }
+    strong {
+      @apply font-medium text-zinc-300;
+    }
+    em {
+      @apply text-zinc-500;
+    }
+    a {
+      @apply text-sky-400 underline decoration-sky-400/30 underline-offset-2 hover:text-sky-300;
+    }
+    code[data-inline] {
+      @apply rounded bg-zinc-900 px-1 py-px font-mono text-[10px] text-zinc-400;
+    }
+  }
+
+  .changelog-release-body {
+    @apply text-xs leading-relaxed text-zinc-400;
+
+    h1, h2 {
+      @apply hidden;
+    }
+    h3 {
+      @apply mt-8 scroll-mt-24 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500 first:mt-0;
+    }
+    h4 {
+      @apply mt-5 text-xs font-semibold text-zinc-300;
+    }
+    p {
+      @apply my-2 text-zinc-400;
+    }
+    a {
+      @apply text-sky-400 underline decoration-sky-400/30 underline-offset-2 hover:text-sky-300;
+    }
+    ul {
+      @apply my-2 list-none space-y-0 pl-0;
+    }
+    ol {
+      @apply my-2 list-decimal space-y-2 pl-4 marker:text-zinc-600;
+    }
+    li {
+      @apply border-b border-dotted border-zinc-700/70 py-3 text-xs leading-relaxed text-zinc-400 last:border-b-0;
+    }
+    li::before {
+      content: none;
+    }
+    li p {
+      @apply my-1;
+    }
+    strong {
+      @apply font-medium text-zinc-100;
+    }
+    em {
+      @apply text-zinc-400 italic;
+    }
+    blockquote {
+      @apply my-3 border-l-2 border-zinc-700 pl-3 text-zinc-500;
+    }
+    hr {
+      @apply my-6 border-zinc-800;
+    }
+    table {
+      @apply my-4 w-full border-collapse text-[11px] text-zinc-400;
+    }
+    thead {
+      @apply border-b border-zinc-800 bg-zinc-900/50;
+    }
+    tbody {
+      @apply divide-y divide-zinc-800;
+    }
+    th, td {
+      @apply px-2 py-1.5 text-left;
+    }
+    pre {
+      @apply my-3 overflow-x-auto rounded-md border border-zinc-800 bg-zinc-950 p-3 text-[11px] leading-relaxed;
+    }
+    pre code {
+      @apply p-0 rounded-none;
+      background: transparent !important;
+    }
+    pre code span {
+      background: transparent !important;
+    }
+    code[data-inline] {
+      @apply rounded bg-zinc-900 px-1 py-px font-mono text-[10px] text-zinc-300;
+    }
+  }
 }
 
 @theme inline {

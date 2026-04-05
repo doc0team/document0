@@ -19,15 +19,12 @@ export const metadata: Metadata = {
   },
 };
 
-import { AiChat } from "@registry/ui/document0/openrouter-chat/AiChat";
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className={cn("dark font-sans", geist.variable)}>
       <head />
       <body className={GeistPixelSquare.variable}>
         {children}
-        <AiChat endpoint="/api/chat" title="document0 AI" placeholder="Ask docs a question..." />
       </body>
     </html>
   );

@@ -2,6 +2,7 @@ import { getPageTree } from "@/lib/source";
 import { Sidebar, MobileSidebar } from "../../../../registry/ui/document0/sidebar/Sidebar";
 import { Header } from "@/components/header";
 import HeroGeometric from "@/components/ui/hero-geometric";
+import { AiChat } from "@registry/ui/document0/openrouter-chat/AiChat";
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const tree = getPageTree();
@@ -24,6 +25,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </div>
         </main>
       </div>
+      <AiChat endpoint="/api/chat" title="document0 Docs AI" placeholder="Ask the docs..." />
     </div>
   );
 }
