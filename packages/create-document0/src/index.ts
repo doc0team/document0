@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import kleur from "kleur";
 import prompts from "prompts";
@@ -13,8 +14,8 @@ const FRAMEWORKS: { value: Framework; title: string; description: string }[] = [
 ];
 
 function templateDir(framework: Framework): string {
-  return path.join(
-    path.dirname(new URL(import.meta.url).pathname),
+  return path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
     `../template-${framework}`
   );
 }
