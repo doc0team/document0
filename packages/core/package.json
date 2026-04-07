@@ -39,10 +39,6 @@
     "./graph": {
       "types": "./dist/graph/index.d.ts",
       "import": "./dist/graph/index.js"
-    },
-    "./plugins": {
-      "types": "./dist/plugins/index.d.ts",
-      "import": "./dist/plugins/index.js"
     }
   },
   "main": "./dist/index.js",
