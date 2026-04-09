@@ -162,6 +162,16 @@ export class DocsSource {
     return readMeta(path.join(this.rootDir, dir));
   }
 
+  /** Absolute path to the scanned content directory. Used by `watchDocsSource` (`@document0/core/watch`). */
+  getContentRoot(): string {
+    return this.rootDir;
+  }
+
+  /** Extensions treated as pages. Used by `watchDocsSource` (`@document0/core/watch`). */
+  getContentExtensions(): readonly string[] {
+    return this.extensions;
+  }
+
   invalidate(): void {
     this._pages = null;
     this._tree = null;
