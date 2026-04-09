@@ -39,6 +39,10 @@
     "./graph": {
       "types": "./dist/graph/index.d.ts",
       "import": "./dist/graph/index.js"
+    },
+    "./watch": {
+      "types": "./dist/watch/index.d.ts",
+      "import": "./dist/watch/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -56,6 +60,7 @@
   "dependencies": {
     "@orama/orama": "^3.1.18",
     "@scalar/openapi-parser": "^0.25.6",
+    "chokidar": "^4.0.3",
     "gray-matter": "^4.0.3"
   },
   "devDependencies": {
