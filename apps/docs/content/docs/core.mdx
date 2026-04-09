@@ -67,6 +67,12 @@ Clears all cached data (pages, tree, search index, lookup maps). Call this when 
 source.invalidate();
 ```
 
+#### Content watching (dev)
+
+**Next.js:** use **`@document0/next-dev`** (`withDocument0` + one `content-stamp` import) so the dev bundler invalidates your `DocsSource` module when `content/` changes (Fumadocs-style). See the **[Next.js guide](/docs/nextjs#content-hot-reload-in-development)**.
+
+**Other runtimes:** **`watchDocsSource`** from **`@document0/core/watch`** (Node-only; separate entry so **chokidar** is not pulled into unrelated graphs).
+
 ### PageData
 
 ```ts
