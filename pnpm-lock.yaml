@@ -35,6 +35,9 @@ importers:
       '@document0/mdx':
         specifier: workspace:*
         version: link:../../packages/mdx
+      '@document0/next-dev':
+        specifier: workspace:*
+        version: link:../../packages/next-dev
       '@mdx-js/mdx':
         specifier: ^3.0.0
         version: 3.1.1
@@ -74,6 +77,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       shadcn:
         specifier: ^4.1.0
         version: 4.1.0(@types/node@20.19.37)(typescript@5.9.3)
@@ -182,6 +188,9 @@ importers:
       '@scalar/openapi-parser':
         specifier: ^0.25.6
         version: 0.25.6
+      chokidar:
+        specifier: ^4.0.3
+        version: 4.0.3
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -331,6 +340,21 @@ importers:
         specifier: ^5.4.0
         version: 5.9.3
 
+  packages/next-dev:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      next:
+        specifier: ^15.0.0
+        version: 15.5.14(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.3
+
   packages/template-nextjs:
     dependencies:
       '@document0/core':
@@ -339,6 +363,9 @@ importers:
       '@document0/mdx':
         specifier: workspace:*
         version: link:../mdx
+      '@document0/next-dev':
+        specifier: workspace:*
+        version: link:../next-dev
       '@mdx-js/mdx':
         specifier: ^3.0.0
         version: 3.1.1
@@ -2750,6 +2777,10 @@ packages:
   character-reference-invalid@2.0.1:
     resolution: {integrity: sha512-iBZ4F4wRbyORVsu0jPV7gXkOsGYjGHPmAyv+HiHG8gi5PtC9KI2j1+v8/tlibRvjoWX027ypmG/n0HtO5t7unw==}
 
+  chokidar@4.0.3:
+    resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
+    engines: {node: '>= 14.16.0'}
+
   chrome-trace-event@1.0.4:
     resolution: {integrity: sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ==}
     engines: {node: '>=6.0'}
@@ -4254,6 +4285,10 @@ packages:
     resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
     engines: {node: '>=0.10.0'}
 
+  readdirp@4.1.2:
+    resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
+    engines: {node: '>= 14.18.0'}
+
   recast@0.23.11:
     resolution: {integrity: sha512-YTUo+Flmw4ZXiWfQKGcwwc11KnoRAYgzAE2E7mXKCjSviTKShtxBsN6YUUBB2gtaBzKzeKunxhUwNHQuRryhWA==}
     engines: {node: '>= 4'}
@@ -4406,6 +4441,9 @@ packages:
   serve-static@2.2.1:
     resolution: {integrity: sha512-xRXBn0pPqQTVQiC8wyQrKs2MOlX24zQ0POGaj0kultvoOCstBQM5yvOhAVSUwOMjQtTvsPWoNCHfPGwaaQJhTw==}
     engines: {node: '>= 18'}
+
+  server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
 
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
@@ -7278,6 +7316,10 @@ snapshots:
 
   character-reference-invalid@2.0.1: {}
 
+  chokidar@4.0.3:
+    dependencies:
+      readdirp: 4.1.2
+
   chrome-trace-event@1.0.4: {}
 
   class-variance-authority@0.7.1:
@@ -9103,6 +9145,8 @@ snapshots:
 
   react@19.2.4: {}
 
+  readdirp@4.1.2: {}
+
   recast@0.23.11:
     dependencies:
       ast-types: 0.16.1
@@ -9383,6 +9427,8 @@ snapshots:
       send: 1.2.1
     transitivePeerDependencies:
       - supports-color
+
+  server-only@0.0.1: {}
 
   setprototypeof@1.2.0: {}
 

@@ -10,6 +10,7 @@
   "dependencies": {
     "@document0/core": "workspace:*",
     "@document0/mdx": "workspace:*",
+    "@document0/next-dev": "workspace:*",
     "@mdx-js/mdx": "^3.0.0",
     "@tailwindcss/postcss": "^4.2.2",
     "class-variance-authority": "^0.7.1",

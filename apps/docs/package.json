@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "cd ../../packages/core && pnpm run build && cd ../mdx && pnpm run build && cd ../../apps/docs && next build",
+    "build": "cd ../../packages/core && pnpm run build && cd ../mdx && pnpm run build && cd ../next-dev && pnpm run build && cd ../../apps/docs && next build",
     "start": "next start --port 3001"
   },
   "dependencies": {
@@ -12,6 +12,7 @@
     "@base-ui/react": "^1.3.0",
     "@document0/core": "workspace:*",
     "@document0/mdx": "workspace:*",
+    "@document0/next-dev": "workspace:*",
     "@mdx-js/mdx": "^3.0.0",
     "@openrouter/ai-sdk-provider": "^2.3.3",
     "@react-three/drei": "^10.7.7",
@@ -25,6 +26,7 @@
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "server-only": "^0.0.1",
     "shadcn": "^4.1.0",
     "shiki": "^1.0.0",
     "tailwind-merge": "^3.5.0",

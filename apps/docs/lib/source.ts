@@ -1,3 +1,7 @@
+import "server-only";
+
+import "@document0/next-dev/content-stamp";
+
 import path from "node:path";
 import fs from "node:fs";
 import { DocsSource, buildPageTree } from "@document0/core";
