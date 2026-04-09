@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import path from "node:path";
 import kleur from "kleur";
 import {
   fetchRegistryIndex,
@@ -7,6 +6,7 @@ import {
   findItem,
 } from "../registry.js";
 import { readLockFile, recordInstall } from "../lockfile.js";
+import { resolveSafeInstallDir, resolveSafeTargetFile } from "../path-safety.js";
 
 export async function update(names: string[]): Promise<void> {
   const lock = readLockFile();
@@ -52,12 +52,24 @@ export async function update(names: string[]): Promise<void> {
         kleur.dim(` v${entry.version} → v${item.version}`),
     );
 
-    const targetDir = path.resolve(process.cwd(), item.installPath);
+    let targetDir: string;
+    try {
+      targetDir = resolveSafeInstallDir(item.installPath);
+    } catch (err) {
+      console.log(kleur.red(`  ${String(err)}`));
+      process.exit(1);
+    }
     fs.mkdirSync(targetDir, { recursive: true });
 
     for (const file of item.files) {
       const content = await fetchItemFile(item, file);
-      const targetPath = path.join(targetDir, file);
+      let targetPath: string;
+      try {
+        targetPath = resolveSafeTargetFile(targetDir, file);
+      } catch (err) {
+        console.log(kleur.red(`  ${String(err)}`));
+        process.exit(1);
+      }
       fs.writeFileSync(targetPath, content, "utf-8");
       console.log(kleur.dim(`    → ${item.installPath}/${file}`));
     }
