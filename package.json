@@ -21,6 +21,8 @@
     "dev:mdx": "pnpm --filter @document0/mdx dev",
     "dev:mdc": "pnpm --filter @document0/mdc dev",
     "dev:cli": "pnpm --filter document0 dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "typecheck:core": "pnpm --filter @document0/core typecheck",
@@ -37,7 +39,8 @@
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=18.0.0"
