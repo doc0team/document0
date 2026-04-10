@@ -10,6 +10,6 @@ export const source = new DocsSource({
   baseUrl: "/docs",
 });
 
-export function getPageTree() {
-  return buildPageTree(source.getPages(), rootDir);
+export async function getPageTree() {
+  return buildPageTree(await source.getPages(), rootDir);
 }

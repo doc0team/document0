@@ -19,17 +19,17 @@ afterEach(() => {
 });
 
 describe("core/DocsSource", () => {
-  it("reloads content after invalidate()", () => {
+  it("reloads content after invalidate()", async () => {
     const rootDir = mkTempDir();
     const filePath = path.join(rootDir, "index.mdx");
     fs.writeFileSync(filePath, "---\ntitle: Home\n---\n\nFirst\n", "utf-8");
 
     const source = new DocsSource({ rootDir, baseUrl: "/docs" });
-    expect(source.getPage("")?.content).toContain("First");
+    expect((await source.getPage(""))?.content).toContain("First");
 
     fs.writeFileSync(filePath, "---\ntitle: Home\n---\n\nUpdated\n", "utf-8");
     source.invalidate();
 
-    expect(source.getPage("")?.content).toContain("Updated");
+    expect((await source.getPage(""))?.content).toContain("Updated");
   });
 });

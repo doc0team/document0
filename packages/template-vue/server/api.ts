@@ -28,19 +28,19 @@ async function getHighlighter() {
   return highlighter;
 }
 
-function getTree() {
-  return buildPageTree(source.getPages(), rootDir);
+async function getTree() {
+  return buildPageTree(await source.getPages(), rootDir);
 }
 
 async function getPage(slug: string) {
-  const page = source.getPage(slug);
+  const page = await source.getPage(slug);
   if (!page) return null;
 
   const raw = fs.readFileSync(page.filePath, "utf-8");
   const hl = await getHighlighter();
   const { body, toc } = await processMdc(raw, { highlighter: hl });
 
-  const tree = getTree();
+  const tree = await getTree();
   const breadcrumbs = getBreadcrumbs(tree, page.url);
   const { previous, next } = getPageNeighbours(tree, page.url);
 
@@ -61,7 +61,7 @@ export function document0ApiPlugin(): Plugin {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         if (req.url === "/api/tree") {
-          const tree = getTree();
+          const tree = await getTree();
           res.setHeader("Content-Type", "application/json");
           res.end(JSON.stringify(tree));
           return;

@@ -31,8 +31,8 @@ import { processMdx } from "@document0/mdx";
 import { createHighlighter } from "shiki";
 
 const source = new DocsSource({ rootDir: "./content/docs", baseUrl: "/docs" });
-const pages = source.getPages();
-const tree = source.getPageTree();
+const pages = await source.getPages();
+const tree = await source.getPageTree();
 
 // Full-text search API route (Orama-backed)
 export const { GET } = createSearchRoute(source);

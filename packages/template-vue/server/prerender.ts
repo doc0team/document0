@@ -20,7 +20,7 @@ async function main() {
     ],
   });
 
-  const tree = buildPageTree(source.getPages(), rootDir);
+  const tree = await buildPageTree(await source.getPages(), rootDir);
 
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, "tree.json"), JSON.stringify(tree));
@@ -28,7 +28,8 @@ async function main() {
   const pageDir = path.join(outDir, "page");
   fs.mkdirSync(pageDir, { recursive: true });
 
-  for (const page of source.getPages()) {
+  const pages = await source.getPages();
+  for (const page of pages) {
     const raw = fs.readFileSync(page.filePath, "utf-8");
     const { body, toc } = await processMdc(raw, { highlighter });
 
@@ -56,7 +57,7 @@ async function main() {
     );
   }
 
-  console.log(`Pre-rendered ${source.getPages().length} pages to ${outDir}`);
+  console.log(`Pre-rendered ${pages.length} pages to ${outDir}`);
   highlighter.dispose();
 }
 

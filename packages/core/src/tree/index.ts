@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import type {
   PageData,
@@ -24,16 +24,15 @@ function titleFromSlug(slug: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function readMetaFromDir(dir: string): MetaFile | null {
+async function readMetaFromDir(dir: string): Promise<MetaFile | null> {
   const candidates = ["_meta.json"];
   for (const candidate of candidates) {
     const full = path.join(dir, candidate);
-    if (fs.existsSync(full)) {
-      try {
-        return JSON.parse(fs.readFileSync(full, "utf-8")) as MetaFile;
-      } catch {
-        return null;
-      }
+    try {
+      const raw = await fs.readFile(full, "utf-8");
+      return JSON.parse(raw) as MetaFile;
+    } catch {
+      continue;
     }
   }
   return null;
@@ -69,17 +68,17 @@ function orderByMeta(nodes: TreeNode[], meta: MetaFile): TreeNode[] {
   return [...ordered, ...remaining];
 }
 
-export function buildPageTree(pages: PageData[], rootDir: string): TreeNode[] {
+export async function buildPageTree(pages: PageData[], rootDir: string): Promise<TreeNode[]> {
   return buildTree(pages, rootDir, rootDir);
 }
 
-function buildTree(
+async function buildTree(
   pages: PageData[],
   dir: string,
   rootDir: string
-): TreeNode[] {
+): Promise<TreeNode[]> {
   const nodes: TreeNode[] = [];
-  const meta = readMetaFromDir(dir);
+  const meta = await readMetaFromDir(dir);
 
   const pagesInDir = pages.filter((p) => {
     const pageDir = path.dirname(p.filePath);
@@ -114,7 +113,7 @@ function buildTree(
     const subPages = pages.filter((p) =>
       p.filePath.startsWith(subDir + path.sep)
     );
-    const subMeta = readMetaFromDir(subDir);
+    const subMeta = await readMetaFromDir(subDir);
     const dirName = path.basename(subDir);
 
     const indexPage = subPages.find(
@@ -123,7 +122,7 @@ function buildTree(
         path.dirname(p.filePath) === subDir
     );
 
-    const children = buildTree(subPages, subDir, rootDir);
+    const children = await buildTree(subPages, subDir, rootDir);
 
     const folder: FolderNode = {
       type: "folder",

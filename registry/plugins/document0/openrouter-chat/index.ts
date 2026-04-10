@@ -52,7 +52,7 @@ export interface OpenRouterChatOptions {
    * Documentation pages the AI can search. Pass `source.getPages()` from
    * @document0/core, or a function that returns pages for lazy evaluation.
    */
-  pages?: ChatPage[] | (() => ChatPage[]);
+  pages?: ChatPage[] | (() => ChatPage[] | Promise<ChatPage[]>);
 
   /**
    * Maximum number of page results the search tool returns per call.
@@ -225,9 +225,9 @@ export function createChatRoute(options: OpenRouterChatOptions = {}) {
     siteName,
   } = options;
 
-  function getPages(): ChatPage[] {
+  async function getPages(): Promise<ChatPage[]> {
     if (!pagesOption) return [];
-    return typeof pagesOption === "function" ? pagesOption() : pagesOption;
+    return typeof pagesOption === "function" ? await pagesOption() : pagesOption;
   }
 
   const openrouter = createOpenRouter({
@@ -266,7 +266,7 @@ export function createChatRoute(options: OpenRouterChatOptions = {}) {
           ? undefined
           : systemPrompt ?? (pagesOption ? DEFAULT_SYSTEM_PROMPT : undefined);
 
-      const allPages = getPages();
+      const allPages = await getPages();
       const tools =
         allPages.length > 0
           ? {

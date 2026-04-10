@@ -2,12 +2,12 @@ import { getPageTree } from "@/lib/source";
 import { Sidebar } from "@/components/sidebar";
 import { MobileSidebar } from "@/components/mobile-sidebar";
 
-export default function DocsLayout({
+export default async function DocsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const tree = getPageTree();
+  const tree = await getPageTree();
 
   return (
     <div className="flex min-h-screen flex-col">

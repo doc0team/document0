@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import type {
@@ -32,30 +32,27 @@ function buildUrl(slugs: string[], baseUrl: string): string {
   return `${baseUrl}/${filtered.join("/")}`;
 }
 
-function readMeta(dir: string): MetaFile | null {
+async function readMeta(dir: string): Promise<MetaFile | null> {
   const full = path.join(dir, "_meta.json");
-  if (fs.existsSync(full)) {
-    try {
-      const raw = fs.readFileSync(full, "utf-8");
-      return JSON.parse(raw) as MetaFile;
-    } catch {
-      return null;
-    }
+  try {
+    const raw = await fs.readFile(full, "utf-8");
+    return JSON.parse(raw) as MetaFile;
+  } catch {
+    return null;
   }
-  return null;
 }
 
-function scanDir(
+async function scanDir(
   dir: string,
   rootDir: string,
   baseUrl: string,
   extensions: string[]
-): PageData[] {
+): Promise<PageData[]> {
   const pages: PageData[] = [];
-  let entries: fs.Dirent[];
+  let entries: import("node:fs").Dirent[];
 
   try {
-    entries = fs.readdirSync(dir, { withFileTypes: true });
+    entries = await fs.readdir(dir, { withFileTypes: true });
   } catch {
     return pages;
   }
@@ -64,7 +61,7 @@ function scanDir(
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      pages.push(...scanDir(fullPath, rootDir, baseUrl, extensions));
+      pages.push(...await scanDir(fullPath, rootDir, baseUrl, extensions));
       continue;
     }
 
@@ -76,7 +73,7 @@ function scanDir(
     if (entry.name.startsWith("_")) continue;
 
     try {
-      const raw = fs.readFileSync(fullPath, "utf-8");
+      const raw = await fs.readFile(fullPath, "utf-8");
       const { data, content } = matter(raw);
       const frontmatter = data as PageFrontmatter;
 
@@ -119,9 +116,9 @@ export class DocsSource {
     this.plugins = options.plugins ?? [];
   }
 
-  getPages(): PageData[] {
+  async getPages(): Promise<PageData[]> {
     if (this._pages) return this._pages;
-    let pages = scanDir(
+    let pages = await scanDir(
       this.rootDir,
       this.rootDir,
       this.baseUrl,
@@ -140,25 +137,25 @@ export class DocsSource {
     return this._pages;
   }
 
-  getPageTree(): TreeNode[] {
+  async getPageTree(): Promise<TreeNode[]> {
     if (this._tree) return this._tree;
-    let tree = buildPageTree(this.getPages(), this.rootDir);
+    let tree = await buildPageTree(await this.getPages(), this.rootDir);
     tree = applyTreeTransforms(tree, this.plugins);
     this._tree = tree;
     return this._tree;
   }
 
-  getPage(slug: string): PageData | undefined {
-    this.getPages();
+  async getPage(slug: string): Promise<PageData | undefined> {
+    await this.getPages();
     return this._slugMap!.get(slug);
   }
 
-  getPageByUrl(url: string): PageData | undefined {
-    this.getPages();
+  async getPageByUrl(url: string): Promise<PageData | undefined> {
+    await this.getPages();
     return this._urlMap!.get(url);
   }
 
-  getMeta(dir: string): MetaFile | null {
+  async getMeta(dir: string): Promise<MetaFile | null> {
     return readMeta(path.join(this.rootDir, dir));
   }
 

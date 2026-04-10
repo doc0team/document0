@@ -204,8 +204,8 @@ export async function getApiPages(): Promise<OpenAPIPageData[]> {
   return cachedApiPages;
 }
 
-export function getPageTree(): TreeNode[] {
-  return buildPageTree(source.getPages(), docsRootDir);
+export async function getPageTree(): Promise<TreeNode[]> {
+  return buildPageTree(await source.getPages(), docsRootDir);
 }
 
 export async function getApiTree(): Promise<TreeNode[]> {

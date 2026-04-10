@@ -18,7 +18,7 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return source.getPages().map((page) => ({
+  return (await source.getPages()).map((page) => ({
     slug: page.slugs.filter(Boolean),
   }));
 }
@@ -26,7 +26,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const slugStr = slug ? slug.join("/") : "";
-  const page = source.getPage(slugStr);
+  const page = await source.getPage(slugStr);
   if (!page) return {};
   return {
     title: page.frontmatter.title,
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function DocPage({ params }: PageProps) {
   const { slug } = await params;
   const slugStr = slug ? slug.join("/") : "";
-  const page = source.getPage(slugStr);
+  const page = await source.getPage(slugStr);
   if (!page) notFound();
 
   const raw = fs.readFileSync(page.filePath, "utf-8");
@@ -55,7 +55,7 @@ export default async function DocPage({ params }: PageProps) {
     baseUrl: import.meta.url,
   } as Parameters<typeof run>[1]);
 
-  const tree = getPageTree();
+  const tree = await getPageTree();
   const breadcrumbs = getBreadcrumbs(tree, page.url);
   const { previous, next } = getPageNeighbours(tree, page.url);
 

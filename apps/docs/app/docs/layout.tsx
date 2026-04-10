@@ -4,8 +4,8 @@ import { Header } from "@/components/header";
 import HeroGeometric from "@/components/ui/hero-geometric";
 import { AiChat } from "@registry/ui/document0/openrouter-chat/AiChat";
 
-export default function DocsLayout({ children }: { children: React.ReactNode }) {
-  const tree = getPageTree();
+export default async function DocsLayout({ children }: { children: React.ReactNode }) {
+  const tree = await getPageTree();
 
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-950">

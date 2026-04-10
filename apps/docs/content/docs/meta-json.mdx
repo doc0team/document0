@@ -41,7 +41,7 @@ Use `generateStaticParams` to pre-render all docs pages at build time:
 
 ```ts
 export async function generateStaticParams() {
-  return source.getPages().map((page) => ({
+  return (await source.getPages()).map((page) => ({
     slug: page.slugs.filter(Boolean),
   }));
 }

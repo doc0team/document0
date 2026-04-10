@@ -47,8 +47,8 @@ const rootDir = path.join(process.cwd(), "content/docs");
 
 export const source = new DocsSource({ rootDir, baseUrl: "/docs" });
 
-export function getPageTree() {
-  return buildPageTree(source.getPages(), rootDir);
+export async function getPageTree() {
+  return buildPageTree(await source.getPages(), rootDir);
 }
 ```
 
@@ -84,14 +84,14 @@ import { getBreadcrumbs, getPageNeighbours } from "@document0/core";
 import type { Plugin } from "vite";
 
 async function getPage(slug: string) {
-  const page = source.getPage(slug);
+  const page = await source.getPage(slug);
   if (!page) return null;
 
   const raw = fs.readFileSync(page.filePath, "utf-8");
   const highlighter = await getHighlighter();
   const { html, toc } = await processMdcToHtml(raw, { highlighter });
 
-  const tree = getPageTree();
+  const tree = await getPageTree();
   const breadcrumbs = getBreadcrumbs(tree, page.url);
   const { previous, next } = getPageNeighbours(tree, page.url);
 
@@ -113,7 +113,7 @@ export function document0ApiPlugin(): Plugin {
       server.middlewares.use(async (req, res, next) => {
         if (req.url === "/api/tree") {
           res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify(getPageTree()));
+          res.end(JSON.stringify(await getPageTree()));
           return;
         }
 

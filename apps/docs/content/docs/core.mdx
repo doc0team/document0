@@ -28,7 +28,7 @@ const source = new DocsSource({
 Returns all pages as a flat array of `PageData`. Cached after first call.
 
 ```ts
-const pages = source.getPages();
+const pages = await source.getPages();
 // PageData[]
 ```
 
@@ -37,7 +37,7 @@ const pages = source.getPages();
 Returns a nested `TreeNode[]` for sidebar rendering. Respects `_meta.json` ordering. Cached after first call.
 
 ```ts
-const tree = source.getPageTree();
+const tree = await source.getPageTree();
 // TreeNode[]
 ```
 
@@ -46,7 +46,7 @@ const tree = source.getPageTree();
 O(1) lookup of a single page by its slug string (e.g. `"guides/installation"`).
 
 ```ts
-const page = source.getPage("installation");
+const page = await source.getPage("installation");
 // PageData | undefined
 ```
 
@@ -55,7 +55,7 @@ const page = source.getPage("installation");
 O(1) lookup of a single page by its full URL (e.g. `"/docs/guides/installation"`).
 
 ```ts
-const page = source.getPageByUrl("/docs/installation");
+const page = await source.getPageByUrl("/docs/installation");
 // PageData | undefined
 ```
 

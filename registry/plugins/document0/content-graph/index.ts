@@ -63,7 +63,7 @@ function normalizeUrl(url: string): string {
  *
  * ```ts
  * import { buildContentGraph } from "./plugins/content-graph";
- * const graph = buildContentGraph(source.getPages());
+ * const graph = buildContentGraph(await source.getPages());
  * graph.getBacklinks("getting-started");
  * graph.getBrokenLinks();
  * ```

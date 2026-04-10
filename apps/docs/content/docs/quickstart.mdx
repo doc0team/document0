@@ -58,14 +58,14 @@ const source = new DocsSource({
 ```ts
 import { processMdx } from "@document0/mdx";
 
-const page = source.getPage("installation");
+const page = await source.getPage("installation");
 const { code, frontmatter, toc } = await processMdx(page.content, options);
 ```
 
 ### 4. Build navigation
 
 ```ts
-const tree = source.getPageTree();        // sidebar tree
+const tree = await source.getPageTree();   // sidebar tree
 const crumbs = getBreadcrumbs(tree, url); // breadcrumbs
 const { previous, next } = getPageNeighbours(tree, url);
 ```

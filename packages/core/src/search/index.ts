@@ -23,7 +23,7 @@ interface SearchRouteOptions {
 
 const SEARCH_DB_KEY = "__searchDb";
 
-function getOrCreateDb(source: DocsSource) {
+async function getOrCreateDb(source: DocsSource) {
   const cached = source._cache.get(SEARCH_DB_KEY) as
     | ReturnType<typeof create>
     | undefined;
@@ -38,7 +38,7 @@ function getOrCreateDb(source: DocsSource) {
     } as const,
   });
 
-  const pages = source.getPages();
+  const pages = await source.getPages();
   for (const page of pages) {
     insert(db, {
       title: page.frontmatter.title ?? page.slug,
