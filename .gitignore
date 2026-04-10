@@ -9,3 +9,4 @@ out/
 .env.*.local
 apps/docs/data/
 .vercel
+TO-DO.md
