@@ -5,7 +5,12 @@ import type {
   PageNeighbours,
 } from "../types.js";
 
+const flatCache = new WeakMap<TreeNode[], PageNode[]>();
+
 function flattenTree(nodes: TreeNode[]): PageNode[] {
+  const cached = flatCache.get(nodes);
+  if (cached) return cached;
+
   const pages: PageNode[] = [];
   for (const node of nodes) {
     if (node.type === "page") {
@@ -15,6 +20,8 @@ function flattenTree(nodes: TreeNode[]): PageNode[] {
       pages.push(...flattenTree(node.children));
     }
   }
+
+  flatCache.set(nodes, pages);
   return pages;
 }
 
@@ -51,12 +58,28 @@ export function getBreadcrumbs(
   return collectAncestors(tree, currentUrl) ?? [];
 }
 
+const indexCache = new WeakMap<TreeNode[], Map<string, number>>();
+
+function getFlatIndex(tree: TreeNode[]): Map<string, number> {
+  const cached = indexCache.get(tree);
+  if (cached) return cached;
+
+  const flat = flattenTree(tree);
+  const map = new Map<string, number>();
+  for (let i = 0; i < flat.length; i++) {
+    map.set(flat[i]!.url, i);
+  }
+  indexCache.set(tree, map);
+  return map;
+}
+
 export function getPageNeighbours(
   tree: TreeNode[],
   currentUrl: string
 ): PageNeighbours {
   const flat = flattenTree(tree);
-  const idx = flat.findIndex((p) => p.url === currentUrl);
+  const urlIndex = getFlatIndex(tree);
+  const idx = urlIndex.get(currentUrl) ?? -1;
 
   return {
     previous: idx > 0 ? { name: flat[idx - 1]!.name, url: flat[idx - 1]!.url } : null,
