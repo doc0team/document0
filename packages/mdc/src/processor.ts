@@ -125,13 +125,14 @@ export async function processMdcToHtml(
 
   proc.use(rehypeStringify as AnyPlugin, { allowDangerousHtml: true });
 
-  const result = await proc.process(content);
+  const mdast = proc.parse(content);
+  const hast = (await proc.run(mdast)) as Root;
 
-  const hast = proc.runSync(proc.parse(content)) as Root;
   const toc = extractToc(hast);
+  const html = proc.stringify(hast);
 
   return {
-    html: String(result),
+    html: String(html),
     frontmatter,
     toc,
   };
