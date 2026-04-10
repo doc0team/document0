@@ -34,58 +34,78 @@ export interface ProcessedHtml {
  *
  * Same Shiki highlighting, GFM tables, TOC extraction — zero React dependency.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyPlugin = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FrozenProcessor = ReturnType<typeof unified> & { process: any; parse: any; run: any; stringify: any };
+
+const htmlCache = new WeakMap<object, { proc: FrozenProcessor; tocRef: TocEntry[] }>();
+const NO_HL = Symbol("no-highlighter");
+
+function buildHtmlProcessor(options: HtmlProcessorOptions): { proc: FrozenProcessor; tocRef: TocEntry[] } {
+  const tocRef: TocEntry[] = [];
+
+  const proc = unified()
+    .use(remarkParse)
+    .use(remarkFrontmatter)
+    .use(remarkGfm)
+    .use(remarkToc, { onToc: (entries: TocEntry[]) => { tocRef.length = 0; tocRef.push(...entries); } });
+
+  if (options.remarkPlugins) {
+    for (const plugin of options.remarkPlugins) {
+      if (Array.isArray(plugin)) proc.use(plugin[0] as AnyPlugin, plugin[1]);
+      else proc.use(plugin as AnyPlugin);
+    }
+  }
+
+  proc.use(remarkRehype, { allowDangerousHtml: true });
+  proc.use(rehypeSlug);
+
+  if (options.highlighter) {
+    proc.use(rehypeShiki as AnyPlugin, {
+      highlighter: options.highlighter,
+      defaultLanguage: options.defaultLanguage ?? "plaintext",
+      themes: options.themes,
+    });
+    proc.use(rehypeStripShikiStyle as AnyPlugin);
+  }
+
+  if (options.rehypePlugins) {
+    for (const plugin of options.rehypePlugins) {
+      if (Array.isArray(plugin)) proc.use(plugin[0] as AnyPlugin, plugin[1]);
+      else proc.use(plugin as AnyPlugin);
+    }
+  }
+
+  proc.use(rehypeStringify, { allowDangerousHtml: true });
+
+  return { proc: proc as unknown as FrozenProcessor, tocRef };
+}
+
+function getCachedHtmlProcessor(options: HtmlProcessorOptions): { proc: FrozenProcessor; tocRef: TocEntry[] } {
+  const key = (options.highlighter ?? NO_HL) as object;
+  if (!options.remarkPlugins?.length && !options.rehypePlugins?.length) {
+    const cached = htmlCache.get(key);
+    if (cached) return cached;
+    const entry = buildHtmlProcessor(options);
+    htmlCache.set(key, entry);
+    return entry;
+  }
+  return buildHtmlProcessor(options);
+}
+
 export async function processMdxToHtml(
   source: string,
   options: HtmlProcessorOptions = {},
 ): Promise<ProcessedHtml> {
   const { data: frontmatter, content } = matter(source);
-  const toc: TocEntry[] = [];
 
-  const processor = unified()
-    .use(remarkParse)
-    .use(remarkFrontmatter)
-    .use(remarkGfm)
-    .use(remarkToc, { onToc: (entries: TocEntry[]) => toc.push(...entries) });
-
-  if (options.remarkPlugins) {
-    for (const plugin of options.remarkPlugins) {
-      if (Array.isArray(plugin)) {
-        processor.use(plugin[0] as Parameters<typeof processor.use>[0], plugin[1]);
-      } else {
-        processor.use(plugin as Parameters<typeof processor.use>[0]);
-      }
-    }
-  }
-
-  processor.use(remarkRehype, { allowDangerousHtml: true });
-  processor.use(rehypeSlug);
-
-  if (options.highlighter) {
-    processor.use(rehypeShiki as unknown as Parameters<typeof processor.use>[0], {
-      highlighter: options.highlighter,
-      defaultLanguage: options.defaultLanguage ?? "plaintext",
-      themes: options.themes,
-    });
-    processor.use(rehypeStripShikiStyle as unknown as Parameters<typeof processor.use>[0]);
-  }
-
-  if (options.rehypePlugins) {
-    for (const plugin of options.rehypePlugins) {
-      if (Array.isArray(plugin)) {
-        processor.use(plugin[0] as Parameters<typeof processor.use>[0], plugin[1]);
-      } else {
-        processor.use(plugin as Parameters<typeof processor.use>[0]);
-      }
-    }
-  }
-
-  processor.use(rehypeStringify, { allowDangerousHtml: true });
-
-  const result = await processor.process(content);
+  const { proc, tocRef } = getCachedHtmlProcessor(options);
+  const result = await proc.process(content);
 
   return {
     html: String(result),
     frontmatter,
-    toc,
+    toc: [...tocRef],
   };
 }
