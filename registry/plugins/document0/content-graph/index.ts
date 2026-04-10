@@ -73,27 +73,49 @@ export function buildContentGraph(pages: PageLike[]): ContentGraph {
   const slugToUrl = new Map(pages.map((p) => [p.slug, p.url]));
 
   const links: LinkInfo[] = [];
+  const linksByFrom = new Map<string, LinkInfo[]>();
+  const linksByTo = new Map<string, LinkInfo[]>();
+  const broken: LinkInfo[] = [];
 
   for (const page of pages) {
     const hrefs = extractHrefs(page.content);
     for (const raw of hrefs) {
       if (!isInternal(raw)) continue;
       const resolved = normalizeUrl(resolveHref(raw, page.url));
-      links.push({ from: page.slug, to: resolved, raw });
+      const info: LinkInfo = { from: page.slug, to: resolved, raw };
+      links.push(info);
+
+      let fromBucket = linksByFrom.get(page.slug);
+      if (!fromBucket) {
+        fromBucket = [];
+        linksByFrom.set(page.slug, fromBucket);
+      }
+      fromBucket.push(info);
+
+      let toBucket = linksByTo.get(resolved);
+      if (!toBucket) {
+        toBucket = [];
+        linksByTo.set(resolved, toBucket);
+      }
+      toBucket.push(info);
+
+      if (!urlSet.has(resolved)) {
+        broken.push(info);
+      }
     }
   }
 
   return {
     getLinks(slug: string): LinkInfo[] {
-      return links.filter((l) => l.from === slug);
+      return linksByFrom.get(slug) ?? [];
     },
     getBacklinks(slug: string): LinkInfo[] {
       const url = slugToUrl.get(slug);
       if (!url) return [];
-      return links.filter((l) => l.to === url);
+      return linksByTo.get(url) ?? [];
     },
     getBrokenLinks(): LinkInfo[] {
-      return links.filter((l) => !urlSet.has(l.to));
+      return broken;
     },
     getAllLinks(): LinkInfo[] {
       return [...links];
