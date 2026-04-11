@@ -15,6 +15,24 @@ type HttpMethod = "get" | "post" | "put" | "patch" | "delete" | "head" | "option
 
 const HTTP_METHODS: HttpMethod[] = ["get", "post", "put", "patch", "delete", "head", "options"];
 
+// --- Type guards for safe property access ---
+
+function isObj(v: unknown): v is Record<string, unknown> {
+  return v !== null && typeof v === "object" && !Array.isArray(v);
+}
+
+function str(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
+}
+
+function bool(v: unknown, fallback = false): boolean {
+  return typeof v === "boolean" ? v : fallback;
+}
+
+function arr(v: unknown): unknown[] {
+  return Array.isArray(v) ? v : [];
+}
+
 function slugify(method: string, path: string, operationId?: string): string {
   if (operationId) {
     return operationId
@@ -30,41 +48,43 @@ function slugify(method: string, path: string, operationId?: string): string {
   return `${method.toLowerCase()}-${cleaned}`;
 }
 
+const VALID_PARAM_IN = new Set<string>(["query", "path", "header", "cookie"]);
+
 function extractParameters(params: unknown[]): OpenAPIParameter[] {
   if (!Array.isArray(params)) return [];
-  return params.map((raw) => {
-    const p = raw as Record<string, unknown>;
+  return params.filter(isObj).map((p) => {
+    const inValue = str(p.in, "query");
     return {
-    name: (p.name as string) ?? "",
-    in: (p.in as OpenAPIParameter["in"]) ?? "query",
-    required: (p.required as boolean) ?? false,
-    description: p.description as string | undefined,
-    schema: (p.schema as Record<string, unknown>) ?? {},
-  };
+      name: str(p.name),
+      in: (VALID_PARAM_IN.has(inValue) ? inValue : "query") as OpenAPIParameter["in"],
+      required: bool(p.required),
+      description: typeof p.description === "string" ? p.description : undefined,
+      schema: isObj(p.schema) ? p.schema : {},
+    };
   });
 }
 
 function extractRequestBody(body: unknown): OpenAPIRequestBody | undefined {
-  if (!body || typeof body !== "object") return undefined;
-  const b = body as Record<string, unknown>;
-  const content = b.content as Record<string, { schema: Record<string, unknown> }> | undefined;
-  if (!content) return undefined;
+  if (!isObj(body)) return undefined;
+  if (!isObj(body.content)) return undefined;
   return {
-    description: b.description as string | undefined,
-    required: (b.required as boolean) ?? false,
-    content,
+    description: typeof body.description === "string" ? body.description : undefined,
+    required: bool(body.required),
+    content: body.content as Record<string, { schema: Record<string, unknown> }>,
   };
 }
 
 function extractResponses(responses: unknown): OpenAPIResponse[] {
-  if (!responses || typeof responses !== "object") return [];
-  return Object.entries(responses as Record<string, Record<string, unknown>>).map(
-    ([status, resp]) => ({
+  if (!isObj(responses)) return [];
+  return Object.entries(responses)
+    .filter((entry): entry is [string, Record<string, unknown>] => isObj(entry[1]))
+    .map(([status, resp]) => ({
       status,
-      description: (resp.description as string) ?? "",
-      content: resp.content as Record<string, { schema: Record<string, unknown> }> | undefined,
-    })
-  );
+      description: str(resp.description),
+      content: isObj(resp.content)
+        ? (resp.content as Record<string, { schema: Record<string, unknown> }>)
+        : undefined,
+    }));
 }
 
 /**
@@ -92,33 +112,26 @@ export async function createOpenAPISource(
   const { schema } = await dereference(spec);
   if (!schema) throw new Error("Failed to dereference OpenAPI spec");
 
-  const paths = (schema as Record<string, unknown>).paths as Record<
-    string,
-    Record<string, unknown>
-  > | undefined;
-  if (!paths) return [];
+  if (!isObj(schema) || !isObj((schema as Record<string, unknown>).paths)) return [];
+  const paths = (schema as Record<string, unknown>).paths as Record<string, unknown>;
 
   const pages: OpenAPIPageData[] = [];
 
   for (const [pathStr, pathItem] of Object.entries(paths)) {
-    if (!pathItem || typeof pathItem !== "object") continue;
-    const pathParams = (pathItem as Record<string, unknown>).parameters as unknown[] | undefined;
+    if (!isObj(pathItem)) continue;
+    const pathParams = arr(pathItem.parameters);
 
     for (const method of HTTP_METHODS) {
-      const operation = (pathItem as Record<string, unknown>)[method] as
-        | Record<string, unknown>
-        | undefined;
-      if (!operation) continue;
+      const operation = pathItem[method];
+      if (!isObj(operation)) continue;
 
-      const operationId = operation.operationId as string | undefined;
+      const operationId = typeof operation.operationId === "string" ? operation.operationId : undefined;
       const slug = slugify(method, pathStr, operationId);
-      const summary =
-        (operation.summary as string) ??
-        `${method.toUpperCase()} ${pathStr}`;
-      const tags = (operation.tags as string[]) ?? [];
+      const summary = str(operation.summary, `${method.toUpperCase()} ${pathStr}`);
+      const tags = arr(operation.tags).filter((t): t is string => typeof t === "string");
 
-      const opParams = (operation.parameters as unknown[]) ?? [];
-      const mergedParams = [...(pathParams ?? []), ...opParams];
+      const opParams = arr(operation.parameters);
+      const mergedParams = [...pathParams, ...opParams];
 
       pages.push({
         slug,
@@ -127,9 +140,9 @@ export async function createOpenAPISource(
         path: pathStr,
         operationId,
         summary,
-        description: operation.description as string | undefined,
+        description: typeof operation.description === "string" ? operation.description : undefined,
         tags,
-        deprecated: (operation.deprecated as boolean) ?? false,
+        deprecated: bool(operation.deprecated),
         parameters: extractParameters(mergedParams),
         requestBody: extractRequestBody(operation.requestBody),
         responses: extractResponses(operation.responses),
