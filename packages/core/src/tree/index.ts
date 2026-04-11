@@ -42,8 +42,22 @@ function orderByMeta(nodes: TreeNode[], meta: MetaFile): TreeNode[] {
   if (!meta.pages || meta.pages.length === 0) return nodes;
 
   const order = meta.pages;
+
+  // Build a map from possible match keys to node, for O(1) lookups.
+  const byKey = new Map<string, TreeNode>();
+  for (const node of nodes) {
+    if (node.type === "page") {
+      const slugTail = node.slug.split("/").pop() ?? node.slug;
+      const urlTail = node.url.split("/").pop() ?? node.url;
+      byKey.set(slugTail, node);
+      if (urlTail !== slugTail) byKey.set(urlTail, node);
+    } else if (node.type === "folder") {
+      byKey.set(node.name.toLowerCase(), node);
+    }
+  }
+
   const ordered: TreeNode[] = [];
-  const remaining = [...nodes];
+  const used = new Set<TreeNode>();
 
   for (const key of order) {
     if (key === "---") {
@@ -54,18 +68,18 @@ function orderByMeta(nodes: TreeNode[], meta: MetaFile): TreeNode[] {
       ordered.push({ type: "separator", name: key.slice(4) });
       continue;
     }
-    const idx = remaining.findIndex((n) => {
-      if (n.type === "page") return n.slug.endsWith(key) || n.url.endsWith(key);
-      if (n.type === "folder") return n.name.toLowerCase() === key.toLowerCase();
-      return false;
-    });
-    if (idx !== -1) {
-      ordered.push(remaining[idx]!);
-      remaining.splice(idx, 1);
+    const node = byKey.get(key) ?? byKey.get(key.toLowerCase());
+    if (node && !used.has(node)) {
+      ordered.push(node);
+      used.add(node);
     }
   }
 
-  return [...ordered, ...remaining];
+  for (const node of nodes) {
+    if (!used.has(node)) ordered.push(node);
+  }
+
+  return ordered;
 }
 
 export async function buildPageTree(pages: PageData[], rootDir: string): Promise<TreeNode[]> {
