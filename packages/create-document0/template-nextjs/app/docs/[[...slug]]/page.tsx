@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { run } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
-import fs from "node:fs";
 import { source, getPageTree } from "@/lib/source";
 import { getHighlighter } from "@/lib/highlighter";
 import { processMdx } from "@document0/mdx";
@@ -39,9 +38,12 @@ export default async function DocPage({ params }: PageProps) {
   const page = await source.getPage(slugStr);
   if (!page) notFound();
 
-  const raw = fs.readFileSync(page.filePath, "utf-8");
   const highlighter = await getHighlighter();
-  const { code, toc } = await processMdx(raw, { highlighter });
+  const { code, toc } = await processMdx(page.content, {
+    highlighter,
+    frontmatter: page.frontmatter,
+    content: page.content,
+  });
 
   const { default: MDXContent } = await run(code, {
     ...(runtime as object),

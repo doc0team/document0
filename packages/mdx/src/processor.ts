@@ -54,6 +54,16 @@ export interface ProcessorOptions {
    * and post-process the compiled result.
    */
   plugins?: ProcessorPlugin[];
+  /**
+   * Pre-parsed frontmatter. When provided together with `content`,
+   * `gray-matter` parsing is skipped.
+   */
+  frontmatter?: Record<string, unknown>;
+  /**
+   * Pre-parsed content (frontmatter already stripped).
+   * When provided together with `frontmatter`, `gray-matter` parsing is skipped.
+   */
+  content?: string;
 }
 
 export interface ProcessedMdx {
@@ -68,7 +78,17 @@ export async function processMdx(
   options: ProcessorOptions = {},
 ): Promise<ProcessedMdx> {
   const plugins = options.plugins ?? [];
-  const { data: frontmatter, content } = matter(source);
+
+  let frontmatter: Record<string, unknown>;
+  let content: string;
+  if (options.frontmatter !== undefined && options.content !== undefined) {
+    frontmatter = options.frontmatter;
+    content = options.content;
+  } else {
+    const parsed = matter(source);
+    frontmatter = parsed.data;
+    content = parsed.content;
+  }
 
   const toc: TocEntry[] = [];
 

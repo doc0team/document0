@@ -30,8 +30,11 @@ async function main() {
 
   const pages = await source.getPages();
   for (const page of pages) {
-    const raw = fs.readFileSync(page.filePath, "utf-8");
-    const { body, toc } = await processMdc(raw, { highlighter });
+    const { body, toc } = await processMdc(page.content, {
+      highlighter,
+      frontmatter: page.frontmatter,
+      content: page.content,
+    });
 
     const breadcrumbs = getBreadcrumbs(tree, page.url);
     const { previous, next } = getPageNeighbours(tree, page.url);

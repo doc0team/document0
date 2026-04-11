@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { run } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
-import fs from "node:fs";
 import { source, getPageTree } from "@/lib/source";
 import { getHighlighter, shikiThemes } from "@/lib/highlighter";
 import { processMdx } from "@document0/mdx";
@@ -40,12 +39,13 @@ export default async function DocPage({ params }: PageProps) {
   const page = await source.getPage(slugStr);
   if (!page) notFound();
 
-  const raw = fs.readFileSync(page.filePath, "utf-8");
   const highlighter = await getHighlighter();
-  const result = await processMdx(raw, {
+  const result = await processMdx(page.content, {
     highlighter,
     themes: shikiThemes,
     plugins: [readingTime()],
+    frontmatter: page.frontmatter,
+    content: page.content,
   });
   const { code, toc } = result;
   const readingTimeMinutes = result.readingTime as number;

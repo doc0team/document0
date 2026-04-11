@@ -1,5 +1,4 @@
 import path from "node:path";
-import fs from "node:fs";
 import { DocsSource, buildPageTree, getBreadcrumbs, getPageNeighbours } from "@document0/core";
 import { processMdc } from "@document0/mdc";
 import { createHighlighter, type HighlighterGeneric, type BundledLanguage, type BundledTheme } from "shiki";
@@ -36,9 +35,12 @@ async function getPage(slug: string) {
   const page = await source.getPage(slug);
   if (!page) return null;
 
-  const raw = fs.readFileSync(page.filePath, "utf-8");
   const hl = await getHighlighter();
-  const { body, toc } = await processMdc(raw, { highlighter: hl });
+  const { body, toc } = await processMdc(page.content, {
+    highlighter: hl,
+    frontmatter: page.frontmatter,
+    content: page.content,
+  });
 
   const tree = await getTree();
   const breadcrumbs = getBreadcrumbs(tree, page.url);

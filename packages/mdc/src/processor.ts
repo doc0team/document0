@@ -22,6 +22,16 @@ export interface MdcProcessorOptions {
   themes?: RehypeShikiThemes;
   remarkPlugins?: unknown[];
   rehypePlugins?: unknown[];
+  /**
+   * Pre-parsed frontmatter. When provided together with `content`,
+   * `gray-matter` parsing is skipped.
+   */
+  frontmatter?: Record<string, unknown>;
+  /**
+   * Pre-parsed content (frontmatter already stripped).
+   * When provided together with `frontmatter`, `gray-matter` parsing is skipped.
+   */
+  content?: string;
 }
 
 type FrozenProcessor = ReturnType<typeof unified>;
@@ -93,7 +103,16 @@ export async function processMdc(
   source: string,
   options: MdcProcessorOptions = {},
 ): Promise<ProcessedMdc> {
-  const { data: frontmatter, content } = matter(source);
+  let frontmatter: Record<string, unknown>;
+  let content: string;
+  if (options.frontmatter !== undefined && options.content !== undefined) {
+    frontmatter = options.frontmatter;
+    content = options.content;
+  } else {
+    const parsed = matter(source);
+    frontmatter = parsed.data;
+    content = parsed.content;
+  }
 
   const proc = getCachedProcessor(mdcCache, options, buildMdcProcessor);
 
@@ -117,7 +136,16 @@ export async function processMdcToHtml(
   source: string,
   options: MdcProcessorOptions = {},
 ): Promise<ProcessedMdcHtml> {
-  const { data: frontmatter, content } = matter(source);
+  let frontmatter: Record<string, unknown>;
+  let content: string;
+  if (options.frontmatter !== undefined && options.content !== undefined) {
+    frontmatter = options.frontmatter;
+    content = options.content;
+  } else {
+    const parsed = matter(source);
+    frontmatter = parsed.data;
+    content = parsed.content;
+  }
 
   const proc = getCachedProcessor(mdcHtmlCache, options, (opts) => {
     const p = buildMdcProcessor(opts);
