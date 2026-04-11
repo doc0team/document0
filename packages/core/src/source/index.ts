@@ -106,8 +106,7 @@ export class DocsSource {
   private _tree: TreeNode[] | null = null;
   private _slugMap: Map<string, PageData> | null = null;
   private _urlMap: Map<string, PageData> | null = null;
-  /** @internal Generic cache for modules (e.g. search DB). */
-  _cache = new Map<string, unknown>();
+  private _cache = new Map<string, unknown>();
 
   constructor(options: SourceOptions) {
     this.rootDir = path.resolve(options.rootDir);
@@ -167,6 +166,17 @@ export class DocsSource {
   /** Extensions treated as pages. Used by `watchDocsSource` (`@document0/core/watch`). */
   getContentExtensions(): readonly string[] {
     return this.extensions;
+  }
+
+  /**
+   * Retrieve a cached value by key, or create and store it using the factory.
+   * Cleared on `invalidate()`.
+   */
+  async getOrSet<T>(key: string, factory: () => T | Promise<T>): Promise<T> {
+    if (this._cache.has(key)) return this._cache.get(key) as T;
+    const value = await factory();
+    this._cache.set(key, value);
+    return value;
   }
 
   invalidate(): void {

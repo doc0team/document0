@@ -24,32 +24,28 @@ interface SearchRouteOptions {
 const SEARCH_DB_KEY = "__searchDb";
 
 async function getOrCreateDb(source: DocsSource) {
-  const cached = source._cache.get(SEARCH_DB_KEY) as
-    | ReturnType<typeof create>
-    | undefined;
-  if (cached) return cached;
-
-  const db = create({
-    schema: {
-      title: "string",
-      description: "string",
-      content: "string",
-      url: "string",
-    } as const,
-  });
-
-  const pages = await source.getPages();
-  for (const page of pages) {
-    insert(db, {
-      title: page.frontmatter.title ?? page.slug,
-      description: page.frontmatter.description ?? "",
-      content: stripMarkdown(page.content),
-      url: page.url,
+  return source.getOrSet(SEARCH_DB_KEY, async () => {
+    const db = create({
+      schema: {
+        title: "string",
+        description: "string",
+        content: "string",
+        url: "string",
+      } as const,
     });
-  }
 
-  source._cache.set(SEARCH_DB_KEY, db);
-  return db;
+    const pages = await source.getPages();
+    for (const page of pages) {
+      insert(db, {
+        title: page.frontmatter.title ?? page.slug,
+        description: page.frontmatter.description ?? "",
+        content: stripMarkdown(page.content),
+        url: page.url,
+      });
+    }
+
+    return db;
+  });
 }
 
 export function createSearchRoute(
