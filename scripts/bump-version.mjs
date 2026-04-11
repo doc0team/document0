@@ -21,6 +21,7 @@ const PACKAGES = [
   "packages/mdx",
   "packages/mdc",
   "packages/cli",
+  "packages/next-dev",
   "packages/create-document0",
   "packages/template-nextjs",
   "packages/template-vue",
