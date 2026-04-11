@@ -11,6 +11,7 @@ import type {
 import type { Document0Plugin } from "../plugin.js";
 import { applyPageTransforms, applyTreeTransforms } from "../plugin.js";
 import { buildPageTree } from "../tree/index.js";
+import { readMeta } from "../meta.js";
 
 const DEFAULT_EXTENSIONS = [".md", ".mdx"];
 const DEFAULT_BASE_URL = "/docs";
@@ -30,16 +31,6 @@ function buildUrl(slugs: string[], baseUrl: string): string {
   const filtered = slugs.filter(Boolean);
   if (filtered.length === 0) return baseUrl;
   return `${baseUrl}/${filtered.join("/")}`;
-}
-
-async function readMeta(dir: string): Promise<MetaFile | null> {
-  const full = path.join(dir, "_meta.json");
-  try {
-    const raw = await fs.readFile(full, "utf-8");
-    return JSON.parse(raw) as MetaFile;
-  } catch {
-    return null;
-  }
 }
 
 async function scanDir(

@@ -1,4 +1,3 @@
-import fs from "node:fs/promises";
 import path from "node:path";
 import type {
   PageData,
@@ -7,6 +6,7 @@ import type {
   FolderNode,
   MetaFile,
 } from "../types.js";
+import { readMeta } from "../meta.js";
 
 function pageToNode(page: PageData): PageNode {
   return {
@@ -22,20 +22,6 @@ function titleFromSlug(slug: string): string {
   return slug
     .replace(/-/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-async function readMetaFromDir(dir: string): Promise<MetaFile | null> {
-  const candidates = ["_meta.json"];
-  for (const candidate of candidates) {
-    const full = path.join(dir, candidate);
-    try {
-      const raw = await fs.readFile(full, "utf-8");
-      return JSON.parse(raw) as MetaFile;
-    } catch {
-      continue;
-    }
-  }
-  return null;
 }
 
 function orderByMeta(nodes: TreeNode[], meta: MetaFile): TreeNode[] {
@@ -122,7 +108,7 @@ async function buildTree(
   childDirs: Map<string, Set<string>>
 ): Promise<TreeNode[]> {
   const nodes: TreeNode[] = [];
-  const meta = await readMetaFromDir(dir);
+  const meta = await readMeta(dir);
 
   const pagesInDir = pagesByDir.get(dir) ?? [];
 
@@ -139,7 +125,7 @@ async function buildTree(
   const subDirs = childDirs.get(dir);
   if (subDirs) {
     for (const subDir of subDirs) {
-      const subMeta = await readMetaFromDir(subDir);
+      const subMeta = await readMeta(subDir);
       const dirName = path.basename(subDir);
 
       const dirPages = pagesByDir.get(subDir) ?? [];
