@@ -76,6 +76,17 @@ function buildMdcProcessor(options: MdcProcessorOptions): FrozenProcessor {
   return proc;
 }
 
+function parseFrontmatter(
+  source: string,
+  options: MdcProcessorOptions,
+): { frontmatter: Record<string, unknown>; content: string } {
+  if (options.frontmatter !== undefined && options.content !== undefined) {
+    return { frontmatter: options.frontmatter, content: options.content };
+  }
+  const parsed = matter(source);
+  return { frontmatter: parsed.data, content: parsed.content };
+}
+
 function getCachedProcessor(
   cache: WeakMap<object, FrozenProcessor>,
   options: MdcProcessorOptions,
@@ -103,17 +114,7 @@ export async function processMdc(
   source: string,
   options: MdcProcessorOptions = {},
 ): Promise<ProcessedMdc> {
-  let frontmatter: Record<string, unknown>;
-  let content: string;
-  if (options.frontmatter !== undefined && options.content !== undefined) {
-    frontmatter = options.frontmatter;
-    content = options.content;
-  } else {
-    const parsed = matter(source);
-    frontmatter = parsed.data;
-    content = parsed.content;
-  }
-
+  const { frontmatter, content } = parseFrontmatter(source, options);
   const proc = getCachedProcessor(mdcCache, options, buildMdcProcessor);
 
   const mdast = proc.parse(content);
@@ -136,17 +137,7 @@ export async function processMdcToHtml(
   source: string,
   options: MdcProcessorOptions = {},
 ): Promise<ProcessedMdcHtml> {
-  let frontmatter: Record<string, unknown>;
-  let content: string;
-  if (options.frontmatter !== undefined && options.content !== undefined) {
-    frontmatter = options.frontmatter;
-    content = options.content;
-  } else {
-    const parsed = matter(source);
-    frontmatter = parsed.data;
-    content = parsed.content;
-  }
-
+  const { frontmatter, content } = parseFrontmatter(source, options);
   const proc = getCachedProcessor(mdcHtmlCache, options, (opts) => {
     const p = buildMdcProcessor(opts);
     p.use(rehypeStringify as AnyPlugin, { allowDangerousHtml: true });
@@ -159,9 +150,5 @@ export async function processMdcToHtml(
   const toc = extractToc(hast);
   const html = proc.stringify(hast);
 
-  return {
-    html: String(html),
-    frontmatter,
-    toc,
-  };
+  return { html: String(html), frontmatter, toc };
 }
