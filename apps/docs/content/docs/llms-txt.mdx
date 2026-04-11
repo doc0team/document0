@@ -11,7 +11,7 @@ Serve [llms.txt](https://llmstxt.org/) files so LLMs and AI tools can discover a
 
 ```ts
 // app/llms.txt/route.ts
-import { createLlmsTxtRoute } from "@document0/core";
+import { createLlmsTxtRoute } from "@document0/core/llms";
 import { source } from "@/lib/source";
 
 export const { GET } = createLlmsTxtRoute(source, {
@@ -25,7 +25,7 @@ export const { GET } = createLlmsTxtRoute(source, {
 
 ```ts
 // app/llms-full.txt/route.ts
-import { createLlmsFullTxtRoute } from "@document0/core";
+import { createLlmsFullTxtRoute } from "@document0/core/llms";
 import { source } from "@/lib/source";
 
 export const { GET } = createLlmsFullTxtRoute(source, {
@@ -41,7 +41,7 @@ Serve raw markdown for individual pages:
 
 ```ts
 // app/api/page/[...slug]/route.ts
-import { createMdxPageRoute } from "@document0/core";
+import { createMdxPageRoute } from "@document0/core/llms";
 import { source } from "@/lib/source";
 
 export const { GET } = createMdxPageRoute(source);

@@ -11,7 +11,7 @@ document0 includes full-text search powered by [Orama](https://orama.com) with f
 
 ```ts
 // app/internal/search/route.ts
-import { createSearchRoute } from "@document0/core";
+import { createSearchRoute } from "@document0/core/search";
 import { source } from "@/lib/source";
 
 export const { GET } = createSearchRoute(source);

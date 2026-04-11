@@ -125,7 +125,7 @@ export default async function DocPage({
 
 ```ts
 // app/internal/search/route.ts
-import { createSearchRoute } from "@document0/core";
+import { createSearchRoute } from "@document0/core/search";
 import { source } from "@/lib/source";
 
 export const { GET } = createSearchRoute(source);
@@ -135,7 +135,7 @@ export const { GET } = createSearchRoute(source);
 
 ```ts
 // app/llms.txt/route.ts
-import { createLlmsTxtRoute } from "@document0/core";
+import { createLlmsTxtRoute } from "@document0/core/llms";
 import { source } from "@/lib/source";
 
 export const { GET } = createLlmsTxtRoute(source, {
