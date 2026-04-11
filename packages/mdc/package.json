@@ -1,6 +1,6 @@
 {
   "name": "@document0/mdc",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "document0 MDC processor - MDC (Markdown Components) parsing, Shiki syntax highlighting, TOC extraction, and JSON AST output for Vue and framework-agnostic rendering",
   "type": "module",
   "exports": {

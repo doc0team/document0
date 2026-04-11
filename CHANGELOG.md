@@ -12,6 +12,44 @@ Each release may begin with **`### Summary`** — a short blurb shown in the cha
 
 _Reserved for the next release._
 
+## [0.7.0] - 2026-04-11
+
+### Summary
+
+Major **performance** and **code quality** release - O(n²)→O(n) tree ordering, cached unified processors, async FS throughout, pre-indexed content graph lookups, and broad refactoring to deduplicate pipelines, tighten type safety, and improve encapsulation. Also adds a **monorepo test suite**, **file watcher integrations**, and **CLI security hardening**.
+
+### Added
+
+- **Monorepo test suite** — Root Vitest runner and config (`vitest.config.ts`, `pnpm test`, `pnpm test:watch`) with a centralized `tests/` layout and baseline coverage across `core`, `cli`, `mdx`, `mdc`, and `next-dev`.
+- **Registry JSON Schema** — `registry/schema.json` now exists and matches the `$schema` reference in `registry-index.json`, enabling editor validation for `version` + `items`.
+- **Watcher integrations** — `@document0/next-dev` for Next.js dev-time content invalidation without sidecar routes; `@document0/core/watch` for runtime-agnostic file watching (`watchDocsSource` / `stopWatchingDocsSource`).
+
+### Changed
+
+- **Slimmed `@document0/core` barrel export** — Types, plugin, source, tree, and navigation remain in the barrel; search, llms, openapi, and graph are now only available via subpath exports (e.g. `@document0/core/search`). All doc examples updated accordingly.
+- **Deduplicated MDC processor pipeline** — Extracted shared `parseFrontmatter()` helper in `processor.ts`, eliminating duplicated frontmatter parsing in `processMdc` and `processMdcToHtml`.
+- **Deduplicated MDX processor pipeline** — Extracted `shared.ts` with `parseFrontmatter()`, `buildRemarkPlugins()`, and `buildRehypePlugins()`. Both `processor.ts` and `html-processor.ts` now import from `shared.ts`.
+- **Typed cache on `DocsSource`** — Replaced the public `_cache` with a private map and a typed `getOrSet<T>(key, factory)` method. The search module now uses `getOrSet` instead of directly accessing the internal map.
+- **Deduplicated `readMeta`** — Extracted `readMeta` from `source/index.ts` into a new `core/src/meta.ts` module, shared by both `source/index.ts` and `tree/index.ts`.
+- **Async FS throughout** — Replaced all synchronous `fs.readdirSync`, `fs.readFileSync`, and `fs.existsSync` calls with `fs.promises` equivalents in `source/index.ts` and `tree/index.ts`. Propagated `async` through `DocsSource` methods (`getPages`, `getPageTree`, `getPage`, `getPageByUrl`, `getMeta`), `buildPageTree`, and all callers.
+- **Type-safe OpenAPI module** — Replaced unsafe `as` casts with `isObj`, `str`, `bool`, `arr` type-guard helpers for safe property access with fallbacks. Non-object entries are now filtered out instead of silently producing wrong data.
+- **Skip redundant frontmatter parsing** — `processMdx`, `processMdxToHtml`, `processMdc`, and `processMdcToHtml` now accept optional pre-parsed frontmatter and content, avoiding re-reading and re-parsing the raw file on every call.
+- **CLI `add`/`update` path validation** — `installPath` must resolve inside the current project root, each file path must resolve inside the validated install directory, and unsafe paths now fail fast with an explicit error.
+- **CLI safe command execution** — Replaced string-based `execSync` with argument-based `execFileSync(command, args)` for dependency installs, removing shell command concatenation from registry-controlled values.
+
+### Removed
+
+- **`"./plugins"` subpath export** — Removed from `@document0/core`. Reading-time is now provided only via the plugin registry (`registry/plugins/document0/reading-time`); consumers install it with the CLI or copy the registry snippet.
+
+### Performance
+
+- **O(n) `orderByMeta`** — Replaced O(n²) `findIndex`+`splice` loop with a pre-built `Map<string, TreeNode>` keyed on slug tails, URL tails, and folder names. Unmatched nodes are appended in a single pass.
+- **O(n) `buildPageTree`** — Pre-computed `pagesByDir` and `childDirs` maps replace O(n²) page filtering at each recursion level with O(1) directory lookups.
+- **O(1) `getPageNeighbours`** — Added a `WeakMap`-cached URL→index map so lookups use `Map.get` instead of `findIndex` on every call.
+- **O(1) `ContentGraph` link lookups** — Replaced linear `links.filter()` in `getLinks`, `getBacklinks`, and `getBrokenLinks` with `Map<string, LinkInfo[]>` indexes built once at construction time.
+- **Single-parse `processMdcToHtml`** — TOC is now extracted from the same HAST tree produced by a single parse+run, eliminating a redundant second pipeline pass.
+- **Cached unified processors** — `WeakMap`-based processor caching keyed on the highlighter instance for `processMdc`, `processMdcToHtml`, and `processMdxToHtml`. The frozen processor is reused across calls, avoiding redundant pipeline construction per page.
+
 ## [0.6.0] - 2026-04-04
 
 ### Summary
