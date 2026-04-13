@@ -7,7 +7,7 @@ export async function GET(
 ) {
   const { slug } = await params;
   const slugStr = slug?.join("/") ?? "";
-  const content = getPageRawContent(source, slugStr);
+  const content = await getPageRawContent(source, slugStr);
 
   if (!content) {
     return new Response("Not found", { status: 404 });

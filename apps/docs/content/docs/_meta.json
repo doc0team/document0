@@ -5,12 +5,24 @@
     "--- Getting Started",
     "installation",
     "quickstart",
-    "--- Packages",
+    "--- API Reference",
     "core",
     "mdx",
-    "--- CLI",
+    "mdc",
+    "--- Tooling",
+    "cli",
     "create",
     "--- Guides",
-    "guides"
+    "search",
+    "llms-txt",
+    "custom-components",
+    "meta-json",
+    "--- Frameworks",
+    "nextjs",
+    "react-vite",
+    "vue",
+    "svelte",
+    "astro",
+    "angular"
   ]
 }

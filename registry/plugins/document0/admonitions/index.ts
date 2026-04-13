@@ -26,7 +26,7 @@ export interface AdmonitionsOptions {
  *
  * ```md
  * > [!NOTE]
- * > This becomes a <Callout type="note"> element.
+ * > Plain text only in the blockquote body. The plugin emits the Callout wrapper.
  * ```
  */
 export function remarkAdmonitions(options?: AdmonitionsOptions) {

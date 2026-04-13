@@ -1,0 +1,49 @@
+{
+  "name": "@document0/next-dev",
+  "version": "0.7.0",
+  "description": "Next.js-specific document0 integration (dev and build tooling)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./content-stamp": {
+      "types": "./dist/content-stamp.d.ts",
+      "import": "./dist/content-stamp.js",
+      "require": "./dist/content-stamp.js",
+      "default": "./dist/content-stamp.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "loaders",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "next": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "next": "^15.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.4.0"
+  },
+  "keywords": [
+    "docs",
+    "document0",
+    "next.js",
+    "nextjs"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,113 @@
+---
+title: "@document0/cli"
+description: Install and update components and plugins from the document0 registry.
+---
+
+# @document0/cli
+
+The CLI is a plugin manager for document0. It installs components and plugins from the registry directly into your project and tracks installed versions in a lock file for upgrades.
+
+## Install
+
+```bash
+npm install -D @document0/cli
+```
+
+Or run commands directly with `npx`:
+
+```bash
+npx @document0/cli add document0/sidebar
+```
+
+## Commands
+
+### add
+
+Install one or more plugins or components from the registry.
+
+```bash
+document0 add document0/sidebar
+document0 add document0/sidebar document0/breadcrumbs document0/toc
+```
+
+Files are copied into your project at the path defined by the registry item (e.g. `components/document0/sidebar/`). A `document0.lock.json` file is created or updated to track installed versions.
+
+Dependencies declared by the plugin are auto-installed with your detected package manager (npm, pnpm, yarn, or bun).
+
+### update
+
+Update installed components and plugins to the latest registry versions.
+
+```bash
+document0 update                    # update all installed items
+document0 update document0/sidebar  # update a specific item
+```
+
+The command compares versions in `document0.lock.json` against the registry. If a newer version exists, the files are re-fetched and the lock file is updated.
+
+### list
+
+List all available items in the registry.
+
+```bash
+document0 list
+```
+
+### search
+
+Search the registry by name, tag, or description.
+
+```bash
+document0 search sidebar
+document0 search navigation
+```
+
+## Lock file
+
+When you run `document0 add`, a `document0.lock.json` file is created in your project root:
+
+```json
+{
+  "version": 1,
+  "items": {
+    "document0/sidebar": {
+      "namespace": "document0",
+      "name": "sidebar",
+      "version": "0.1.0",
+      "installPath": "components/document0/sidebar",
+      "installedAt": "2026-03-29T00:00:00.000Z"
+    }
+  }
+}
+```
+
+This file should be committed to your repository. It enables `document0 update` to detect when newer versions are available.
+
+## Registry
+
+The CLI fetches from the public document0 registry on GitHub by default. Override the registry URL with the `DOCUMENT0_REGISTRY` environment variable:
+
+```bash
+DOCUMENT0_REGISTRY=https://my-registry.example.com document0 add my-org/my-plugin
+```
+
+### Registry categories
+
+| Category | Install path | Description |
+|---|---|---|
+| `ui` | `components/<namespace>/<name>/` | React components (sidebar, TOC, search dialog, etc.) |
+| `core` | `plugins/<namespace>/<name>/` | Framework-agnostic utilities (reading time, content graph) |
+| `mdx` | `plugins/<namespace>/<name>/` | Remark/rehype plugins (admonitions, etc.) |
+
+## Available plugins
+
+| Name | Category | Description |
+|---|---|---|
+| `document0/admonitions` | mdx | GitHub-style blockquote callouts |
+| `document0/reading-time` | core | Adds reading time and word count |
+| `document0/content-graph` | core | Internal link graph with backlinks and broken link detection |
+| `document0/sidebar` | ui | Collapsible navigation sidebar |
+| `document0/toc` | ui | Table of contents with scroll-spy |
+| `document0/breadcrumbs` | ui | Breadcrumb navigation |
+| `document0/page-navigation` | ui | Previous/Next page links |
+| `document0/search-dialog` | ui | Command-palette search with keyboard navigation |

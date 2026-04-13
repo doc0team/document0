@@ -70,6 +70,27 @@ import { createSearchRoute } from "@document0/core";
 export const { GET } = createSearchRoute(source);
 ```
 
+### Development: file watching
+
+`DocsSource` caches pages, navigation, and internal search state. Editing markdown or `_meta.json` on disk does not refresh that cache by itself.
+
+**Next.js:** use **`@document0/next-dev`** so the dev bundler invalidates your `DocsSource` module when content changes (see that package’s README).
+
+**Other runtimes (Node only, not Edge):** import **`watchDocsSource`** from **`@document0/core/watch`**. That entry is separate from the main package graph so **chokidar** is not pulled in when you only use `DocsSource`.
+
+```ts
+import { watchDocsSource } from "@document0/core/watch";
+
+await watchDocsSource(source, {
+  debounceMs: 150,
+  onInvalidate: () => {
+    // e.g. Vite: server.ws.send({ type: "full-reload" })
+  },
+});
+```
+
+Call **`stopWatchingDocsSource(source)`** when tearing down the dev server if you start the watcher manually.
+
 ## Types
 
 ```ts

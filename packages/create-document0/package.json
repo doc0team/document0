@@ -1,18 +1,22 @@
 {
   "name": "create-document0",
-  "version": "0.2.0",
+  "version": "0.7.0",
   "description": "Create a new document0 site",
   "type": "module",
   "bin": {
     "create-document0": "./dist/index.js"
   },
-  "files": ["dist", "template"],
+  "files": [
+    "dist",
+    "template-nextjs",
+    "template-vue"
+  ],
   "scripts": {
-    "copy-template": "node -e \"const fs=require('fs');fs.cpSync('../template','.\/template',{recursive:true,filter:(s)=>!s.includes('node_modules')&&!s.includes('.next')&&!s.includes('.turbo')})\"",
+    "copy-template": "node -e \"const fs=require('fs');const f=(s)=>!s.includes('node_modules')&&!s.includes('.next')&&!s.includes('.turbo')&&!s.includes('dist');fs.cpSync('../template-nextjs','./template-nextjs',{recursive:true,filter:f});fs.cpSync('../template-vue','./template-vue',{recursive:true,filter:f})\"",
     "build": "tsc -p tsconfig.json && npm run copy-template",
     "dev": "tsc -p tsconfig.json --watch",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist template"
+    "clean": "rimraf dist template-nextjs template-vue"
   },
   "dependencies": {
     "kleur": "^4.1.5",
@@ -24,6 +28,16 @@
     "rimraf": "^5.0.0",
     "typescript": "^5.4.0"
   },
-  "keywords": ["docs", "document0", "documentation", "nextjs", "shadcn", "create", "scaffold"],
+  "keywords": [
+    "docs",
+    "document0",
+    "documentation",
+    "nextjs",
+    "vue",
+    "vite",
+    "shadcn",
+    "create",
+    "scaffold"
+  ],
   "license": "MIT"
 }

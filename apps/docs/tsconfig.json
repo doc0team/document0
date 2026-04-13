@@ -15,9 +15,28 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@registry/*": ["../../registry/*"],
+      "@ai-sdk/react": ["./node_modules/@ai-sdk/react"],
+      "@openrouter/ai-sdk-provider": [
+        "./node_modules/@openrouter/ai-sdk-provider"
+      ],
+      "ai": ["./node_modules/ai"],
+      "shiki/bundle/web": ["./node_modules/shiki/dist/bundle-web.d.mts"],
+      "zod": ["./node_modules/zod"],
+      "@base-ui/react/*": ["./node_modules/@base-ui/react/*"],
+      "lucide-react": ["./node_modules/lucide-react"],
+      "tailwind-merge": ["./node_modules/tailwind-merge"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../registry/ui/**/*.ts",
+    "../../registry/ui/**/*.tsx",
+    "../../registry/plugins/document0/openrouter-chat/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

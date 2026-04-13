@@ -15,7 +15,7 @@ interface SearchResult {
  *
  * Usage:
  * ```tsx
- * import { SearchDialog } from "@/components/search-dialog";
+ * import { SearchDialog } from "@/components/document0/search-dialog/SearchDialog";
  *
  * // In your layout/header:
  * const [open, setOpen] = useState(false);
@@ -92,10 +92,10 @@ export function SearchDialog({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelected((s: number) => Math.min(s + 1, results.length - 1));
+      setSelected((s) => Math.min(s + 1, results.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelected((s: number) => Math.max(s - 1, 0));
+      setSelected((s) => Math.max(s - 1, 0));
     } else if (e.key === "Enter" && results[selected]) {
       navigate(results[selected].url);
     } else if (e.key === "Escape") {
@@ -152,7 +152,7 @@ export function SearchDialog({
             )}
             {!loading && results.length > 0 && (
               <ul className="py-2">
-                {results.map((result: SearchResult, i: number) => (
+                {results.map((result, i) => (
                   <li key={result.url}>
                     <button
                       type="button"
@@ -160,13 +160,15 @@ export function SearchDialog({
                       onMouseEnter={() => setSelected(i)}
                       className={[
                         "w-full text-left px-4 py-2.5 flex flex-col gap-0.5 transition-colors",
-                        selected === i ? "bg-zinc-800" : "hover:bg-zinc-800/60",
+                        selected === i
+                          ? "bg-sky-500/10"
+                          : "hover:bg-zinc-800/60",
                       ].join(" ")}
                     >
                       <span
                         className={[
                           "text-sm font-medium",
-                          selected === i ? "text-white" : "text-zinc-200",
+                          selected === i ? "text-sky-400" : "text-zinc-200",
                         ].join(" ")}
                       >
                         {result.title}

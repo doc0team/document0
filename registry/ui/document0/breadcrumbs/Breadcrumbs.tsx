@@ -1,16 +1,12 @@
 import Link from "next/link";
-
-interface BreadcrumbItem {
-  name: string;
-  url?: string;
-}
+import type { BreadcrumbItem } from "@document0/core";
 
 /**
  * Breadcrumb navigation showing current page path.
  *
  * Usage:
  * ```tsx
- * import { Breadcrumbs } from "@/components/breadcrumbs";
+ * import { Breadcrumbs } from "@/components/document0/breadcrumbs/Breadcrumbs";
  * import { getBreadcrumbs } from "@document0/core";
  *
  * // In your page component:

@@ -3,12 +3,14 @@ import kleur from "kleur";
 import { add } from "./commands/add.js";
 import { list } from "./commands/list.js";
 import { search } from "./commands/search.js";
+import { update } from "./commands/update.js";
 
 const HELP = `
   ${kleur.bold().cyan("document0")} - plugin manager for document0
 
   ${kleur.bold("Commands:")}
     add <plugin> [...]   Install plugins from the registry
+    update [plugin ...]  Update installed plugins to latest versions
     list                 List all available plugins
     search <query>       Search plugins by name, tag, or description
 
@@ -21,6 +23,8 @@ const HELP = `
   ${kleur.bold("Examples:")}
     document0 add document0/admonitions
     document0 add document0/sidebar acme/changelog
+    document0 update
+    document0 update document0/sidebar
     document0 list
     document0 search sidebar
 `;
@@ -37,6 +41,9 @@ async function main(): Promise<void> {
   switch (command) {
     case "add":
       await add(args.slice(1));
+      break;
+    case "update":
+      await update(args.slice(1));
       break;
     case "list":
     case "ls":

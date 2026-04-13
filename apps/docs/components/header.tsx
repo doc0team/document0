@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SearchDialog } from "./search-dialog";
+import { SearchDialog } from "../../../registry/ui/document0/search-dialog/SearchDialog";
 
 function NavLinks() {
   const pathname = usePathname();
@@ -13,7 +13,7 @@ function NavLinks() {
     { href: "/plugins", label: "Plugins", match: (p: string) => p.startsWith("/plugins") },
   ];
   return (
-    <nav className="flex items-center gap-1 text-sm text-zinc-400 ml-4">
+    <nav className="hidden md:flex items-center gap-1 text-sm text-zinc-400 ml-4">
       {links.map((link) => (
         <Link
           key={link.href}
@@ -32,7 +32,7 @@ function NavLinks() {
   );
 }
 
-export function Header() {
+export function Header({ mobileSidebar }: { mobileSidebar?: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
@@ -49,8 +49,9 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
-        <div className="flex h-14 items-center gap-6 px-4 max-w-screen-xl mx-auto">
-          <Link href="/docs" className="flex items-center gap-2 text-white">
+        <div className="flex h-14 items-center gap-4 md:gap-6 px-4 max-w-screen-xl mx-auto">
+          {mobileSidebar}
+          <Link href="/docs" className="flex items-center gap-2 text-white shrink-0">
             <span
               className="text-base tracking-tight"
               style={{ fontFamily: "var(--font-geist-pixel-square)" }}

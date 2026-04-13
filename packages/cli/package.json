@@ -1,6 +1,6 @@
 {
   "name": "@document0/cli",
-  "version": "0.2.1",
+  "version": "0.7.0",
   "description": "document0 CLI: add plugins, browse the registry",
   "type": "module",
   "bin": {

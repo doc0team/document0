@@ -1,0 +1,256 @@
+---
+title: Vue
+description: Build a document0 docs site with Vue 3 and Vite.
+---
+
+# Vue
+
+This guide builds a working docs site from scratch using Vue 3, Vite, and document0.
+
+Unlike the React/Next.js guides that use `@document0/mdx`, the Vue integration uses `@document0/mdc` — a lightweight Markdown Components processor that outputs HTML directly. No React, no JSX runtime, no server-side rendering shims.
+
+## 1. Create a Vue + Vite app
+
+```bash
+npm create vite@latest my-docs -- --template vue-ts
+cd my-docs
+```
+
+Install Vue Router and Tailwind CSS:
+
+```bash
+npm install vue-router@4 tailwindcss @tailwindcss/vite
+```
+
+## 2. Install document0
+
+```bash
+npm install @document0/core @document0/mdc shiki
+```
+
+| Package | Purpose |
+|---|---|
+| `@document0/core` | File-system source, page trees, navigation, search |
+| `@document0/mdc` | MDC processing — parses markdown to HTML with Shiki highlighting |
+| `shiki` | Syntax highlighting engine |
+
+No React dependencies needed. `@document0/mdc` handles markdown processing and outputs HTML strings that Vue renders with `v-html`.
+
+## 3. Create your source loader
+
+```ts
+// server/source.ts
+import path from "node:path";
+import { DocsSource, buildPageTree } from "@document0/core";
+
+const rootDir = path.join(process.cwd(), "content/docs");
+
+export const source = new DocsSource({ rootDir, baseUrl: "/docs" });
+
+export async function getPageTree() {
+  return buildPageTree(await source.getPages(), rootDir);
+}
+```
+
+## 4. Create a Shiki highlighter
+
+```ts
+// server/highlighter.ts
+import { createHighlighter } from "shiki";
+
+let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
+
+export async function getHighlighter() {
+  if (highlighter) return highlighter;
+  highlighter = await createHighlighter({
+    themes: ["github-dark", "github-light"],
+    langs: ["typescript", "javascript", "vue", "bash", "json", "css", "html"],
+  });
+  return highlighter;
+}
+```
+
+## 5. Create a Vite plugin to serve docs data
+
+Since document0's core runs in Node.js (file system, MDC compilation, Shiki), you need a Vite plugin that serves page data as JSON during development. The Vue client fetches this data and renders it.
+
+```ts
+// server/api.ts
+import fs from "node:fs";
+import { source, getPageTree } from "./source";
+import { getHighlighter } from "./highlighter";
+import { processMdcToHtml } from "@document0/mdc";
+import { getBreadcrumbs, getPageNeighbours } from "@document0/core";
+import type { Plugin } from "vite";
+
+async function getPage(slug: string) {
+  const page = await source.getPage(slug);
+  if (!page) return null;
+
+  const raw = fs.readFileSync(page.filePath, "utf-8");
+  const highlighter = await getHighlighter();
+  const { html, toc } = await processMdcToHtml(raw, { highlighter });
+
+  const tree = await getPageTree();
+  const breadcrumbs = getBreadcrumbs(tree, page.url);
+  const { previous, next } = getPageNeighbours(tree, page.url);
+
+  return {
+    title: page.frontmatter.title,
+    description: page.frontmatter.description,
+    html,
+    toc,
+    breadcrumbs,
+    previous,
+    next,
+  };
+}
+
+export function document0ApiPlugin(): Plugin {
+  return {
+    name: "document0-api",
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url === "/api/tree") {
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(await getPageTree()));
+          return;
+        }
+
+        const match = req.url?.match(/^\/api\/page\/(.*)$/);
+        if (match) {
+          const data = await getPage(decodeURIComponent(match[1]));
+          if (!data) {
+            res.statusCode = 404;
+            res.end(JSON.stringify({ error: "Not found" }));
+            return;
+          }
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(data));
+          return;
+        }
+
+        next();
+      });
+    },
+  };
+}
+```
+
+Register the plugin in `vite.config.ts`:
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import tailwindcss from "@tailwindcss/vite";
+import { document0ApiPlugin } from "./server/api";
+
+export default defineConfig({
+  plugins: [vue(), tailwindcss(), document0ApiPlugin()],
+});
+```
+
+## 6. Set up routing
+
+```ts
+// src/main.ts
+import { createApp } from "vue";
+import { createRouter, createWebHistory } from "vue-router";
+import App from "./App.vue";
+import "./globals.css";
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: "/", redirect: "/docs" },
+    {
+      path: "/docs/:slug(.*)*",
+      component: () => import("./pages/DocPage.vue"),
+    },
+  ],
+});
+
+const app = createApp(App);
+app.use(router);
+app.mount("#app");
+```
+
+## 7. Create the doc page
+
+```vue
+<!-- src/pages/DocPage.vue -->
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const page = ref<any>(null);
+
+async function loadPage() {
+  const slugParts = route.params.slug;
+  const slug = Array.isArray(slugParts)
+    ? slugParts.join("/")
+    : slugParts ?? "";
+
+  const res = await fetch(`/api/page/${slug}`);
+  if (res.ok) page.value = await res.json();
+}
+
+watch(() => route.params.slug, loadPage, { immediate: true });
+</script>
+
+<template>
+  <article v-if="page">
+    <h1>{{ page.title }}</h1>
+    <div v-html="page.html" />
+  </article>
+</template>
+```
+
+The HTML returned by `processMdcToHtml` includes Shiki-highlighted code blocks, heading anchors, and GFM features (tables, task lists, etc.) — ready for `v-html`.
+
+## 8. Add some content
+
+```bash
+mkdir -p content/docs
+```
+
+Create `content/docs/index.mdx`:
+
+```mdx
+---
+title: My Docs
+description: Welcome to my documentation.
+---
+
+# My Docs
+
+Hello world!
+```
+
+## 9. Run the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173/docs](http://localhost:5173/docs). Your docs site is live.
+
+## MDC vs MDX
+
+| | `@document0/mdx` | `@document0/mdc` |
+|---|---|---|
+| Output | Compiled JS (needs `run()` + React) | HTML string or JSON AST |
+| Peer deps | `react`, `react-dom`, `@mdx-js/mdx` | None |
+| Best for | React / Next.js | Vue, Svelte, or any non-React framework |
+| Custom components | JSX component map | `v-html` styling or JSON AST renderer |
+
+See the [@document0/mdc reference](/docs/mdc) for the full API.
+
+## Next steps
+
+- Install Vue UI components: `npx @document0/cli add document0-vue/sidebar document0-vue/toc document0-vue/search-dialog`
+- Add a sidebar, table of contents, and breadcrumbs using the [registry components](/plugins)
+- [Core package reference](/docs/core): all APIs for source, navigation, search, and llms.txt
+- [@document0/mdc reference](/docs/mdc): processMdc, processMdcToHtml, types

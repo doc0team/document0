@@ -1,16 +1,26 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import kleur from "kleur";
 import prompts from "prompts";
 
-const TEMPLATE_DIR = path.join(
-  path.dirname(new URL(import.meta.url).pathname),
-  "../template"
-);
+type Framework = "nextjs" | "vue";
 
-const SKIP_DIRS = new Set(["node_modules", ".next", ".turbo"]);
+const FRAMEWORKS: { value: Framework; title: string; description: string }[] = [
+  { value: "nextjs", title: "Next.js", description: "React + Next.js" },
+  { value: "vue", title: "Vue", description: "Vue + Vite" },
+];
+
+function templateDir(framework: Framework): string {
+  return path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    `../template-${framework}`
+  );
+}
+
+const SKIP_DIRS = new Set(["node_modules", ".next", ".turbo", "dist"]);
 
 function copyDir(src: string, dest: string): void {
   fs.mkdirSync(dest, { recursive: true });
@@ -42,6 +52,11 @@ function devCommand(pm: string): string {
   return pm === "npm" ? "npm run dev" : `${pm} dev`;
 }
 
+const onCancel = () => {
+  console.log(kleur.red("\n  Cancelled.\n"));
+  process.exit(1);
+};
+
 async function main(): Promise<void> {
   console.log();
   console.log(kleur.bold().cyan("  document0"));
@@ -59,12 +74,7 @@ async function main(): Promise<void> {
         validate: (v: string) =>
           v.trim().length > 0 ? true : "Project name is required",
       },
-      {
-        onCancel: () => {
-          console.log(kleur.red("\n  Cancelled.\n"));
-          process.exit(1);
-        },
-      }
+      { onCancel }
     );
     projectName = (response as { projectName: string }).projectName;
   }
@@ -80,18 +90,24 @@ async function main(): Promise<void> {
         message: `Directory "${projectName}" is not empty. Continue?`,
         initial: false,
       },
-      {
-        onCancel: () => {
-          console.log(kleur.red("\n  Cancelled.\n"));
-          process.exit(1);
-        },
-      }
+      { onCancel }
     );
     if (!overwrite) {
       console.log(kleur.red("\n  Cancelled.\n"));
       process.exit(1);
     }
   }
+
+  const { framework } = (await prompts(
+    {
+      type: "select",
+      name: "framework",
+      message: "Framework:",
+      choices: FRAMEWORKS,
+      initial: 0,
+    },
+    { onCancel }
+  )) as { framework: Framework };
 
   const pm = detectPackageManager();
 
@@ -102,17 +118,13 @@ async function main(): Promise<void> {
       message: `Install dependencies with ${kleur.cyan(pm)}?`,
       initial: true,
     },
-    {
-      onCancel: () => {
-        process.exit(1);
-      },
-    }
+    { onCancel }
   );
 
   console.log();
   console.log(kleur.dim(`  Scaffolding into ${kleur.reset(targetDir)} ...`));
 
-  copyDir(TEMPLATE_DIR, targetDir);
+  copyDir(templateDir(framework), targetDir);
 
   const pkgPath = path.join(targetDir, "package.json");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
@@ -123,7 +135,7 @@ async function main(): Promise<void> {
   };
   if (dependencies) {
     for (const key of Object.keys(dependencies)) {
-      if (dependencies[key] === "workspace:*") {
+      if (dependencies[key]?.startsWith("workspace:")) {
         delete dependencies[key];
       }
     }
@@ -146,6 +158,11 @@ async function main(): Promise<void> {
     }
   }
 
+  const devUrl =
+    framework === "nextjs"
+      ? "http://localhost:3000/docs"
+      : "http://localhost:5173";
+
   console.log();
   console.log(kleur.bold().green("  Done! ✓"));
   console.log();
@@ -159,7 +176,7 @@ async function main(): Promise<void> {
   }
   console.log(kleur.cyan(`    ${devCommand(pm)}`));
   console.log();
-  console.log(kleur.dim("  Open http://localhost:3000/docs to see your site."));
+  console.log(kleur.dim(`  Open ${devUrl} to see your site.`));
   console.log();
 }
 

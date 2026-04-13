@@ -75,6 +75,38 @@ export interface SourceOptions {
   plugins?: import("./plugin.js").Document0Plugin[];
 }
 
+/** Kind of change reported by `watchDocsSource` (`@document0/core/watch`). */
+export type DocsSourceWatchKind =
+  | "add"
+  | "change"
+  | "unlink"
+  | "addDir"
+  | "unlinkDir";
+
+export interface DocsSourceWatchEvent {
+  kind: DocsSourceWatchKind;
+  /** Absolute path (normalized). */
+  path: string;
+}
+
+export interface DocsSourceWatchOptions {
+  /**
+   * Debounce delay before {@link DocsSource.invalidate} runs after a batch of events.
+   * @default 150
+   */
+  debounceMs?: number;
+  /** Extra paths to ignore (absolute or relative); return true to exclude. */
+  ignored?: (path: string) => boolean;
+  /** Fires for each chokidar event (before debounced invalidate). */
+  onEvent?: (event: DocsSourceWatchEvent) => void;
+  /** Fires after debounced `DocsSource.invalidate` runs. */
+  onInvalidate?: () => void;
+}
+
+export interface DocsSourceWatcher {
+  close(): Promise<void>;
+}
+
 export interface NavigationItem {
   name: string;
   url: string;
@@ -84,7 +116,7 @@ export interface NavigationItem {
 
 export interface BreadcrumbItem {
   name: string;
-  url: string;
+  url?: string;
 }
 
 export interface PageNeighbours {

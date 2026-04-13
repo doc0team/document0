@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import type {
@@ -11,6 +11,7 @@ import type {
 import type { Document0Plugin } from "../plugin.js";
 import { applyPageTransforms, applyTreeTransforms } from "../plugin.js";
 import { buildPageTree } from "../tree/index.js";
+import { readMeta } from "../meta.js";
 
 const DEFAULT_EXTENSIONS = [".md", ".mdx"];
 const DEFAULT_BASE_URL = "/docs";
@@ -32,33 +33,17 @@ function buildUrl(slugs: string[], baseUrl: string): string {
   return `${baseUrl}/${filtered.join("/")}`;
 }
 
-function readMeta(dir: string): MetaFile | null {
-  const candidates = ["_meta.json", "_meta.ts", "_meta.js"];
-  for (const candidate of candidates) {
-    const full = path.join(dir, candidate);
-    if (fs.existsSync(full)) {
-      try {
-        const raw = fs.readFileSync(full, "utf-8");
-        return JSON.parse(raw) as MetaFile;
-      } catch {
-        return null;
-      }
-    }
-  }
-  return null;
-}
-
-function scanDir(
+async function scanDir(
   dir: string,
   rootDir: string,
   baseUrl: string,
   extensions: string[]
-): PageData[] {
+): Promise<PageData[]> {
   const pages: PageData[] = [];
-  let entries: fs.Dirent[];
+  let entries: import("node:fs").Dirent[];
 
   try {
-    entries = fs.readdirSync(dir, { withFileTypes: true });
+    entries = await fs.readdir(dir, { withFileTypes: true });
   } catch {
     return pages;
   }
@@ -67,7 +52,7 @@ function scanDir(
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      pages.push(...scanDir(fullPath, rootDir, baseUrl, extensions));
+      pages.push(...await scanDir(fullPath, rootDir, baseUrl, extensions));
       continue;
     }
 
@@ -79,7 +64,7 @@ function scanDir(
     if (entry.name.startsWith("_")) continue;
 
     try {
-      const raw = fs.readFileSync(fullPath, "utf-8");
+      const raw = await fs.readFile(fullPath, "utf-8");
       const { data, content } = matter(raw);
       const frontmatter = data as PageFrontmatter;
 
@@ -110,6 +95,9 @@ export class DocsSource {
   private plugins: Document0Plugin[];
   private _pages: PageData[] | null = null;
   private _tree: TreeNode[] | null = null;
+  private _slugMap: Map<string, PageData> | null = null;
+  private _urlMap: Map<string, PageData> | null = null;
+  private _cache = new Map<string, unknown>();
 
   constructor(options: SourceOptions) {
     this.rootDir = path.resolve(options.rootDir);
@@ -118,9 +106,9 @@ export class DocsSource {
     this.plugins = options.plugins ?? [];
   }
 
-  getPages(): PageData[] {
+  async getPages(): Promise<PageData[]> {
     if (this._pages) return this._pages;
-    let pages = scanDir(
+    let pages = await scanDir(
       this.rootDir,
       this.rootDir,
       this.baseUrl,
@@ -128,31 +116,65 @@ export class DocsSource {
     );
     pages = applyPageTransforms(pages, this.plugins);
     this._pages = pages;
+
+    this._slugMap = new Map();
+    this._urlMap = new Map();
+    for (const page of pages) {
+      this._slugMap.set(page.slug, page);
+      this._urlMap.set(page.url, page);
+    }
+
     return this._pages;
   }
 
-  getPageTree(): TreeNode[] {
+  async getPageTree(): Promise<TreeNode[]> {
     if (this._tree) return this._tree;
-    let tree = buildPageTree(this.getPages(), this.rootDir);
+    let tree = await buildPageTree(await this.getPages(), this.rootDir);
     tree = applyTreeTransforms(tree, this.plugins);
     this._tree = tree;
     return this._tree;
   }
 
-  getPage(slug: string): PageData | undefined {
-    return this.getPages().find((p) => p.slug === slug);
+  async getPage(slug: string): Promise<PageData | undefined> {
+    await this.getPages();
+    return this._slugMap!.get(slug);
   }
 
-  getPageByUrl(url: string): PageData | undefined {
-    return this.getPages().find((p) => p.url === url);
+  async getPageByUrl(url: string): Promise<PageData | undefined> {
+    await this.getPages();
+    return this._urlMap!.get(url);
   }
 
-  getMeta(dir: string): MetaFile | null {
+  async getMeta(dir: string): Promise<MetaFile | null> {
     return readMeta(path.join(this.rootDir, dir));
+  }
+
+  /** Absolute path to the scanned content directory. Used by `watchDocsSource` (`@document0/core/watch`). */
+  getContentRoot(): string {
+    return this.rootDir;
+  }
+
+  /** Extensions treated as pages. Used by `watchDocsSource` (`@document0/core/watch`). */
+  getContentExtensions(): readonly string[] {
+    return this.extensions;
+  }
+
+  /**
+   * Retrieve a cached value by key, or create and store it using the factory.
+   * Cleared on `invalidate()`.
+   */
+  async getOrSet<T>(key: string, factory: () => T | Promise<T>): Promise<T> {
+    if (this._cache.has(key)) return this._cache.get(key) as T;
+    const value = await factory();
+    this._cache.set(key, value);
+    return value;
   }
 
   invalidate(): void {
     this._pages = null;
     this._tree = null;
+    this._slugMap = null;
+    this._urlMap = null;
+    this._cache.clear();
   }
 }

@@ -21,34 +21,31 @@ interface SearchRouteOptions {
   language?: string;
 }
 
-let cachedDb: Awaited<ReturnType<typeof create>> | null = null;
-let cachedSourceRef: DocsSource | null = null;
+const SEARCH_DB_KEY = "__searchDb";
 
 async function getOrCreateDb(source: DocsSource) {
-  if (cachedDb && cachedSourceRef === source) return cachedDb;
-
-  const db = create({
-    schema: {
-      title: "string",
-      description: "string",
-      content: "string",
-      url: "string",
-    } as const,
-  });
-
-  const pages = source.getPages();
-  for (const page of pages) {
-    insert(db, {
-      title: page.frontmatter.title ?? page.slug,
-      description: page.frontmatter.description ?? "",
-      content: stripMarkdown(page.content),
-      url: page.url,
+  return source.getOrSet(SEARCH_DB_KEY, async () => {
+    const db = create({
+      schema: {
+        title: "string",
+        description: "string",
+        content: "string",
+        url: "string",
+      } as const,
     });
-  }
 
-  cachedDb = db;
-  cachedSourceRef = source;
-  return db;
+    const pages = await source.getPages();
+    for (const page of pages) {
+      insert(db, {
+        title: page.frontmatter.title ?? page.slug,
+        description: page.frontmatter.description ?? "",
+        content: stripMarkdown(page.content),
+        url: page.url,
+      });
+    }
+
+    return db;
+  });
 }
 
 export function createSearchRoute(

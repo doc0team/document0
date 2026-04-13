@@ -56,7 +56,7 @@ export default async function ApiPage({ params }: PageProps) {
   if (!slug || slug.length === 0) {
     const groups = groupByTag(pages);
     return (
-      <div className="px-8 py-10 max-w-screen-xl mx-auto w-full">
+      <div className="px-4 md:px-8 py-6 md:py-10 max-w-screen-xl mx-auto w-full">
         <h1 className="text-3xl font-bold text-white mb-2">API Reference</h1>
         <p className="text-zinc-400 mb-8">
           Browse all available API endpoints and their documentation.

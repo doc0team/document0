@@ -1,0 +1,193 @@
+---
+title: Next.js
+description: Build a document0 docs site with Next.js App Router.
+---
+
+# Next.js
+
+This guide builds a working docs site from scratch using Next.js App Router and document0.
+
+## 1. Create a Next.js app
+
+```bash
+npx create-next-app@latest my-docs --typescript --tailwind --app --no-src-dir
+cd my-docs
+```
+
+Or scaffold instantly with `create-document0`:
+
+```bash
+npx create-document0 my-docs
+```
+
+## 2. Install document0
+
+```bash
+npm install @document0/core @document0/mdx @document0/next-dev shiki @mdx-js/mdx
+```
+
+## 3. Configure Next.js
+
+Add `serverExternalPackages` and wrap the config with **`withDocument0`** from **`@document0/next-dev`**:
+
+```ts
+// next.config.ts
+import type { NextConfig } from "next";
+import { withDocument0 } from "@document0/next-dev";
+
+const nextConfig: NextConfig = {
+  serverExternalPackages: ["@document0/core", "@document0/mdx", "shiki"],
+};
+
+export default withDocument0({ contentDir: "content/docs" })(nextConfig);
+```
+
+`contentDir` is relative to your Next project root and must match the folder you pass to `DocsSource`.
+
+## 4. Create your source loader
+
+Import the **content stamp** once in the same file as `DocsSource` so the dev bundler treats your docs tree as a dependency (same idea as Fumadocs: content on the webpack graph). When anything under `content/docs` changes, this module re-runs and you get a fresh `DocsSource`.
+
+```ts
+// lib/source.ts
+import "@document0/next-dev/content-stamp";
+
+import path from "node:path";
+import { DocsSource } from "@document0/core";
+
+const rootDir = path.join(process.cwd(), "content/docs");
+
+export const source = new DocsSource({ rootDir, baseUrl: "/docs" });
+```
+
+## 5. Create a Shiki highlighter
+
+```ts
+// lib/highlighter.ts
+import { createHighlighter } from "shiki";
+
+let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
+
+export async function getHighlighter() {
+  if (highlighter) return highlighter;
+  highlighter = await createHighlighter({
+    themes: ["github-dark"],
+    langs: ["typescript", "javascript", "bash", "json"],
+  });
+  return highlighter;
+}
+```
+
+## 6. Create your docs page
+
+```tsx
+// app/docs/[[...slug]]/page.tsx
+import { notFound } from "next/navigation";
+import { run } from "@mdx-js/mdx";
+import * as runtime from "react/jsx-runtime";
+import { source } from "@/lib/source";
+import { getHighlighter } from "@/lib/highlighter";
+import { processMdx } from "@document0/mdx";
+
+export async function generateStaticParams() {
+  return (await source.getPages()).map((page) => ({
+    slug: page.slugs.filter(Boolean),
+  }));
+}
+
+export default async function DocPage({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}) {
+  const { slug } = await params;
+  const page = await source.getPage(slug ? slug.join("/") : "");
+  if (!page) notFound();
+
+  const highlighter = await getHighlighter();
+  const { code } = await processMdx(page.content, { highlighter });
+
+  const { default: MDXContent } = await run(code, {
+    ...(runtime as object),
+    baseUrl: import.meta.url,
+  } as Parameters<typeof run>[1]);
+
+  return (
+    <article>
+      <h1>{page.frontmatter.title}</h1>
+      <MDXContent />
+    </article>
+  );
+}
+```
+
+## 7. Add a search route
+
+```ts
+// app/internal/search/route.ts
+import { createSearchRoute } from "@document0/core/search";
+import { source } from "@/lib/source";
+
+export const { GET } = createSearchRoute(source);
+```
+
+## 8. Add llms.txt routes (optional)
+
+```ts
+// app/llms.txt/route.ts
+import { createLlmsTxtRoute } from "@document0/core/llms";
+import { source } from "@/lib/source";
+
+export const { GET } = createLlmsTxtRoute(source, {
+  title: "My Docs",
+  description: "Documentation for my project",
+  baseUrl: "https://docs.example.com",
+});
+```
+
+## 9. Add some content
+
+```bash
+mkdir -p content/docs
+```
+
+Create `content/docs/index.mdx`:
+
+```mdx
+---
+title: My Docs
+description: Welcome to my documentation.
+---
+
+# My Docs
+
+Hello world!
+```
+
+## Content hot reload in development
+
+`DocsSource` caches pages after the first read. Editing markdown or `_meta.json` does not change your `app/**/*.tsx` modules, so by default the dev server would keep serving cached data.
+
+**`@document0/next-dev`** fixes that in development by registering your **`contentDir`** as a **webpack context dependency** (via a small loader on `content-stamp`). Any file change under that directory invalidates the module that imports **`@document0/next-dev/content-stamp`**, which should be the same module that constructs **`DocsSource`** — so that file re-executes and reads from disk again.
+
+Requirements:
+
+- Run **`next dev`** with **webpack** (the default in many setups). Custom webpack is **not** used when you pass **`--turbo`**; use plain **`next dev`** or **`next dev --webpack`** if Turbopack is your default.
+- Keep the **`content-stamp`** import in the same file as `new DocsSource(...)`.
+
+Scaffolds from **`create-document0`** apply **`withDocument0`** and the content-stamp import by default.
+
+**Vite** does not use this package. For manual file watching there, use **`watchDocsSource`** from **`@document0/core/watch`** in a dev plugin (for example **`server.ws.send({ type: "full-reload" })`** in `onInvalidate`). See the [@document0/core](/docs/core) package README and the [React + Vite](/docs/react-vite) guide.
+
+## 10. Run the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000/docs](http://localhost:3000/docs). Your docs site is live.
+
+## Next steps
+
+- Install UI components: `npx document0 add document0/sidebar document0/toc document0/search-dialog`
+- [Core package reference](/docs/core): all APIs for source, navigation, search, and llms.txt

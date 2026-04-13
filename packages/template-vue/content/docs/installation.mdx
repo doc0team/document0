@@ -1,0 +1,81 @@
+---
+title: Installation
+description: How to install and set up document0 in your project.
+---
+
+# Installation
+
+## Requirements
+
+- Node.js 18 or later
+- Vue 3.5 or later
+
+## Install
+
+```bash
+npm install @document0/core @document0/mdc shiki
+```
+
+Or with your preferred package manager:
+
+```bash
+pnpm add @document0/core @document0/mdc shiki
+yarn add @document0/core @document0/mdc shiki
+bun add @document0/core @document0/mdc shiki
+```
+
+## Quick setup with Vue + Vite
+
+### 1. Install Vue dependencies
+
+```bash
+npm install vue vue-router@4 tailwindcss @tailwindcss/vite
+```
+
+### 2. Create your content directory
+
+```bash
+mkdir -p content/docs
+```
+
+### 3. Set up your source
+
+Create `server/source.ts`:
+
+```ts
+import path from "node:path";
+import { DocsSource, buildPageTree } from "@document0/core";
+
+const rootDir = path.join(process.cwd(), "content/docs");
+
+export const source = new DocsSource({ rootDir, baseUrl: "/docs" });
+
+export function getPageTree() {
+  return buildPageTree(source.getPages(), rootDir);
+}
+```
+
+### 4. Set up the Shiki highlighter
+
+Create `server/highlighter.ts`:
+
+```ts
+import { createHighlighter } from "shiki";
+
+let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
+
+export async function getHighlighter() {
+  if (highlighter) return highlighter;
+  highlighter = await createHighlighter({
+    themes: ["github-dark", "github-light"],
+    langs: ["typescript", "javascript", "vue", "bash", "json", "css"],
+  });
+  return highlighter;
+}
+```
+
+### 5. Create a Vite API plugin
+
+Create `server/api.ts` with a Vite plugin that serves page data as JSON. Use `processMdcToHtml` to convert markdown to HTML.
+
+See the [Configuration](/docs/configuration) page for all available options.

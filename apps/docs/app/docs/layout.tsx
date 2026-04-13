@@ -1,14 +1,15 @@
 import { getPageTree } from "@/lib/source";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar, MobileSidebar } from "../../../../registry/ui/document0/sidebar/Sidebar";
 import { Header } from "@/components/header";
 import HeroGeometric from "@/components/ui/hero-geometric";
+import { AiChat } from "@registry/ui/document0/openrouter-chat/AiChat";
 
-export default function DocsLayout({ children }: { children: React.ReactNode }) {
-  const tree = getPageTree();
+export default async function DocsLayout({ children }: { children: React.ReactNode }) {
+  const tree = await getPageTree();
 
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-950">
-      <Header />
+      <Header mobileSidebar={<MobileSidebar tree={tree} navLinks={[{ href: "/docs", label: "Docs" }, { href: "/api", label: "API Reference" }, { href: "/plugins", label: "Plugins" }]} />} />
       <div className="flex flex-1 items-start">
         <Sidebar tree={tree} />
         <main className="relative flex-1 min-w-0">
@@ -24,6 +25,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </div>
         </main>
       </div>
+      <AiChat endpoint="/api/chat" title="document0 Docs AI" placeholder="Ask the docs..." />
     </div>
   );
 }

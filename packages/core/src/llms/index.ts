@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import type { DocsSource } from "../source/index.js";
 
 export interface LlmsOptions {
@@ -8,20 +7,15 @@ export interface LlmsOptions {
   baseUrl: string;
 }
 
-function stripFrontmatter(raw: string): string {
-  const match = raw.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
-  return match ? raw.slice(match[0].length) : raw;
-}
-
 /**
  * Generates `llms.txt` content - a concise index of all pages
  * following the llms.txt specification.
  */
-export function generateLlmsTxt(
+export async function generateLlmsTxt(
   source: DocsSource,
   options: LlmsOptions
-): string {
-  const pages = source.getPages();
+): Promise<string> {
+  const pages = await source.getPages();
   const lines: string[] = [];
 
   lines.push(`# ${options.title}`);
@@ -50,11 +44,11 @@ export function generateLlmsTxt(
  * Generates `llms-full.txt` - the complete content of every page
  * concatenated into a single text file for full-context ingestion.
  */
-export function generateLlmsFullTxt(
+export async function generateLlmsFullTxt(
   source: DocsSource,
   options: LlmsOptions
-): string {
-  const pages = source.getPages();
+): Promise<string> {
+  const pages = await source.getPages();
   const sections: string[] = [];
 
   sections.push(`# ${options.title}`);
@@ -65,8 +59,7 @@ export function generateLlmsFullTxt(
   for (const page of pages) {
     const url = `${options.baseUrl}${page.url}`;
     const title = page.frontmatter.title ?? page.slug;
-    const raw = fs.readFileSync(page.filePath, "utf-8");
-    const content = stripFrontmatter(raw).trim();
+    const content = page.content.trim();
 
     sections.push(
       "",
@@ -87,22 +80,21 @@ export function generateLlmsFullTxt(
  * Returns the raw MDX/MD content for a single page by slug,
  * with frontmatter stripped.
  */
-export function getPageRawContent(
+export async function getPageRawContent(
   source: DocsSource,
   slug: string
-): string | null {
-  const page = source.getPage(slug);
+): Promise<string | null> {
+  const page = await source.getPage(slug);
   if (!page) return null;
-  const raw = fs.readFileSync(page.filePath, "utf-8");
-  return stripFrontmatter(raw).trim();
+  return page.content.trim();
 }
 
 // --- Route helpers ---
 
 export function createLlmsTxtRoute(source: DocsSource, options: LlmsOptions) {
   return {
-    GET(): Response {
-      const body = generateLlmsTxt(source, options);
+    async GET(): Promise<Response> {
+      const body = await generateLlmsTxt(source, options);
       return new Response(body, {
         headers: { "Content-Type": "text/plain; charset=utf-8" },
       });
@@ -115,8 +107,8 @@ export function createLlmsFullTxtRoute(
   options: LlmsOptions
 ) {
   return {
-    GET(): Response {
-      const body = generateLlmsFullTxt(source, options);
+    async GET(): Promise<Response> {
+      const body = await generateLlmsFullTxt(source, options);
       return new Response(body, {
         headers: { "Content-Type": "text/plain; charset=utf-8" },
       });
@@ -126,12 +118,12 @@ export function createLlmsFullTxtRoute(
 
 export function createMdxPageRoute(source: DocsSource) {
   return {
-    GET(
+    async GET(
       _request: Request,
       { params }: { params: { slug?: string[] } }
-    ): Response {
+    ): Promise<Response> {
       const slug = params.slug?.join("/") ?? "";
-      const content = getPageRawContent(source, slug);
+      const content = await getPageRawContent(source, slug);
 
       if (!content) {
         return new Response("Not found", { status: 404 });

@@ -1,3 +1,7 @@
+import "server-only";
+
+import "@document0/next-dev/content-stamp";
+
 import path from "node:path";
 import fs from "node:fs";
 import { DocsSource, buildPageTree } from "@document0/core";
@@ -27,6 +31,8 @@ export interface RegistryItem {
   registryDependencies: string[];
   installPath: string;
   preview?: boolean;
+  logo?: string;
+  framework?: "react" | "vue";
 }
 
 export interface RegistryIndex {
@@ -71,8 +77,6 @@ export function getItemSource(namespace: string, name: string): string | null {
 
 export function getPluginsTree(): TreeNode[] {
   const registry = getRegistry();
-
-  const namespaces = [...new Set(registry.items.map((i) => i.namespace))];
   const nodes: TreeNode[] = [];
 
   nodes.push({
@@ -82,60 +86,108 @@ export function getPluginsTree(): TreeNode[] {
     slug: "",
   } as PageNode);
 
-  for (const ns of namespaces) {
-    const nsItems = registry.items.filter((i) => i.namespace === ns);
-    const mdx = nsItems.filter((i) => i.category === "mdx");
-    const core = nsItems.filter((i) => i.category === "core");
-    const ui = nsItems.filter((i) => i.category === "ui");
+  const mdxItems = registry.items.filter((i) => i.category === "mdx");
+  const coreItems = registry.items.filter((i) => i.category === "core");
+  const uiItems = registry.items.filter((i) => i.category === "ui");
 
-    nodes.push({ type: "separator", name: ns } as SeparatorNode);
+  if (mdxItems.length > 0 || coreItems.length > 0) {
+    nodes.push({ type: "separator", name: "Plugins" } as SeparatorNode);
 
-    if (mdx.length > 0) {
-      const children = mdx.map((item) => ({
-        type: "page" as const,
-        name: item.name,
-        url: `/plugins/${ns}/${item.name}`,
-        slug: item.name,
-      })) as PageNode[];
-
+    if (mdxItems.length > 0) {
       nodes.push({
         type: "folder",
-        name: "MDX Plugins",
-        defaultOpen: true,
-        children,
+        name: "MDX",
+        defaultOpen: false,
+        children: mdxItems.map((item) => ({
+          type: "page" as const,
+          name: item.name,
+          url: `/plugins/${item.namespace}/${item.name}`,
+          slug: item.name,
+        })),
       } as FolderNode);
     }
 
-    if (core.length > 0) {
-      const children = core.map((item) => ({
-        type: "page" as const,
-        name: item.name,
-        url: `/plugins/${ns}/${item.name}`,
-        slug: item.name,
-      })) as PageNode[];
-
+    if (coreItems.length > 0) {
       nodes.push({
         type: "folder",
-        name: "Core Plugins",
-        defaultOpen: true,
-        children,
+        name: "Core",
+        defaultOpen: false,
+        children: coreItems.map((item) => ({
+          type: "page" as const,
+          name: item.name,
+          url: `/plugins/${item.namespace}/${item.name}`,
+          slug: item.name,
+        })),
       } as FolderNode);
     }
+  }
 
-    if (ui.length > 0) {
-      const children = ui.map((item) => ({
-        type: "page" as const,
-        name: item.name,
-        url: `/plugins/${ns}/${item.name}`,
-        slug: item.name,
-      })) as PageNode[];
+  const uiNamespaces = [...new Set(uiItems.map((i) => i.namespace))];
 
-      nodes.push({
-        type: "folder",
-        name: "UI Components",
-        defaultOpen: true,
-        children,
-      } as FolderNode);
+  if (uiItems.length > 0) {
+    nodes.push({ type: "separator", name: "UI Components" } as SeparatorNode);
+
+    const frameworkSuffixes = ["-vue", "-react", "-svelte", "-solid"];
+
+    function getBaseNamespace(ns: string): string {
+      for (const suffix of frameworkSuffixes) {
+        if (ns.endsWith(suffix)) return ns.slice(0, -suffix.length);
+      }
+      return ns;
+    }
+
+    function getFrameworkLabel(ns: string, base: string): string {
+      if (ns === base) return "React";
+      const suffix = ns.slice(base.length + 1);
+      return suffix.charAt(0).toUpperCase() + suffix.slice(1);
+    }
+
+    const uiByBase = new Map<string, string[]>();
+    for (const ns of uiNamespaces) {
+      const base = getBaseNamespace(ns);
+      if (!uiByBase.has(base)) uiByBase.set(base, []);
+      uiByBase.get(base)!.push(ns);
+    }
+
+    for (const [base, variants] of uiByBase) {
+      if (variants.length === 1) {
+        const ns = variants[0];
+        const nsItems = uiItems.filter((i) => i.namespace === ns);
+        nodes.push({
+          type: "folder",
+          name: ns,
+          defaultOpen: false,
+          children: nsItems.map((item) => ({
+            type: "page" as const,
+            name: item.name,
+            url: `/plugins/${ns}/${item.name}`,
+            slug: item.name,
+          })),
+        } as FolderNode);
+      } else {
+        const children: TreeNode[] = variants.map((ns) => {
+          const nsItems = uiItems.filter((i) => i.namespace === ns);
+          const label = getFrameworkLabel(ns, base);
+          return {
+            type: "folder" as const,
+            name: label,
+            defaultOpen: ns === base,
+            children: nsItems.map((item) => ({
+              type: "page" as const,
+              name: item.name,
+              url: `/plugins/${ns}/${item.name}`,
+              slug: item.name,
+            })),
+          } as FolderNode;
+        });
+
+        nodes.push({
+          type: "folder",
+          name: base,
+          defaultOpen: base === "document0",
+          children,
+        } as FolderNode);
+      }
     }
   }
 
@@ -152,8 +204,8 @@ export async function getApiPages(): Promise<OpenAPIPageData[]> {
   return cachedApiPages;
 }
 
-export function getPageTree(): TreeNode[] {
-  return buildPageTree(source.getPages(), docsRootDir);
+export async function getPageTree(): Promise<TreeNode[]> {
+  return buildPageTree(await source.getPages(), docsRootDir);
 }
 
 export async function getApiTree(): Promise<TreeNode[]> {

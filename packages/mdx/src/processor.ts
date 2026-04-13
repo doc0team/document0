@@ -1,11 +1,6 @@
-import { compile, type CompileOptions } from "@mdx-js/mdx";
-import matter from "gray-matter";
-import remarkGfm from "remark-gfm";
-import remarkFrontmatter from "remark-frontmatter";
-import rehypeSlug from "rehype-slug";
-import type { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki";
-import { rehypeShiki, rehypeStripShikiStyle, type RehypeShikiThemes } from "./plugins/rehype-shiki.js";
-import { remarkToc, type TocEntry } from "./plugins/remark-toc.js";
+import { compile } from "@mdx-js/mdx";
+import type { TocEntry } from "./plugins/remark-toc.js";
+import { parseFrontmatter, buildRemarkPlugins, buildRehypePlugins, type BaseProcessorOptions } from "./shared.js";
 
 /**
  * Structurally compatible with Document0Plugin from @document0/core.
@@ -20,30 +15,7 @@ export interface ProcessorPlugin {
   ) => ProcessedMdx & Record<string, unknown>;
 }
 
-export interface ProcessorOptions {
-  /**
-   * Shiki highlighter instance. Create with `createHighlighter` from shiki.
-   * If omitted, code blocks will not be syntax-highlighted.
-   */
-  highlighter?: HighlighterGeneric<BundledLanguage, BundledTheme>;
-  /**
-   * Default language for code blocks without a specified language.
-   * @default "plaintext"
-   */
-  defaultLanguage?: string;
-  /**
-   * Shiki themes: `{ light, dark }` for dual-theme CSS variable output.
-   * Defaults to `{ light: "github-light", dark: "github-dark" }`.
-   */
-  themes?: RehypeShikiThemes;
-  /**
-   * Additional remark plugins to apply.
-   */
-  remarkPlugins?: CompileOptions["remarkPlugins"];
-  /**
-   * Additional rehype plugins to apply.
-   */
-  rehypePlugins?: CompileOptions["rehypePlugins"];
+export interface ProcessorOptions extends BaseProcessorOptions {
   /**
    * Whether to output automatic or classic JSX runtime.
    * @default "automatic"
@@ -68,39 +40,20 @@ export async function processMdx(
   options: ProcessorOptions = {},
 ): Promise<ProcessedMdx> {
   const plugins = options.plugins ?? [];
-  const { data: frontmatter, content } = matter(source);
+  const { frontmatter, content } = parseFrontmatter(source, options);
 
   const toc: TocEntry[] = [];
 
   const pluginRemark = plugins.flatMap((p) => p.remarkPlugins ?? []);
   const pluginRehype = plugins.flatMap((p) => p.rehypePlugins ?? []);
 
-  const remarkPlugins: CompileOptions["remarkPlugins"] = [
-    remarkFrontmatter,
-    remarkGfm,
-    [remarkToc, { onToc: (entries: TocEntry[]) => toc.push(...entries) }],
-    ...(options.remarkPlugins ?? []),
-    ...(pluginRemark as CompileOptions["remarkPlugins"] & unknown[]),
-  ];
+  const remarkPlugins = buildRemarkPlugins(
+    options,
+    (entries: TocEntry[]) => toc.push(...entries),
+    pluginRemark,
+  );
 
-  const rehypePlugins: CompileOptions["rehypePlugins"] = [
-    rehypeSlug,
-    ...(options.highlighter
-      ? [
-          [
-            rehypeShiki,
-            {
-              highlighter: options.highlighter,
-              defaultLanguage: options.defaultLanguage ?? "plaintext",
-              themes: options.themes,
-            },
-          ] as never,
-          rehypeStripShikiStyle as never,
-        ]
-      : []),
-    ...(options.rehypePlugins ?? []),
-    ...(pluginRehype as CompileOptions["rehypePlugins"] & unknown[]),
-  ];
+  const rehypePlugins = buildRehypePlugins(options, pluginRehype);
 
   const compiled = await compile(content, {
     outputFormat: "function-body",

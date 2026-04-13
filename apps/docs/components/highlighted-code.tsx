@@ -7,23 +7,28 @@ export function HighlightedCode({
   code,
   lang = "tsx",
   className,
+  theme = "github-light",
 }: {
   code: string;
   lang?: string;
   className?: string;
+  /** `github-dark` for dark page backgrounds */
+  theme?: "github-light" | "github-dark";
 }) {
   const [html, setHtml] = useState<string | null>(null);
 
   useEffect(() => {
     codeToHtml(code, {
       lang,
-      theme: "github-light",
+      theme,
     }).then(setHtml);
-  }, [code, lang]);
+  }, [code, lang, theme]);
 
   if (!html) {
     return (
-      <pre className={`text-[13px] leading-relaxed font-mono text-zinc-700 whitespace-pre ${className ?? ""}`}>
+      <pre
+        className={`text-[13px] leading-relaxed font-mono whitespace-pre ${theme === "github-dark" ? "text-zinc-400" : "text-zinc-700"} ${className ?? ""}`}
+      >
         {code}
       </pre>
     );

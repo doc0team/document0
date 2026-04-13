@@ -8,3 +8,6 @@ out/
 .env.local
 .env.*.local
 apps/docs/data/
+.vercel
+TO-DO.md
+to-do-speed.md

@@ -12,9 +12,11 @@ description: Install document0 in your project.
 ## Requirements
 
 - Node.js 18 or later
-- React 18 or later (React 19 recommended)
+- React 18+ (for React/Next.js) or Vue 3+ (for Vue)
 
 ## Install the packages
+
+### React / Next.js
 
 <CodeTabs labels={["npm", "pnpm", "yarn", "bun"]}>
 
@@ -36,9 +38,7 @@ bun add @document0/core @document0/mdx
 
 </CodeTabs>
 
-## Peer dependencies
-
-You'll also need these peer dependencies depending on your setup:
+You'll also need these peer dependencies:
 
 <CodeTabs labels={["npm", "pnpm", "yarn", "bun"]}>
 
@@ -66,8 +66,64 @@ bun add shiki @mdx-js/mdx react react-dom
 | `@mdx-js/mdx` | Compiling MDX at runtime |
 | `react` / `react-dom` | Rendering compiled MDX |
 
+### Vue / Svelte / Other frameworks
+
+<CodeTabs labels={["npm", "pnpm", "yarn", "bun"]}>
+
+```bash
+npm install @document0/core @document0/mdc shiki
+```
+
+```bash
+pnpm add @document0/core @document0/mdc shiki
+```
+
+```bash
+yarn add @document0/core @document0/mdc shiki
+```
+
+```bash
+bun add @document0/core @document0/mdc shiki
+```
+
+</CodeTabs>
+
+`@document0/mdc` processes markdown to HTML or JSON AST — no React dependencies needed. See the [Vue guide](/docs/vue) or [@document0/mdc reference](/docs/mdc).
+
+## CLI (optional)
+
+Install the CLI to add plugins and components from the registry:
+
+<CodeTabs labels={["npm", "pnpm", "yarn", "bun"]}>
+
+```bash
+npm install -D @document0/cli
+```
+
+```bash
+pnpm add -D @document0/cli
+```
+
+```bash
+yarn add -D @document0/cli
+```
+
+```bash
+bun add -D @document0/cli
+```
+
+</CodeTabs>
+
+Then install components:
+
+```bash
+npx document0 add document0/sidebar document0/search-dialog
+```
+
+See the [CLI reference](/docs/cli) for all commands.
+
 ## Framework setup
 
 document0 works with any Node.js framework. The [Quickstart](/docs/quickstart) guide walks through a complete Next.js setup.
 
-For other frameworks, use `DocsSource` and `processMdx` directly; they have no framework dependencies.
+For React frameworks, use `DocsSource` and `processMdx` directly. For Vue and other frameworks, use `DocsSource` with `processMdcToHtml` from `@document0/mdc`.

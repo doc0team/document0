@@ -1,11 +1,11 @@
 ---
 title: Introduction
-description: document0 is a file-system based documentation framework with zero UI assumptions.
+description: document0 is a headless documentation framework — file-system sourcing, MDX processing, search, llms.txt, and a plugin registry with zero UI assumptions.
 ---
 
 # Introduction
 
-**document0** is an open-source documentation framework that gives you all the hard parts: file-system scanning, page trees, MDX processing, and Shiki syntax highlighting, while making zero decisions about your UI.
+**document0** is an open-source, headless documentation framework that gives you all the hard parts — file-system scanning, page trees, MDX processing, full-text search, llms.txt generation, and a plugin registry — while making zero decisions about your UI.
 
 Build your docs site with any styling system you like. Ship exactly the design you want.
 
@@ -15,24 +15,30 @@ Most documentation frameworks force you into their component library, their desi
 
 ## Packages
 
-document0 ships two packages:
-
 | Package | Description |
 |---|---|
-| `@document0/core` | File-system source scanning, page tree building, navigation utilities, search indexing |
+| `@document0/core` | File-system source, page trees, navigation, Orama-backed search, llms.txt generation, OpenAPI support |
 | `@document0/mdx` | MDX compilation, frontmatter extraction, remark/rehype plugins, Shiki highlighting |
+| `@document0/mdc` | MDC processor for Vue/Svelte/non-React — markdown to HTML or JSON AST with Shiki highlighting |
+| `@document0/cli` | Plugin manager — install and update components and plugins from the registry |
+| `create-document0` | Scaffold a complete docs site in seconds |
 
 ## Quick example
 
 ```ts
-import { DocsSource, buildPageTree } from "@document0/core";
+import { DocsSource } from "@document0/core";
+import { createSearchRoute } from "@document0/core/search";
 import { processMdx } from "@document0/mdx";
 import { createHighlighter } from "shiki";
 
 const source = new DocsSource({ rootDir: "./content/docs", baseUrl: "/docs" });
-const pages = source.getPages();
-const tree = buildPageTree(pages, "./content/docs");
+const pages = await source.getPages();
+const tree = await source.getPageTree();
 
+// Full-text search API route (Orama-backed)
+export const { GET } = createSearchRoute(source);
+
+// MDX processing with syntax highlighting
 const highlighter = await createHighlighter({ themes: ["github-dark"], langs: ["typescript"] });
 const { code, frontmatter, toc } = await processMdx(rawMdx, { highlighter });
 ```
@@ -41,3 +47,6 @@ const { code, frontmatter, toc } = await processMdx(rawMdx, { highlighter });
 
 - [Installation](/docs/installation): install the packages
 - [Quickstart](/docs/quickstart): build your first docs site in 5 minutes
+- [CLI](/docs/cli): install plugins and components from the registry
+- [Next.js guide](/docs/nextjs): App Router walkthrough, including content hot reload in dev
+- [Changelog](/changelog): release history for packages and docs

@@ -1,6 +1,6 @@
 {
   "name": "@document0/core",
-  "version": "0.2.0",
+  "version": "0.7.0",
   "description": "document0 core - file system source, page tree, navigation, and search utilities",
   "type": "module",
   "exports": {
@@ -40,9 +40,9 @@
       "types": "./dist/graph/index.d.ts",
       "import": "./dist/graph/index.js"
     },
-    "./plugins": {
-      "types": "./dist/plugins/index.d.ts",
-      "import": "./dist/plugins/index.js"
+    "./watch": {
+      "types": "./dist/watch/index.d.ts",
+      "import": "./dist/watch/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -60,6 +60,7 @@
   "dependencies": {
     "@orama/orama": "^3.1.18",
     "@scalar/openapi-parser": "^0.25.6",
+    "chokidar": "^4.0.3",
     "gray-matter": "^4.0.3"
   },
   "devDependencies": {

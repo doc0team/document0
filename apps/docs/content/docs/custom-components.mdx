@@ -1,0 +1,137 @@
+---
+title: Custom Components
+description: Override any HTML element rendered from MDX with your own components.
+---
+
+# Custom Components
+
+Replace any HTML element rendered from MDX with your own component by passing a `components` map to the compiled `MDXContent`:
+
+```tsx
+const components = {
+  h2: ({ children, id }) => (
+    <h2 id={id} className="text-2xl font-bold mt-10 text-white">
+      {children}
+    </h2>
+  ),
+  a: ({ children, href }) => (
+    <a href={href} className="text-sky-400 underline">
+      {children}
+    </a>
+  ),
+};
+
+<MDXContent components={components} />
+```
+
+You can override any valid HTML tag name: `h1`–`h6`, `p`, `a`, `ul`, `ol`, `li`, `blockquote`, `pre`, `code`, `table`, `thead`, `tbody`, `tr`, `th`, `td`, `hr`, `strong`, `em`, and more.
+
+## Building a sidebar
+
+Use the `TreeNode` type from `@document0/core` to build a recursive sidebar component:
+
+```tsx
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { TreeNode } from "@document0/core";
+
+function SidebarNode({ node }: { node: TreeNode }) {
+  const pathname = usePathname();
+
+  if (node.type === "separator") {
+    return <p className="sidebar-label">{node.name}</p>;
+  }
+
+  if (node.type === "page") {
+    return (
+      <Link
+        href={node.url}
+        className={pathname === node.url ? "active" : ""}
+      >
+        {node.name}
+      </Link>
+    );
+  }
+
+  if (node.type === "folder") {
+    return (
+      <div>
+        <span>{node.name}</span>
+        <ul>
+          {node.children.map((child, i) => (
+            <SidebarNode key={i} node={child} />
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+```
+
+Or install pre-built components from the registry:
+
+```bash
+document0 add document0/sidebar document0/toc document0/breadcrumbs
+```
+
+## Table of contents
+
+Build an active-heading TOC using the `toc` array returned by `processMdx`:
+
+```tsx
+"use client";
+import { useEffect, useState } from "react";
+import type { TocEntry } from "@document0/mdx";
+
+export function Toc({ toc }: { toc: TocEntry[] }) {
+  const [activeId, setActiveId] = useState("");
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        }
+      },
+      { rootMargin: "0px 0px -70% 0px" }
+    );
+
+    toc.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [toc]);
+
+  return (
+    <ul>
+      {toc.map((entry) => (
+        <li key={entry.id} style={{ paddingLeft: `${(entry.depth - 1) * 12}px` }}>
+          <a
+            href={`#${entry.id}`}
+            className={activeId === entry.id ? "active" : ""}
+          >
+            {entry.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Previous / next navigation
+
+```ts
+import { getPageNeighbours } from "@document0/core";
+
+const { previous, next } = getPageNeighbours(tree, page.url);
+```
+
+Both `previous` and `next` are `PageNode | null`. Or install from the registry:
+
+```bash
+document0 add document0/page-navigation
+```

@@ -21,6 +21,7 @@ export async function getHighlighter() {
       "typescript", "javascript", "tsx", "jsx",
       "bash", "sh", "json", "css", "html",
       "mdx", "markdown", "yaml", "toml",
+      "vue", "vue-html",
     ],
   });
   return highlighter;
